@@ -1,0 +1,122 @@
+/***********************************************
+ * filename: mainpage/stockminer/css/menu.css
+ * License:  Public Domain
+ **********************************************/
+/**************
+ * Main Menu **
+ *************/
+nav      {display:block}
+nav ul   {padding:0;list-style:none}
+.mtitle  {color:#8f4fff !important}
+nav li,
+nav span {display:inline-block;z-index:100;font-size:15px}
+.menu    {text-align:center;margin-top:-0.1px;background-color:#111}
+.menu > li                   {position:relative;border:none;font-weight:bold}
+.menu > li > span            {padding:10px 30px}
+.menu > li:hover > span      {color:white !important}
+.menu > li:hover > ul        {opacity:1;visibility:visible;margin:0}
+.menu > li:focus-within > ul {opacity:1;visibility:visible;margin:0}
+.dropdown:before {
+	content:"";
+	position:absolute;
+	border:4px solid transparent;
+	border-bottom:0;
+	border-top-color:currentColor;
+	top:50%;
+	margin-top:-2px;
+	right:10px;
+}
+.submenu{
+	min-width:100%;
+	position:absolute;
+	top:100%;
+	left:0;
+	z-index:1;
+	opacity:0;
+	visibility:hidden;
+	margin:20px 0 0 0;
+	background-color:#373737;
+	transition:margin 0.15s, opacity 0.15s;
+}
+.submenu > li {width:100%;border-bottom:1px solid #515151}
+.submenu > li:first-child > span:after{
+	content:"";
+	position:absolute;
+	height:0;
+	width:0;
+	left:1em;
+	top:-6px;
+	border:6px solid transparent;
+	border-top:0;
+	border-bottom-color:inherit;
+}
+.submenu > li:last-child {border:0}
+.submenu span{
+	padding:10px;
+	width:100%;
+	color:#aaaaaa;
+	font-size:12px;
+	border-color:#373737;
+}
+.submenu span:hover {border-color:#0186ba;color:#fff}
+
+/* Indexes */
+#spx     {width:60px;height:60px;position:absolute;margin-left:3%;color:white;font-weight:bold}
+#ndx     {width:60px;height:60px;position:absolute;margin-left:8%;color:white;font-weight:bold}
+#dow     {width:60px;height:60px;position:absolute;margin-left:13.5%;color:white;font-weight:bold}
+#XLK     {width:60px;height:60px;position:absolute;margin-left:19%;color:white;font-weight:bold}
+.ipr     {position:absolute;margin-left:75%;margin-top:-50%;font-size:12px}
+
+@keyframes shake {
+  0%   { transform: translate(1px,   1px) rotate(0deg);  }
+  10%  { transform: translate(-1px, -2px) rotate(-1deg); }
+  20%  { transform: translate(-3px,  0px) rotate(1deg);  }
+  30%  { transform: translate(3px,   2px) rotate(0deg);  }
+  40%  { transform: translate(1px,  -1px) rotate(1deg);  }
+  50%  { transform: translate(-1px,  2px) rotate(-1deg); }
+  60%  { transform: translate(-3px,  1px) rotate(0deg);  }
+  70%  { transform: translate(3px,   1px) rotate(-1deg); }
+  80%  { transform: translate(-1px, -1px) rotate(1deg);  }
+  90%  { transform: translate(1px,   2px) rotate(0deg);  }
+  100% { transform: translate(1px,  -2px) rotate(-1deg); }
+}
+
+
+/********************************
+ * Object Menus,Jcontext menus **
+ *******************************/
+.chrome-tab-favicon {
+	color:green;
+	margin-left:-7px;
+	margin-top:-9px;
+	position:absolute;
+	cursor:pointer!important;
+	z-index:100;
+	font-size:24px!important;
+}
+.chome-tab-title                 {color:#821eda !important}
+.chrome-tab-favicon span         {cursor:pointer!important}
+.context-menu-icon:before        {content:'\2699'}
+.context-menu-icon-Green:before  {color:lightgreen!important}
+.context-menu-icon-Red:before    {color:red !important}
+.context-menu-icon-Purp:before   {color:#821eda !important}
+.context-menu-icon-Cyan:before   {color:cyan !important}
+.context-menu-icon-Orange:before {color:orange !important}
+.context-menu-icon-Yellow:before {color:yellow !important}
+.context-menu-icon-White:before  {color:white !important}
+.context-menu-icon-2x2:before    {content:'';background:linear-gradient(90deg,#fff 50%,#000 0) 0/2.1em,linear-gradient(#fff 50%,#000 0) 0/9% 2.1em;margin-left:2px;width:33px;position:absolute;border:2px inset grey;cursor:pointer;background-color:silver;height:24px;background-blend-mode:exclusion}
+.context-menu-icon-1x1:before    {content:'';margin-left:2px;width:33px;position:absolute;border:2px inset grey;cursor:pointer;background-color:silver;height:24px;background-blend-mode:exclusion}
+.context-menu-icon-1x2x1:before  {content:'';margin-left:2px;width:33px;position:absolute;border:2px inset grey;cursor:pointer;height:24px;background-position:center;background-repeat:no-repeat;background-image: url("data:image/svg+xml,%3Csvg width='32' height='32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='Layer_1'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cpath id='svg_1' d='m0.12515,0.43765l10.3749,0l0,31.49971l-10.3749,0l0,-31.49971z' opacity='undefined' stroke='%23000' fill='%23c0c0c0'/%3E%3Cpath id='svg_3' d='m21.87495,0.06265l9.74991,0l0,31.49971l-9.74991,0l0,-31.49971z' opacity='undefined' stroke='%23000' fill='%23c0c0c0'/%3E%3Cpath id='svg_4' d='m10.50006,18.81248l11.37489,0l0,12.74988l-11.37489,0l0,-12.74988z' opacity='undefined' stroke='%23000' fill='%23808080'/%3E%3Crect id='svg_5' height='18.49983' width='10.9999' y='0.18765' x='10.62506' stroke='%23000' fill='%23808080'/%3E%3C/g%3E%3C/svg%3E")}
+.context-menu-icon-2x2   span    {margin-left:8px}
+.context-menu-icon-1x1   span    {margin-left:8px}
+.context-menu-icon-1x2x1 span    {margin-left:8px}
+
+[placeholder]::input-placeholder       {color:rgba(255,255,255,.8)}
+[placeholder]:hover::input-placeholder {color:rgba(255,255,255,.4)}
+[placeholder]:focus::input-placeholder {color:transparent}
+[placeholder]::placeholder             {color:rgba(255,255,255,.8)}
+[placeholder]:hover::placeholder       {color:rgba(255,255,255,.4)}
+[placeholder]:focus::placeholder       {color:transparent}
+[placeholder]:input-placeholder        {color:rgba(255,255,255,.8)}
+[placeholder]:hover:-input-placeholder {color:rgba(255,255,255,.4)}
+[placeholder]:focus:-input-placeholder {color:transparent}

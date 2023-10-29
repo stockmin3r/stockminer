@@ -1,0 +1,99 @@
+/***********************************************
+ * filename: mainpage/stockminer/css/grid.css
+ * License:  Public Domain
+ **********************************************/
+.grid13{
+	display:grid;
+	margin-right:8px;
+	margin-top:10px;
+	grid-template-columns:14vw 1fr 1fr 1fr 1fr 1fr 1fr;
+	grid-row-gap:25px;
+	grid-column-gap:5px;
+}
+.gridUFO{
+	display:grid;
+	margin-left:5px;
+	grid-template-columns:14vw 1fr 1fr 4fr;
+	grid-row-gap:25px;
+	grid-column-gap:5px;
+}
+.grid12{
+	display:grid;
+	margin-left:5px;
+	grid-template-columns:13.3% 13.3% 13.3% 13.3% 13.3% 13.3% 13.3%;
+	grid-template-rows:350px 350px 350px 350px 350px 350px 350px;
+	grid-row-gap:25px;
+	grid-column-gap:20px;
+}
+.grid25{
+	display:grid;
+	grid-template-columns:24% 24% 24% 24%;
+	grid-template-rows:350px 350px 350px 350px;
+	grid-row-gap:25px;
+	grid-column-gap:20px;
+}
+.grid33{
+	display:grid;
+	grid-template-columns:32% 32% 32%;
+	grid-template-rows:350px 350px 350px;
+	grid-row-gap:25px;
+	grid-column-gap:20px;
+}
+
+
+/* Workspace Grids */
+.grid1{
+	background:linear-gradient(90deg,#FFF 50%,#000 0)0/3em,linear-gradient(#FFF 50%,#000 0)0/9% 3em;
+	width:24px;
+	cursor:pointer;
+	border:2px inset grey;
+	display:inline-block;
+	background-color:silver;
+	margin-left:8px;
+	height:41px;
+	background-blend-mode:exclusion
+}
+.grid2{
+	background:linear-gradient(90deg,#FFF 50%,#000 0)0/3em,linear-gradient(#FFF 50%,#000 0)0/9% 3em;
+	width:48px;
+	cursor:pointer;
+	display:inline-block;
+	border:2px inset grey;
+	background-color:silver;
+	margin-left:8px;
+	height:41px;
+	background-blend-mode:exclusion
+}
+#grid3{
+	background:linear-gradient(90deg,#FFF 50%,#000 0)0/3em,linear-gradient(#FFF 50%,#000 0)0/9% 3em;
+	width:72px;
+	cursor:pointer;
+	background-color:silver;
+	border:2px inset grey;
+	display:inline-block;
+	height:41px;
+	margin-left:8px;
+	background-blend-mode:exclusion
+}
+#grid4{
+	background:linear-gradient(90deg,#FFF 50%,#000 0)0/3em,linear-gradient(#FFF 50%,#000 0)0/9% 3em;
+	width:96px;
+	border:2px inset grey;
+	cursor:pointer;
+	margin-left:8px;
+	background-color:silver;
+	display:inline-block;
+	height:41px;
+	background-blend-mode:exclusion
+}
+#grid5{
+	background:linear-gradient(90deg,#FFF 50%,#000 0)0/3em,linear-gradient(#FFF 50%,#000 0)0/9% 3em;
+	width:144px;
+	cursor:pointer;
+	border:2px inset #821eda;
+	margin-left:8px;
+	background-color:silver;
+	display:inline-block;
+	height:41px;
+	background-blend-mode:exclusion
+}

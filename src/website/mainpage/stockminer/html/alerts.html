@@ -1,0 +1,111 @@
+<div id=ALERTS style="display:none">
+	<img src="/img/logo2.png">
+	<span class="iclose" onclick=closeindi()>&times;</span>
+	<div class=box>
+		<div class=boxmenu>
+			<ul>
+				<li class=boxmain onclick="indicator('en')">View Alerts</li>
+				<li onclick="indicator('pri')">Price Alerts</li>
+				<li onclick="indicator('vol')">Volume Alerts</li>
+				<li onclick="indicator('can')">Candle Alerts</li>
+				<li onclick="indicator('indi')">Indicator Alerts</li>
+				<li onclick="indicator('opt')">Option Alerts</li>
+			</ul>
+		</div>
+		<!-- RHS Content -->
+		<div class=rhs>
+		<div class="imenu en">
+			<div class=menutitle>Enabled Alerts</div><div class=l></div>
+			<div class=enabled>
+				<table class=DTAB id=ATAB>
+					<thead>
+						<tr>
+							<td>Type</td>
+							<td>Ticker</td>
+							<td>Watchlist</td>
+							<td>Condition</td>
+							<td>Condarg</td>
+							<td>&times;</td>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+		<div class="imenu pri" style="display:none">
+			<div class=menutitle>Price Alerts</div><div class=l></div>
+			<div class=info>Alert if Price reaches a Price Target above or below the Current Price</div>
+			<div class=boxes>
+			<div class=V>Ticker:               </div><div class=vbx><input type=text id=parg2 class=arg></div>
+			<div class=V>Alert When Price Reaches:     </div><div class=vbx><input type=text id=parg1 class=arg placeholder="Price Target"></div>
+			</div>
+			<div class=wadd>Link Alert with Watchlist:</div>
+			<select id=pwatch class=wsel></select>
+		</div>
+		<div class="imenu vol" style="display:none">
+			<div class=menutitle>Volume Alerts</div><div class=l></div>
+			<div class=info>Alert if Volume reaches a specified value during a chosen period</div>
+			<div class=abox>
+				<label class=checkbox>
+				<input type=checkbox period=1 class=checkbox_input checked>
+				<span class=checkbox_ctrl title="1 Day"><span class="check tick" onclick=check()>&check;</span></span>
+				<span>1d</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox period=2 class=checkbox_input>
+				<span class=checkbox_ctrl title="1 Minute"><span class="check untick" onclick=check()>&check;</span></span>
+				<span>1m</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox period=3 class=checkbox_input>
+				<span class=checkbox_ctrl title="15 Minutes"><span class="check untick" onclick=check()>&check;</span></span>
+				<span>15m</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox period=4 class=checkbox_input>
+				<span class=checkbox_ctrl title="1 Hour"><span class="check untick" onclick=check()>&check;</span></span>
+				<span>1h</span>
+				</label>
+				<div id=boxes>
+				<div class=V>Ticker           </div><div class=vbx><input type=text id=varg4 class=arg></div>
+				<div class=V>If Volume Reaches</div><div class=vbx><input type=text id=varg1 class=arg></div>
+				<div class=V>If Volume Exceeds</div><div class=vbx><input type=text id=varg2 class=arg placeholder="% of AVG"></div>
+				<div class=V>If RVOL   Exceeds</div><div class=vbx><input type=text id=varg3 class=arg></div>
+				</div>
+				<div class=wadd>Link Alert with Watchlist</div>
+				<select id=vwatch class=wsel>
+					<option value=0>Watchlist</option>
+				</select>
+			</div>
+		</div>
+		<div class="imenu indi" style="display:none">
+			<div class=menutitle>Indicator Alerts</div><div class=l></div>
+			<select id=asel>
+				<option value=1>SMA</option>
+				<option value=2>EMA</option>
+				<option value=3>MACD</option>
+				<option value=4>Vortex</option>
+			</select>
+			<div class="sma" style="display:none">
+				<div class=menutitle>SMA Alerts</div><div class=l></div>
+				<span>Period</span><input type=text class=sma-period value=14>
+			</div>
+			<div class="ema" style="display:none">
+				<div class=menutitle>EMA Alerts</div><div class=l></div>
+				<span>Period</span><input type=text class=ema-period value=14>
+			</div>
+			<div class="imenu macd" style="display:none">
+				<div class=menutitle>MACD Alerts</div><div class=l></div>
+			</div>
+		</div>
+		<div class="imenu opt" style="display:none">
+			<div class=menutitle>Option Alerts</div><div class=l></div>
+			<div class=wadd>Link Alert with Watchlist</div>
+			<select id=pwatch class=wsel>
+				<option value=0>Watchlist</option>
+			</select>
+		</div>
+		</div><!-- .rhs -->
+		<button type="button" onclick=exec_alert()>Create Alert</button>
+	</div><!-- #box -->
+</div><!-- #ALERTS -->

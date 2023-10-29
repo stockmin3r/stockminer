@@ -1,0 +1,172 @@
+/***********************************************
+ * filename: mainpage/stockminer/css/alerts.css
+ * License:  Public Domain
+ **********************************************/
+#ALERTS .line        {width:97%}
+#ALERTS .rhs         {margin-right:37px;width:61%}
+#ALERTS .rhs span    {width:0px}
+#ALERTS .imenu .wadd {color:orange;font-size:15px;width:300px;margin-top:6%}
+#ALERTS .imenu select{color:dodgerblue;width:175px !important}
+
+.etd                 {width:40px !important}
+.boxes               {margin-top:15px}
+.tickbox             {width:40px;height:50px}
+.tick                {opacity:100}
+.wc                  {font-size:14px;cursor:pointer}
+.untick              {opacity:0}
+.wsel                {width:130px !important}
+.vol .wadd           {margin-top:15px;width:130px}
+.abox .checkbox_ctrl {margin-bottom:-10px}
+.check               {position:absolute;z-index:100;width:0px !important;margin-left:5px;margin-top:-1px !important}
+.boxtick             {background-color:#821eda}
+.checkbox            {display:block;cursor:pointer;margin-bottom:30px}
+.checkbox_input      {opacity:0;position:absolute}
+.checkbox_ctrl{
+	position:relative;
+	display:inline-block;
+	width:20px;
+	height:20px;
+	margin-right:12px;
+	vertical-align:middle;
+	background-color:inherit;
+	border:2px solid #821eda;
+}
+.checkbox_input:checked+.checkbox_ctrl:after {
+	content:"";
+	display:block;
+	position:absolute;
+	width:100%;
+	height:100%;
+	background-color:#821eda;
+}
+.checkbox_input:checked+.checkbox_ctrl {border-color:#821eda}
+.idiv{
+	color:white;
+	position:relative;
+	width:100px;
+	height:30px;
+	margin-top:20px;
+	text-align:center;
+	font-size:16px;
+	border:1px solid purple;
+	background-color:#1d2227;
+}
+.itype             {display:block;margin-top:2px !important}
+.l                 {width:80%;margin-bottom:5%;border-bottom:2px solid #821eda}
+.media:first-child {margin-top:0}
+.navbar-nav .open .dropdown-menu {
+	position:absolute;
+	background:#00001A;
+	border:1px solid;
+	width:325px;
+	-webkit-box-shadow:0 3px 8px rgba(0,0,0,0.25);
+	box-shadow:0 3px 8px rgba(0,0,0,0.25);
+}
+.navbar .dropdown-menu {max-width:360px;left:0}
+.navbar-nav .open .dropdown-menu .dropdown-header {
+	padding:5px 20px 8px;
+	border-bottom:1px solid rgba(130, 30, 218);
+	color:white;
+	font-size:18px;
+	font-weight:700;
+	letter-spacing:7px;
+	text-transform:uppercase;
+	font-family:'Lato', sans-serif;
+}
+.dropdown-menu>li.dropdown-header                               {padding:5px 20px 8px;border-bottom:1px solid #bbb}
+.dropdown-notification>li.notification-item                     {position:relative}
+.navbar-nav .open .dropdown-notification>li.notification-item>a {padding: 15px 20px}
+.dropdown-notification>li.notification-item a                   {padding:15px 20px}
+.dropdown-menu>li>a                                             {font-size:12px;padding:5px 20px;color:#bbb}
+.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus            {background:#171721;color:#bbb}
+.dropdown-notification>li.notification-item a:after             {content:'';display:table;clear:both}
+.dropdown-notification>li.notification-item a:before,
+.dropdown-notification>li.notification-item .media{
+	float:left;
+	width:40px;
+	height:40px;
+	overflow:hidden;
+	text-align:center;
+	line-height:40px;
+	border-radius:50%;
+	background:#ccc;
+	color:#000;
+}
+.dropdown-notification>li.notification-item .media i        {font-size:15px}
+.dropdown-notification>li.notification-item .media+.message {margin-left:50px}
+.dropdown-notification>li.notification-item .message        {padding-right:20px}
+.dropdown-notification>li.notification-item .desc {
+	font-size:14px;
+	font-weight:bold;
+	color:dodgerblue;
+	margin-bottom:3px;
+	color:#8f8f8f;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+.dropdown-notification>li.notification-item .option {
+	position:absolute;
+	right:10px;
+	top:10px;
+	padding:5px 10px;
+	font-size:12px;
+}
+.dropdown-notification>li.notification-item .option .fa:before      {color:#821EDA}
+.dropdown-notification>li.notification-item .option.read .fa:before {content:'\f058';color:#821EDA}
+.bg-success {background:#821EDA !important}
+.split      {margin-top:10px;margin-left:-1px}
+
+#notify {
+	position:absolute;
+	background:#00001A;
+	margin-left:71vw;
+	width:400px;
+}
+#notify-hdr {
+	padding:15px 8px 0px;
+	letter-spacing:7px;
+	text-transform:uppercase;
+	text-align:center;
+	font-family:'Lato';
+	font-weight:700;
+	font-size:18px;
+	padding:15px 8px 0px;
+	border-bottom:1px solid #821eda;
+	color:white;
+	height:36px;
+}
+.notify-row{
+	height:45px; 
+	padding:15px;
+}
+.notify-row:hover {background: #171721}
+.notify-icon {
+	float:left;
+	margin-left:5px;
+	margin-top:5px;
+	text-align:center;
+	width:40px;
+	line-height:40px;
+	height:36px;
+	border-radius:50%;
+	background:#ccc;
+}
+.notify-chart{
+	font-size:15px;
+	display:inline-block;
+	width:20px;
+	height:16px;
+	color:black;
+	background-repeat:no-repeat;
+	background-position:center;
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='currentColor' d='M496 384H64V80c0-8.84-7.16-16-16-16H16C7.16 64 0 71.16 0 80v336c0 17.67 14.33 32 32 32h464c8.84 0 16-7.16 16-16v-32c0-8.84-7.16-16-16-16zM464 96H345.94c-21.38 0-32.09 25.85-16.97 40.97l32.4 32.4L288 242.75l-73.37-73.37c-12.5-12.5-32.76-12.5-45.25 0l-68.69 68.69c-6.25 6.25-6.25 16.38 0 22.63l22.62 22.62c6.25 6.25 16.38 6.25 22.63 0L192 237.25l73.37 73.37c12.5 12.5 32.76 12.5 45.25 0l96-96 32.4 32.4c15.12 15.12 40.97 4.41 40.97-16.97V112c.01-8.84-7.15-16-15.99-16z'%3E%3C/path%3E%3C/svg%3E");
+}
+.notify-msg{
+	color:#8f8f8f;
+	float:left;
+	margin-top:15px;
+	font-weight:bold;
+	font-size:12px;
+	margin-left:15px;
+}

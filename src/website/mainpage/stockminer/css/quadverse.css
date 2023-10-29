@@ -1,0 +1,380 @@
+/*************************************************
+ * filename: mainpage/stockminer/css/quadverse.css
+ * License:  Public Domain
+ ************************************************/
+html                     {scrollbar-width:thin}
+body                     {margin:0 auto;color:black;background-color:#141617;font-family:Arial;scrollbar-color:#821eda grey;scrollbar-width:thin}
+input                    {color:white;background-color:#202225;text-align:center;border:1px outset grey;font-weight:bold}
+button                   {cursor:pointer;text-align:center}
+select                   {background-color:#202225;text-align:center;font-weight:bold;font-size:14px}
+table                    {text-align:center}
+caption                  {caption-side:top;text-align:center;font-weight:bold;font-size:13.5px;padding-bottom:5px;color:#821eda;margin-bottom:-5px}
+th                       {border:1px outset grey}
+th, td                   {white-space:nowrap}
+th.sorting_asc,th.sorting_desc{color:cyan}
+h3                       {text-align:center;margin-top:10px;margin-bottom:-40px}
+ul                       {list-style-type:none}
+a                        {text-decoration:none}
+p                        {color:#bbb}
+iframe                   {min-height:80vh}
+
+#logo                    {width:40px;height:32px;position:absolute;cursor:pointer;display:block;background:url('/img/logo.png') no-repeat center center;filter:grayscale(100%)}
+#logo:hover              {filter:grayscale(0%)}
+.logoi                   {filter:grayscale(0%)!important}
+#lowcaps td:nth-child(1) {font-weight:bold;color:#821eda !important}
+#MENU                    {margin-bottom:-.6rem;opacity:1;transition: opacity 1s}
+#MENU.fade               {opacity:0}
+#sbox                    {position:absolute;width:380px;line-height:1;margin-left:25vw;top:0;margin-top:5px}
+#query                   {width:200px;line-height:2}
+#sbtn                    {cursor:pointer}
+#autoq                   {padding:3px;width:450px;line-height:2;background-color:#202225;cursor:pointer}
+@font-face               {font-family:airfont;src:url("/img/airfont") format("opentype")}
+.query-div:hover         {background-color:#821eda}
+.query-stock             {display:inline-block;color:white;font-weight:bold;width:40%}
+.query-name              {text-align:right;color:grey;font-weight:bold}
+
+/* Quadverse Menu */
+.desktop                    {margin-right:10px;display:inline-grid;width:200px!important;height:120px!important;margin-top:5px;border-radius:26px;padding:4px;margin-bottom:40px;cursor:pointer}
+.desktop canvas             {width:200px !important;height:120px !important}
+.deskstops                  {height:220px;width:100%}
+.desktop img, .desktop span {position:absolute;width:200px;height:120px;border-radius:26px;border:1px solid silver;margin-left:10px;cursor:pointer}
+.qtitle                     {color:#821eda;font-weight:bold;font-size:16px;position:absolute;margin-left:8vh;margin-top:14.5vh}
+.backpage img               {border:1px solid gold}
+
+#gridspace {background:linear-gradient(90deg,#fff 50%,#000 0) 0/2.1em,linear-gradient(#fff 50%,#000 0) 0/9% 2.1em;width:33px;position:absolute;top:0;right:0;border:2px inset grey;margin-right:40rem;margin-top:5px;cursor:pointer;background-color:silver;height:24px;background-blend-mode:exclusion}
+#minispace {background:linear-gradient(90deg,#fff 50%,#000 0) 0/1.1em,linear-gradient(#fff 50%,#000 0) 0/9% 2.1em;width:61px;position:absolute;top:0;right:0;border:2px inset grey;margin-right:35rem;margin-top:5px;cursor:pointer;background-color:silver;height:24px;background-blend-mode:exclusion}
+
+#LOGIN   {position:absolute;font-size:13.5px;font-weight:bold;cursor:pointer;margin-right:1.3vw;margin-top:5px;color:#821eda;top:0;right:0}
+#version {position:absolute;font-size:13px;font-weight:bold;color:orange;cursor:pointer;margin-right:25rem;margin-top:10px;top:0;right:0}
+#bell    {position:absolute;top:0;right:0;width:20px;z-index:100;margin-right:33rem;cursor:pointer;color:transparent;text-shadow:0 0 0 grey;margin-top:12px}
+#help    {position:absolute;font-size:20px;cursor:pointer;margin-top:5px;top:0;right:0}
+#PCustom img {border:2px solid #821eda}
+
+
+/*************************
+ *  Main Page Dimensions *
+ ************************/
+#graph                  {height:87vh;width: calc(80vw - 20px);border:2px solid #2f3136 !important}
+[class^='grid'] #graph  {height:auto;width:auto}
+.qmax #graph            {width:calc(100vw - 20px)}	
+.gridmain               {grid-template-columns:20vw 1fr;grid-column-gap:10px}
+.gridmain .quad         {max-height:93vh;width:calc(80vw-10px)}
+
+/*************************
+ *  Quadverse Dimensions *
+ ************************/
+.quadverse   {width:100%;position:absolute;z-index:-1}
+.quadspace   {margin-top:1vh}
+
+.quad{
+	width:auto;
+	overflow:hidden;
+	max-height:49vh;
+	min-height:47vh;
+	border-radius:5px;
+	border:1px inset #555555;
+}
+.grid50{
+	display:grid;
+	grid-template-columns:49.5% 50%;
+	grid-template-rows:48vh;
+	grid-row-gap:13px;
+	grid-column-gap:5px;
+}
+
+.grid2x2 {
+	display:grid;
+	grid-template-columns:50% 1fr;
+	grid-template-rows:50%;
+	grid-column-gap:10px;
+	grid-row-gap:13px;
+	height:90vh;
+}
+.grid50 .qchart {max-height:43.5vh!important}
+
+.grid100       {min-height:95vh}
+.grid100 .quad {max-height:94vh}
+#P0Q2q0        {max-height:128vh}
+#P4Q0q1        {overflow:auto}
+
+#QB{
+	margin:0 auto;
+	width:60vw;
+	height:100%;
+}
+#reload{
+	color:white;
+	width:100px;
+	font-size:18px;
+	border:1px solid #821eda;
+	background-color:black;
+}
+#QB-select{
+	color:white;
+	width:200px;
+	display:block;
+	margin:0 auto;
+	margin-bottom:10px;
+	margin-top:5px;
+}
+.QGrid100 {
+	grid-template-columns:100%;
+}
+.QGrid2x2 {
+	display:grid;
+	grid-template-columns:48% 48%;
+
+}
+.QB-QSP{
+	display:grid;
+	padding:20px;
+	border:2px solid #36393f;
+}	
+.qname {color:white;margin-left:47%;font-weight:bold}
+
+.QB-Quad{
+	border:3px solid #4f545c;
+}
+.QGrid100 {
+	min-height:75vh;
+}
+.QB-obj {
+	width:100px;
+	height:100px;
+	border:2px solid #54677F
+}
+.QB-obj img {
+	width:100px;
+	height:100px;
+}
+
+.QB-obj {
+	margin-left:40%;
+	margin-top:40px;
+}
+.QB-obj input {
+	position:absolute;
+	margin-left:-2px;
+	margin-top:100px;
+	width:98px;
+	color:orange;
+}
+
+/****************
+ *   Stockpage
+ ***************/
+.stockpage.opgrid                   {grid-template-rows: 61.3vh 80vh !important}
+.stockpage .quad                    {max-height:98vh!important}
+.stockpage .LQ .highcharts-container{height:93vh !important}
+.stockpage .RQ .highcharts-container{height:93vh !important}
+.stockpage .MQ .highcharts-container{height:55vh !important}
+.stockpage .MQ                      {min-height:60vh;height:60vh !important;max-height:60vh !important;overflow:hidden}
+.stockpage .LQ                      {height:99vh}
+.stockpage .RQ                      {height:99vh}
+.stockpage .DQ                      {max-height:35vh !important;min-height:35.8vh}
+.stockpage .freq                    {margin-top:10px}
+.stockpage .qchart                  {max-height:100% !important}
+.qchart    .freq                    {margin-top:10px}
+.stockpage label                    {color:lightgrey;display:inline;font-weight:bold;padding:10px}
+/*.stockpage .LQ .chrome-tab.ws0    {width: 80px !important} */
+.DQ-control                         {text-align:center;margin-top:8vh !important;margin:0 auto}
+
+.candy      {color:white}
+.candy-date {color:grey;text-align:center;margin-top:5px}
+.candy-date2{margin-left:10px}
+.candy-stat {margin-bottom:5vh;margin-top:2vh;text-align:center;font-weight:bold}
+.candy-pic  {
+	margin:0 auto;
+	width:64px;
+	height:64px;
+	background-repeat:no-repeat;
+	background-position:center;
+}
+.candy h2      {text-align:center;margin-bottom:10px}
+.candles .quad {min-height:250%}
+
+.gridSQ{
+	display:grid;
+	grid-template-columns:25% 1fr 25%;
+	grid-template-rows:90vh;
+	grid-column-gap:5px
+}
+.gridSQ .quad {
+	min-height:80vh !important;
+	max-height:90vh !important; 
+}
+
+/****************
+ *    OpVerse
+ ***************/
+.opgrid .quad  {max-height:89vh}
+.opgrid{
+	display:grid;
+	grid-template-columns:25% 1fr 25%;
+	grid-template-rows:50vh 80vh;
+	grid-column-gap:5px
+}
+.LQ      {height:93vh;grid-row-end:2}
+.RQ      {grid-column-start:3;grid-row-start:1;grid-row-end:2;height:93vh}
+.MQ      {grid-column-start:2;overflow:auto;min-height:62vh}
+.DQ      {grid-column-start:2;height:38vh}
+#OPCHART {height:44vh}
+
+.OpRQ .chrome-tab[active] .chrome-tab-title  {color:#FF3406!important}
+.OpRQ .chrome-tab         .chrome-tab-title  {color:brown!important}
+.OpRQ .chrome-tab[active] .link              {font-size:18px!important;color:#FF3406}
+.OpRQ .chrome-tab         .link              {font-size:18px!important;color:brown}
+
+.OpLQ .chrome-tab         .chrome-tab-title  {color:#07AD73}
+.OpLQ .chrome-tab         .chrome-tab-title  {color:#00FC83}	
+.OpLQ .chrome-tab[active] .link              {font-size:18px!important;color:#00e6e6}
+.OpLQ .chrome-tab         .link              {font-size:18px!important;color:darkcyan}
+
+.OpMQ .chrome-tab[active] .link              {font-size:18px!important;color:#00e6e6}
+.OpMQ .chrome-tab         .link              {font-size:18px!important;color:darkcyan}
+.OpDQ .chrome-tab[active] .link              {font-size:18px!important;color:#00e6e6}
+
+.Screener .QSP                      .chrome-tab-title {color:#821eda!important}
+.Screener .QSP  .chrome-tab[active] .chrome-tab-title {color:dodgerblue!important}
+.Screener .quad .chrome-tab[active] .chrome-tab-title {color:blueviolet!important}
+.Screener .quad .chrome-tab         .chrome-tab-title {color:dodgerblue!important}
+.Screener .chrome-tab[active]       .link             {font-size:18px !important;color:dodgerblue}
+.Screener .chrome-tab               .link             {font-size:18px !important;color:blueviolet}
+
+/* Monster QuadSpace Tab Colors */
+.Monster .chrome-tab[active]        .chrome-tab-title {color:yellow !important}
+.Monster .chrome-tab                .chrome-tab-title {color:gold !important}
+.Monster .chrome-tab[active]        .link             {font-size:18px !important;color:yellow}
+.Monster .chrome-tab                .link             {font-size:18px !important;color:gold}
+.Monster .quad                                        {overflow:auto}
+/* Monster Quad Tab Colors */
+.Monster .quad .chrome-tab[active]  .link             {font-size:18px !important;color:brown}
+.Monster .quad .chrome-tab          .link             {font-size:18px !important;color:brown}
+.Monster .quad .chrome-tab[active] .chrome-tab-title  {color:brown !important}
+.Monster .quad .chrome-tab .chrome-tab-title          {color:brown !important}
+
+/******************************
+ *   Screener Body Dimensions *
+ *****************************/
+.screener{
+	color:white;
+	height:42vh;
+	border:5px solid #202225;
+	background:linear-gradient(to left, #202225 32%, purple 303%)
+}
+.wsrc{
+	border:2px solid #585A5E;
+	width:47%;
+	height:82%;
+	overflow:auto;
+	float:left;
+}
+.wdst{
+	height:82%;
+	width:45%;
+	overflow:auto;
+	float:right;
+	border:2px solid #585a5e;
+}
+/*******************************
+ *     Screener Resolutions    *
+ ******************************/
+@media screen and (min-width:2560px){
+	.screener  {height:50vh !important}
+	.wsrc      {height:68%  !important}
+	.wdst      {height:68%  !important}
+	#stocklist {width:52%}
+}
+@media screen and (min-width:1920px){ 
+	.gridmain > .quad:first-child {overflow:auto}
+}
+
+/******************************
+ *    Watchlist Conf Header   *
+ *****************************/
+.whdr             {width:100%;height:60px}
+.wpre             {position:absolute;margin-top:10px;margin-left:5px;font-weight:bold}
+.watch-control    {width:50%;float:right;margin-top:5px}
+.wmid             {width:20px;float:left}
+.wmadd            {margin-left:15px}
+.wmrem            {margin-left:5px;margin-top:10px}
+.wmcol            {margin-left:10px;margin-top:10px;color:orange!important}
+
+/******************************
+ *   Common ScreenMod Styles  *
+ *****************************/
+.screener select  {color:white;border:2px outset grey}
+.screener ul      {margin-top:-2px;padding:5px}
+.screener li      {cursor:pointer;line-height:1.4}
+.whdr button      {background-color:black;color:grey; border:1px solid #821eda;padding:8px;font-size:14px;margin-top:5px}
+.wmid button      {background-color:black;color:green;border:1px solid #821eda;padding:5px;font-size:10px;font-weight:bold;display:block}
+.wnew             {float:right;margin-right:-72px}
+.wnew input       {line-height:1.5;display:block;width:60%;margin-top:5%;margin-right:20px}
+.on               {font-weight:bold;color:white!important}
+.wsave            {position:absolute;color:grey;margin-top:3px;margin-left:110px;font-weight:bold;cursor:pointer}
+.wstrash          {position:absolute;color:grey;margin-top:1%; margin-left:20%;font-weight:bold;font-size:24px;cursor:pointer}
+.wsbomb           {position:absolute;color:black;margin-top:1%;margin-left:24%;font-weight:bold;font-size:24px;cursor:pointer}
+.GEAR:before      {content:'\1F6E0';color:black;margin-left:-20px;margin-top:-15px;position:absolute;font-size:21px}
+.bulb             {border-radius:50%;height:15px;width:15px;margin-left:5px;display:inline-block;margin-top:-8px;position:absolute}
+.stocklist        {color:white}
+
+/* Presets */
+.presets            {margin-top:55%}
+.prename            {margin-bottom:-5%}
+.savepre            {color:white;width:100px;font-size:18px;cursor:pointer;text-align:center;margin-top:25px;border:1px solid #821eda;background-color:black}
+.cbx span           {margin:0 !important}
+.cbx .checkbox_ctrl {cursor:pointer;width:12px !important;height:15px !important}
+
+/* QCMenu */
+.tpop       {color:white;border:3px solid #36393f;height:80px;padding:10px;background-color:#202225}
+.tpop input {border-radius:26px;width:100px}
+.tload {
+	margin:0 auto;
+	margin-top:10px;
+	width:100px;
+	color:green;
+	font-weight:bold;
+	border-radius:26px;
+	cursor:pointer;
+	text-align:center;
+	height:25px;
+	background-color:#18191c;
+}
+
+/* Login Page */
+#LBOX       {border:2px solid #821eda;margin:auto;margin-top:5%;height:69%;z-index:1;color:white;background-color:#323130;width:300px;padding:5px}
+#LBOX input {background-color:#323130;color:white}
+#LBOX img   {margin:0 auto;width:60%;height:40%;margin-top:-20px;margin-bottom:-20px;display:block}
+.usr        {margin-top:10px !important}
+.pwd        {margin-top:20px !important}
+.uid        {line-height:3;margin:0 auto;font-size:14px;display:block;width:256px;border:1px inset grey}
+.reg        {cursor:pointer;text-align:center;color:limegreen;font-weight:bold;display:block;font-size:13px;margin-bottom:5px}
+.login      {margin:0 auto;margin-top:40px;margin-bottom:20px;display:block;padding:15px 0px;background-color:#821eda!important;border:none;width:256px;font-size:16px;cursor:pointer}
+.error      {margin-bottom:10px;color:red;text-align:center}
+.welcome    {display:block;color:white;font-weight:bold;background-color:#821eda;padding:15px 32px;text-align:center;font-size:14px;font-style:italic}
+.udiv       {margin:0 auto;width:256px;display:block;margin-top:10px}
+.upwd       {margin:0 auto;width:256px;display:block;margin-top:20px;margin-bottom:-5px}
+.mailbox    {margin-top:20px;margin-bottom:-20px}
+.email      {margin:0 auto;width:256px;margin-bottom:10px}
+#back       {margin:0 auto;width:256px;margin-top:10px;text-align:center;font-size:44px;position:absolute;color:#821eda;cursor:pointer}
+
+/* Payment CSS */
+#paybox {border:2px solid #821eda;margin:auto;margin-top:150px;height:540px;z-index:1;width:300px;padding:5px;text-align:center;font-weight:bold}
+#pay    {margin:0 auto;margin-top:50px;margin-bottom:20px;width:256px;padding:15px 0px;background-color:#821eda;border:none;color:white;font-size:16px;cursor:pointer}
+
+/* Rapid Tables */
+.tabview{width:110px;height:20px;position:absolute;z-index:600;color:white;font-weight:bold;margin-top:15px;background-color:#323130;border:5px solid #202225}
+.TPIC   {position:absolute;margin-top:20px;margin-left:15px;z-index:500;cursor:pointer;font-size:24px;color:yellow}
+.GNuke  {margin-top:-8px !important}
+.LNuke  {margin-top:-3px}
+.LNuke + div table {margin-top:7px}
+.itab       {padding:5px;cursor:pointer;border-bottom:2px inset green}
+.itab:hover {color:dodgerblue}
+.ic2    {position:absolute;font-size:16px;right:0;margin-top:-3px !important;color:white;cursor:pointer}
+.iclose {position:absolute;top:0;right:0;margin-right:5px;margin-top:-5px;font-size:35px;color:white;cursor:pointer}
+
+#main_content a:hover {color: #0069ba;text-shadow: #0090ff 0px 0px 2px}
+#main_content a {-moz-transition: text-shadow 0.5s ease}
+
+.pdf:hover {border:15px solid #821eda}		
+.ws-pdf    {width:900px;height:350px}

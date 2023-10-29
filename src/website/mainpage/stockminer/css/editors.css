@@ -1,0 +1,381 @@
+/***********************************************
+ * filename: mainpage/stockminer/css/editors.css
+ * License:  Public Domain
+ **********************************************/
+/********************
+ * CSS TABLE THEMES *
+ *******************/
+#editor h2 {
+	color:white;
+	text-align:center;
+}
+#utsave {
+	position:absolute;
+	top:0;
+	left:0;
+	font-weight:bold;
+	margin-top:10px;
+	margin-left:5px;
+	cursor:pointer;
+	color:lightgreen;
+}
+#css-class{
+	position:absolute;
+	top:0;
+	left:0;
+	margin-left:5px;
+	margin-top:40px;
+	width:100px;
+}
+#editor {
+	position:relative;
+	width:95vw;
+	height:85vh;
+	margin-left:2%;
+	border:5px solid #202225;
+	background:linear-gradient(to left, #202225 32%, purple 303%);
+}
+
+#editor .UTL {
+	width:47%;
+	height:75vh;
+	padding:10px;
+	background:#202225;
+	border:2px solid #585a5e;
+	overflow:auto;
+	float:left;
+}
+
+#editor .UTR {
+	width:49%;
+	height:75vh;
+	padding:10px;
+	border:2px solid #585a5e;
+	float:right;
+}
+#editor textarea {width:99%!important;height:99%!important}
+.UTR .watchtable-tools {margin:0 auto;margin-left:12.3%}
+
+/******************************
+ *       Template Mod         *
+ *****************************/
+.temp-control     {width:100%;margin-left:20%;}
+.template         {width:50%;height:40%;float:left}
+.temp-obj         {width:28%;height:40%;float:left;margin-left:15px;border:1px outset grey}
+.temp-mod         {width:15%;height:40%;float:left;margin-left:15px;border:1px outset grey}
+.template .quad   {min-height:300px}
+.wsnew-edit       {font-size:32px;margin-left:50%;margin-top:6%;color:#5f679F}
+.max-edit         {font-size:32px;margin-left:50%;margin-top:6%;color:#5f679F}
+.link-edit        {font-size:32px;margin-left:50%;margin-top:6%;color:green}
+.cblock           {width:40px;cursor:pointer;margin-left:40%;margin-top:14%;border:none !important;background-color:transparent}
+.emod             {text-align:center;margin-top:15px}
+.esave            {position:absolute;bottom:30px;right:10px}
+.obj-name         {color:white;font-weight:bold;text-align:center;margin-top:15px}
+.bgblock          {width:30px;height:23px;margin-left:50%;margin-top:6%;background-color:#292929;border:1px inset grey}
+
+
+/*
+ * Canvas-Designer
+ */
+.design-surface {
+    background-color: transparent;
+}
+.design-surface canvas {
+    position: absolute;
+}
+.design-surface canvas:last-child {
+    position: static;
+}
+
+.selected-shape {
+    background: #eeeeee!important;
+}
+/* surface */
+
+.preview-panel {
+    position: absolute;
+    right: 10px;
+    background-color: #FBFBFB;
+    bottom: 0;
+}
+.preview-panel div {
+    border: 1px solid #E5E5E5;
+    display: inline-block;
+    padding: 5px 10px;
+}
+.preview-panel #code-preview {
+    margin-left: -6px;
+}
+.preview-panel div {
+    border: 1px solid #E5E5E5;
+}
+.preview-panel div:not(.preview-selected) {} .preview-panel div {
+    border: 1px solid rgb(9, 159, 243);
+}
+.preview-selected {
+    margin-top: -4px;
+    background-color: rgb(6, 205, 255);
+    color: white;
+}
+.allow-select {
+    -webkit-user-select: initial;
+    -moz-user-select: initial;
+    user-select: initial
+}
+/* arc */
+
+.arc-range-container, .pdf-page-container {
+    position: absolute;
+    z-index: 1000;
+    display: none;
+}
+.arc-range {
+    font-size: 18px;
+    padding: 2px 16px;
+    text-align: center;
+    width: 40px;
+}
+.arc-range-container-guide {
+    margin-top: 10px;
+    color: #C5C5C5;
+}
+/* code viewer */
+
+.code-container {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: none;
+}
+.code-text {
+    resize: none;
+    width: 99%;
+    height: 300px;
+    padding: 15px;
+    outline: 0;
+    border: 0;
+    border-top: 1px solid #E5E5E5;
+    font-family: Consolas, "Andale Mono", "Lucida Console", "Courier New", monospace;
+    color: #666;
+}
+/* options */
+
+.options-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 1px solid #E5E5E5;
+    border-left: 0;
+    background-color: #FBFBFB;
+    display: none;
+}
+.options-container div {
+    border-bottom: 1px solid #E5E5E5;
+    padding: 5px;
+}
+.options-container div:last-child {
+    border-bottom: 0;
+}
+/* context menu */
+
+.context-popup {
+    position: absolute;
+    display: none;
+    padding: 5px;
+    border: 1px solid #E5E5E5;
+    border-left: 0;
+    background-color: #FBFBFB;
+    box-shadow: inset 0 0 14px rgb(229, 229, 229);
+}
+.line-width-text,
+.colors-container input {
+    width: 25px;
+    padding: 2px 5px;
+    text-align: center;
+}
+/* colors */
+
+.colors-container label {
+    width: 100px;
+    display: inline-block;
+}
+.colors-container input {
+    width: 100px;
+    text-align: left;
+}
+.colors-container .input-div {
+    margin-bottom: 5px;
+}
+/* additional controls */
+
+.additional-container label,
+.additional-container select {
+    width: 200px;
+    display: inline-block;
+}
+.additional-container select {
+    width: 120px;
+}
+.btn-007 {
+    font-family: Verdana, arial, helvetica, sans-serif;
+    font-weight: normal;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    padding: 2px 3px;
+    text-decoration: none;
+    color: rgb(27, 26, 26);
+    display: inline-block;
+    box-shadow: rgb(255, 255, 255) 1px 1px 0px 0px inset;
+    text-shadow: none;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0.05, rgb(241, 241, 241)), to(rgb(230, 230, 230)));
+    font-size: 13px;
+    border: 1px solid red;
+    outline: none;
+}
+.btn-007:hover,
+.btn-007:focus {
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(5%, rgb(221, 221, 221)), to(rgb(250, 250, 250)));
+    border: 1px solid rgb(142, 142, 142);
+}
+.btn-007[disabled] {
+    background: rgb(249, 249, 249);
+    border: 1px solid rgb(218, 207, 207);
+    color: rgb(197, 189, 189);
+}
+.fontSelect {
+    position: relative;
+    padding: 3px;
+    height: 28px;
+    line-height: 28px;
+    cursor: pointer;
+    margin: 3px;
+    width: 200px;
+    background-image: -webkit-linear-gradient(top, #f9f9f9, #f0f0f0);
+    background-image: -moz-linear-gradient(top, #f9f9f9, #f0f0f0);
+    background-image: -o-linear-gradient(top, #f9f9f9, #f0f0f0);
+    background-image: -ms-linear-gradient(top, #f9f9f9, #f0f0f0);
+    background-image: linear-gradient(top, #f9f9f9, #f0f0f0);
+    filter: progid: DXImageTransform.Microsoft.gradient(GradientType=0, StartColorStr='$from', EndColorStr='$to');
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border: 1px solid #cecece;
+}
+.fontSelect span {
+    overflow: hidden;
+    margin-left: 5px;
+}
+.fontSelect .arrow-down {
+    position: absolute;
+    right: 10px;
+    top: 14px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #AAA;
+}
+.fontSelectUl,
+.fontSizeUl {
+    list-style: none;
+    width: 200px;
+    background: #f9f9f9;
+    position: absolute;
+    left: 0;
+    top: 35px;
+    padding: 0;
+}
+.fontSelectUl {
+    padding-left: 5px;
+}
+.fontSelectUl li,
+.fontSizeUl li {
+    height: 24px;
+    line-height: 24px;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0 10px;
+    font-size: 14px;
+    border-left: 1px solid #f0f0f0;
+    border-right: 1px solid #f0f0f0;
+}
+.fontSelectUl li:last-child,
+.fontSizeUl li:last-child {
+    -webkit-border-radius: 0 0 4px 4px;
+    -moz-border-radius: 0 0 4px 4px;
+    border-radius: 0 0 4px 4px;
+    border-bottom: 1px solid #EEEEEE;
+}
+.fontSelectUl li:hover,
+.fontSizeUl li:hover {
+    background: #DDD;
+}
+.fontSelectUl li.font-family-selected,
+.fontSizeUl   li.font-size-selected {
+    background: rgb(6, 205, 255)!important;
+    color: white!important;
+}
+#marker-selected-color,
+#marker-selected-color-2, #pencil-selected-color,
+#pencil-selected-color-2 {
+    display: inline-block;
+    vertical-align: middle;
+    width: 30px;
+    height: 30px;
+}
+#marker-fill-colors, #pencil-fill-colors {
+    display: none;
+}
+#marker-color-container, #pencil-color-container {
+    position: relative;
+}
+#marker-fill-colors, #pencil-fill-colors {
+    left: 100%;
+    top: 0;
+    width: 100px;
+    padding: 10px;
+}
+#marker-fill-style, #pencil-fill-style {
+    width: 50px;
+    display: inline-block;
+}
+#marker-colors-list, #pencil-colors-list {
+    margin: 10px auto;
+    border-collapse: collapse;
+}
+#marker-colors-list td, #pencil-colors-list td {
+    width:15px;
+    height:15px;
+    border:1px solid black;
+    padding:0;
+}
+#marker-colors-list td:hover, #pencil-colors-list td:hover {
+    border: 1px solid white;
+}
+.pdf-next, .pdf-prev, .pdf-close {
+    width:22px;
+    vertical-align:middle;
+    cursor:pointer;
+}
+/* toolbox */
+.tool-box {
+    position:absolute;
+    top:0;
+    width:40px;
+	margin-top:50px;
+	margin-left:2px;
+    background-color:#821eda;
+    height:100%;
+    overflow:hidden;
+    overflow-y:auto;
+}
+
+.tool-box div:hover {background:purple}
+.tool-box div       {font-size:30px;cursor:pointer}
+.Teraser            {padding-left:5px}
+.Timage             {padding-left:5px;margin-top:-5px}
+.TdragLast          {padding-left:5px}
+.TdragAll           {padding-left:5px}
+.Tline              {padding-left:12px}
+.Tpdf               {padding-left:5px}
+.Tarrow             {padding-left:5px}

@@ -1,0 +1,979 @@
+<div class=sigflight style="display:none">
+  <div class=sigpanel>
+    <div class=sf-left>
+      <div class=sf-ticker></div>
+      <div class=sf-date></div>
+   </div>
+   <div class=sf-mid>
+     <span class=plane></span>
+     <div class=line-top></div>
+     <div class=sf-midinfo></div>
+     <div class=sf-status></div>
+   </div>
+   <div class=sf-right>
+     <div class=sf-price></div>
+     <div class=sf-date2></div>
+   </div>
+  </div>
+</div>
+
+<!-- Scatter Table Lightbox -->
+<div id=cscatter style="display:none">
+	<div class="modal" id="scatbox" tabindex="-1" role="dialog" style="display:none">
+		<div class="modal-dialog modal-lg" style="max-width:1100px;width:1000px" role="document">
+			<div class="modal-content">
+				<div class="modal-body" id=sbx style="width:1050px;height:750px">	</div>
+			</div>
+		</div>
+    </div>
+</div>
+
+<!-- Monster Menu -->
+<div id=MSR_MENU style="display:none">
+	<img src="/img/logo2.png">
+	<div class=box>
+		<div class=boxmenu>
+			<ul>
+				<li onclick=msdiag_ticker()>Ticker</li>
+				<li onclick=msdiag_price()>Price</li>
+				<li onclick=msdiag_delta()>Daily Delta</li>
+				<li onclick=msdiag_peak()>Peak Delta</li>
+				<li onclick=msdiag_one()>Ones</li>
+				<li onclick=msdiag_two()>Twos</li>
+				<li onclick=msdiag_esp()>ESP</li>
+				<li onclick=msdiag_ytd()>YTD</li>
+				<li onclick=msdiag_y20()>YTD-2020</li>
+				<li onclick=msdiag_y19()>YTD-2019</li>
+				<li onclick=msdiag_5pc()>5% return</li>
+				<li onclick=msdiag_10pc()>10% return</li>
+			</ul>
+		</div>
+		<!-- RHS Content -->
+		<div class=rhs>
+		<div class=msmenu id=menu_ticker style="display:none">
+			<label class=checkbox>
+			<input type=checkbox class=checkbox_input>
+			<span class=checkbox_ctrl></span>
+			<span>All High Caps</span>
+			</label>
+			<label class=checkbox>
+			<input type=checkbox class=checkbox_input>
+			<span class=checkbox_ctrl></span>
+			<span>Today's Gainers</span>
+			</label>
+			<label class=checkbox>
+			<input type=checkbox class=checkbox_input>
+			<span class=checkbox_ctrl></span>
+			<span>Today's Losers</span>
+			</label>
+			<label class=checkbox>
+			<input type=checkbox class=checkbox_input>
+			<span class=checkbox_ctrl></span>
+			<span>S&P 500</span>
+			</label>
+			<label class=checkbox>
+			<input type=checkbox class=checkbox_input>
+			<span class=checkbox_ctrl></span>
+			<span>Nasdaq 100</span>
+			</label>
+		</div>
+		<div class=msmenu id=menu_price style="display:none">
+			<div class=menutitle>Price Range</div><div class=l></div>
+			<div id=price_mini_div>
+				<span class=menu_min>Minimum</span>
+				<input onkeyup=price_mini() type=text id=price_mini>
+			</div>
+			<div id=price_maxi_div>
+				<span class=menu_max>Maximum</span><input onkeyup=price_maxi() type=text id=price_maxi>
+			</div>
+		</div>
+		<div class=msmenu id=menu_delta style="display:none">
+			<div class=menutitle>Daily Delta</div><div class=l></div>
+			<div>
+				<span class=menu_min>Minimum</span><input onkeyup=delta_mini() type=text id=delta_mini>
+			</div>
+			<div>
+				<span class=menu_max>Maximum</span>
+				<input onkeyup=delta_maxi() type=text id=delta_maxi>
+			</div>
+			<div class="menutitle ctitle">Direction</div><div class=l></div>
+			<label class="checkbox" onclick=delta_pos()>
+			<input type="checkbox" id=delta_pos class="checkbox_input">
+			<span class="checkbox_ctrl"></span>
+			<span class="checkbox_label">Positive Delta</span>
+			</label>
+			<label class="checkbox" onclick=delta_neg()>
+			<input type="checkbox" id=delta_neg class="checkbox_input">
+			<span class="checkbox_ctrl"></span>
+			<span class="checkbox_label">Negative Delta</span>
+			</label>
+		</div>
+		<div class=msmenu id=menu_peak style="display:none">
+			<div class=menutitle>Peak Delta</div><div class=l></div>
+			<div>
+				<span class=menu_min>Minimum</span><input onkeyup=peak_mini() type=text id=peak_mini>
+			</div>
+			<div>
+				<span class=menu_max>Maximum</span>
+				<input onkeyup=peak_maxi() type=text id=peak_maxi>
+			</div>
+			<div class="menutitle ctitle">Direction</div><div class=l></div>
+			<label class="checkbox" id=peak_peak onclick=peak_peak()>
+			<input type="checkbox" class="checkbox_input">
+			<span class="checkbox_ctrl"></span>
+			<span class="checkbox_label">Peak</span>
+			</label>
+			<label class="checkbox" onclick=peak_bear()>
+			<input type="checkbox" id=peak_bear class="checkbox_input">
+			<span class="checkbox_ctrl"></span>
+			<span class="checkbox_label">Bear</span>
+			</label>
+		</div>
+		<div class=msmenu id=menu_one style="display:none">
+			<div class=menutitle>One</div><div class=l></div>
+			<div>
+				<span class=menu_min>Minimum</span>
+				<input onkeyup=one_mini() type=text id=one_mini>
+			</div>
+			<div>
+				<span class=menu_max>Maximum</span><input onkeyup=one_maxi() type=text id=one_maxi>
+			</div>
+		</div>
+		<div class=msmenu id=menu_two style="display:none">
+			<div class=menutitle>Two</div><div class=l></div>
+			<div>
+				<span class=menu_min>Minimum</span>
+				<input onkeyup=two_mini() type=text id=two_mini>
+			</div>
+			<div>
+				<span class=menu_max>Maximum</span><input onkeyup=two_maxi() type=text id=two_maxi>
+			</div>
+		</div>
+		<div class=msmenu id=menu_esp style="display:none">
+			<div class=menutitle>ESP</div><div class=l></div>
+			<label class=checkbox onclick=esp_a1()>
+			<input type=checkbox id=esp_a1 class=checkbox_input>
+			<span class=checkbox_ctrl></span>
+			<span class=checkbox_label>Action 1</span>
+			</label>
+			<label class=checkbox onclick=esp_a4()>
+			<input type=checkbox id=esp_a4 class=checkbox_input>
+			<span class=checkbox_ctrl></span>
+			<span class=checkbox_label>Action 4</span>
+			</label>
+			<label class=checkbox onclick=esp_master()>
+			<input type=checkbox id=esp_master class=checkbox_input>
+			<span class=checkbox_ctrl></span>
+			<span class=checkbox_label>Master</span>
+			</label>
+		</div>
+		<div class=msmenu id=menu_ytd style="display:none">
+			<div class=menutitle>Year to Date</div><div class=l></div>
+			<div>
+				<span class=menu_min>Minimum</span>
+				<input onkeyup=ytd_mini() type=text id=ytd_mini>
+			</div>
+			<div>
+				<span class=menu_max>Maximum</span><input onkeyup=ytd_maxi() type=text id=ytd_maxi>
+			</div>
+		</div>
+		<div class=msmenu id=menu_ytd21 style="display:none">
+			<div class=menutitle>Year to Date 2021</div><div class=l></div>
+			<div>
+				<span class=menu_min>Minimum</span>
+				<input onkeyup=ytd21_mini() type=text id=ytd21_mini>
+			</div>
+			<div>
+				<span class=menu_max>Maximum</span><input onkeyup=ytd21_maxi() type=text id=ytd21_maxi>
+			</div>
+		</div>
+		<div class=msmenu id=menu_ytd20 style="display:none">
+			<div class=menutitle>Year to Date 2020</div><div class=l></div>
+			<div>
+				<span class=menu_min>Minimum</span>
+				<input onkeyup=ytd20_mini() type=text id=ytd20_mini>
+			</div>
+			<div>
+				<span class=menu_max>Maximum</span><input onkeyup=ytd20_maxi() type=text id=ytd20_maxi>
+			</div>
+		</div>
+		<div class=msmenu id=menu_ytd1 style="display:none">
+			<div class=menutitle>Year to Date 2019</div><div class=l></div>
+			<div>
+				<span class=menu_min>Minimum</span>
+				<input onkeyup=ytd19_mini() type=text id=ytd19_mini>
+			</div>
+			<div>
+				<span class=menu_max>Maximum</span><input onkeyup=ytd19_maxi() type=text id=ytd19_maxi>
+			</div>
+		</div>
+		<div class="msmenu menu_quarter" id=menu_five style="display:none">
+			<div class=menu_Qstrategy>
+				<div class=menutitle>Strategy</div>
+				<label class=checkbox>
+				<input type=checkbox id=check_stg5_anyday onclick=strategy_5anyday() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>Any Day</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox id=check_stg5_a1 onclick=strategy_5a1() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>Action 1</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox id=check_stg5_a4 onclick=strategy_5a4() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>Action 4</span>
+				</label>
+			</div>
+			<div class=menu_Qyear>
+				<div class=menutitle>Year</div>
+				<label class=checkbox>
+				<input type=checkbox id=year_2022 onclick=year_2022() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>2022</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox id=year_2021 onclick=year_2021() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>2021</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox id=year_2020 onclick=year_2020() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>2020</span>
+				</label>
+			</div>
+			<div class=menu_Qframe>
+				<div class=menutitle>Time Frame</div><div class=l></div>
+				<label class=checkbox>
+				<input type=checkbox id=check_5q1 onclick=five_check_1q() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>1Q</span>
+				<input type=text onkeyup=five_input_1q() class=qinput id=menu_5q1><br>
+				<label class=checkbox>
+				<input type=checkbox id=check_5q2 onclick=five_check_2q() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>2Q</span>
+				<input type=text onkeyup=five_input_2q() class=qinput id=menu_5q2><br>
+				<label class=checkbox>
+				<input type=checkbox id=check_5avg  onclick=five_check_avg() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>Average Days</span>
+				<input type=text onkeyup=five_input_avg() class=qinput id=menu_5avg><br>
+			</div>
+		</div>
+		<div class="msmenu menu_quarter" id=menu_ten style="display:none">
+			<div class=menu_Qstrategy>
+				<div class=menutitle>Strategy</div>
+				<label class=checkbox>
+				<input type=checkbox id=check_stg10_anyday onclick=strategy_10anyday() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>Any Day</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox id=check_stg10_a1 onclick=strategy_10a1() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>Action 1</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox id=check_stg10_a4 onclick=strategy_10a4() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>Action 4</span>
+				</label>
+			</div>
+			<div class=menu_Qyear>
+				<div class=menutitle>Year</div>
+				<label class=checkbox>
+				<input type=checkbox id=year10_2022 onclick=year10_2022() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>2022</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox id=year10_2021 onclick=year10_2021() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>2021</span>
+				</label>
+				<label class=checkbox>
+				<input type=checkbox id=year10_2020 onclick=year10_2020() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>2020</span>
+				</label>
+			</div>
+			<div class=menu_Qframe>
+				<div class=menutitle>Time Frame</div><div class=l></div>
+				<label class=checkbox>
+				<input type=checkbox id=check_10q1 onclick=ten_check_1q() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>1Q</span>
+				<input type=text id=check_10q2 onkeyup=ten_input_1q() class=qinput id=menu_10q1><br>
+				<label class=checkbox>
+				<input type=checkbox onclick=ten_check_2q() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>2Q</span>
+				<input type=text id=check_10avg onkeyup=ten_input_2q() class=qinput id=menu_10q2><br>
+				<label class=checkbox>
+				<input type=checkbox onclick=ten_check_avg() class=checkbox_input>
+				<span class=checkbox_ctrl></span>
+				<span>Average Days</span>
+				<input type=text onkeyup=ten_input_avg() class=qinput id=menu_10avg><br>									
+			</div>
+		</div>
+	</div>
+	<button type="button" class="btn btn-default" onclick=msr_apply() data-dismiss="modal">Apply</button>
+	</div><!-- #mbox -->
+</div><!-- #MSR_MENU -->
+
+<!-- Airport -->
+<div id=AIRPORT>
+	<div id=AIR-QUICKLOOK></div>
+	<div id=AIR-BOARDING></div>
+	<div id=AIR-FLIGHTS></div>
+	<div id=AIR-FORKS></div>
+	<div id=AIR-SAFTEY></div>
+</div>
+
+<!-- QuickLook -->
+<div id=QL_PAGE style="display:none">
+<h3 class=WFH>Security Checkpoint</h3>
+<table id=QL class="XTAB cell-border no-footer dataTable non-sortable">
+<thead>
+	<tr class=trx>
+		<th colspan=11></th>
+		<th colspan=7>21d Trend</th>
+		<th colspan=6>Fibbonacci Trend</th>
+	</tr>
+	<tr>
+		<th>Rank</th>
+		<th>Sym</th>
+		<th>ED</th>
+		<th>Price</th>
+		<th>Peak%</th>
+		<th>1d</th>
+		<th>3d</th>
+		<th>5d</th>
+		<th>8d</th>
+		<th>13d</th>
+		<th>21d</th>
+		<th>YTD</th>
+		<th>Streak</th>
+		<th>Dir</th>
+		<th>Buy</th>
+		<th>BuyΔ</th>
+		<th>Sell</th>
+		<th>SellΔ</th>
+		<th>Fib</th>
+		<th>Dir</th>
+		<th>BuyFIB</th>
+		<th>BuyFIBΔ</th>
+		<th>SellFIB</th>
+		<th>SellFIBΔ</th>
+	</tr>
+</thead>
+</table>
+</div>
+
+<!-- PeakWatch -->
+<div id=PW_PAGE style="display:none">
+<h3 class=WFH>Peaked Recently</h3>
+<h2 class=WFHi>Stocks that might be of interest to buy</h2>
+<div id=boarding-time></div>
+<table id=PW class="AIRTAB cell-border no-footer dataTable non-sortable">
+<thead>
+	<tr class=trx>
+		<th colspan=12></th>
+		<th colspan=4>21d Trend</th>
+		<th colspan=7>Fibbonacci Trend</th>
+	</tr>
+	<tr>
+		<th>Rank</th>
+		<th>Sym</th>
+		<th>Added</th>
+		<th>ED</th>
+		<th>Price</th>
+		<th>Chg%</th>
+		<th>Peak%</th>
+		<th>1d</th>
+		<th>3d</th>
+		<th>5d</th>
+		<th>8d</th>
+		<th>13d</th>
+		<th>21d</th>
+		<th>Buy</th>
+		<th>BuyΔ</th>
+		<th>Sell</th>
+		<th>SellΔ</th>
+		<th>BuyFIB</th>
+		<th>BuyFIBΔ</th>
+		<th>SellFIB</th>
+		<th>SellFIBΔ</th>
+		<th>P₁ₒΔ</th>
+		<th>Sig</th>
+	</tr>
+</thead>
+</table>
+</div>
+
+<!-- Signal Page -->
+<div id=FDT_PAGE style="display:none">
+	<h3 class=WFH>Flight Departures</h3>
+	<div class=sigplanes>
+		<span id=sig-jet   onclick=stockplane(0) class=plane-jet></span>
+		<span id=sig-biz   onclick=stockplane(1) class=plane-biz></span>
+		<span id=sig-prop  onclick=stockplane(2) class=plane-prop></span>
+		<span id=sig-crash onclick=stockplane(3) class=plane-crash></span>
+	</div>
+	<table id=FDT class="XTAB cell-border no-footer dataTable non-sortable">
+	<thead>
+		<tr>
+		<th>Rank</th>
+		<th>Sym</th>
+		<th>Entry Date</th>
+		<th>Entry Price</th>
+		<th>Exit Date</th>
+		<th>Exit Price</th>
+		<th>% Return</th>
+		<th>Status</th>
+		<th class=vhide>Class</th>
+	</tr>
+	</thead>
+	</table>
+</div>
+
+<!-- Forks -->
+<div id=FORKS style="display:none">
+	<h3 class=WFH>Fleet Information</h3>
+	<div class=sigplanes>
+		<span id=sig-jet   onclick=plane_portclick(0) class=plane-jet></span>
+		<span id=sig-biz   onclick=plane_portclick(1) class=plane-biz></span>
+		<span id=sig-prop  onclick=plane_portclick(2) class=plane-prop></span>
+		<span id=sig-crash onclick=plane_portclick(3) class=plane-crash></span>
+	</div>
+	<div id=fork-left>
+		<div class=fork-ports>
+			<table id=PORTS class="XTAB cell-border no-footer dataTable non-sortable">
+				<thead>
+				<tr>
+					<th>ID</th>
+					<th>Capital</th>
+					<th>RTD</th>
+					<th>APY</th>
+					<th>Last</th>
+					<th>Ticker</th>
+					<th>Shares</th>
+				</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+	</div>
+	<div id=fork-right>
+		<div id=port-scatter></div>
+		<div id=fork-passes></div>
+		<div id=fork-scatter style="display:none"></div>
+		<table style="display:none" id=forktab class="XTAB cell-border no-footer dataTable non-sortable"><tbody></tbody></table>
+	</div>
+</div>
+
+<!-- Flight Saftey Table -->
+<div id=QF_PAGE style="display:none">
+	<h3 class=WFH>Flight Saftey</h3>
+	<h2 class=WFHi>reaching the heights of success</h2>
+	<table id=COLVAR>
+		<tr>
+			<td class=g0>100%</td>
+			<td class=g1>90-99%</td>
+			<td class=g2>80-89%</td>
+			<td class=Y>70-79%</td>
+			<td class=O>60-69%</td>
+			<td class=P>50-59%</td>
+			<td class=S>&lt; 50%</td>
+		</tr>
+	</table>
+	<table id=QFH class="XTAB cell-border no-footer dataTable">
+		<thead><tr><th rowspan=2>Start</th><th rowspan=2>Stop</th></tr></thead>
+		<tbody>
+			<!-- 2020 -->
+			<tr><td>1/1/2020</td><td>3/31/2020</td></tr>
+			<tr><td>1/1/2020</td><td>3/31/2020</td></tr>
+			<tr><td>4/1/2020</td><td>6/30/2020</td></tr>
+			<tr><td>7/1/2020</td><td>9/30/2020</td></tr>
+			<tr><td>10/1/2020</td><td>12/31/2020</td></tr>
+			<!-- 2021 -->
+			<tr><td>1/1/2021</td><td>3/31/2021</td></tr>
+			<tr><td>1/1/2021</td><td>3/31/2021</td></tr>
+			<tr><td>4/1/2021</td><td>6/30/2021</td></tr>
+			<tr><td>7/1/2021</td><td>9/30/2021</td></tr>
+			<tr><td>10/1/2021</td><td>12/31/2021</td></tr>
+			<!-- 2022 -->
+			<tr><td>1/1/2022</td><td>3/31/2022</td></tr>
+			<!--
+			<tr><td colspan=2>&gt;index, &lt;&gt;bear,Δday&gt;-0.1</td></tr>
+			<tr><td>1/1/2022</td><td>3/31/2022</td></tr>
+			<tr><td colspan=2>&gt;index, &lt;&gt;bear,Δday&gt;-0.1</td></tr>					
+			<tr><td>4/1/2022</td><td>6/30/2022</td></tr>
+			<tr><td colspan=2>&gt;index, &lt;&gt;bear,Δday&gt;-0.1</td></tr>					
+			<tr><td>7/1/2022</td><td>9/30/2022</td></tr>
+			<tr><td colspan=2>&gt;index, &lt;&gt;bear,Δday&gt;-0.1</td></tr>					
+			<tr><td>10/1/2022</td><td>12/31/2022</td></tr>
+			<tr><td colspan=2>&gt;index, &lt;&gt;bear,Δday&gt;-0.1</td></tr>
+			 -->
+		</tbody>
+	</table>
+	<table id=QF class="XTAB cell-border">
+		<thead>
+			<tr class=trx>
+				<th class=tabletop colspan=5>Ranks [1,200]</th>
+				<th class=tabletop colspan=5>Ranks [1,50]</th>
+				<th class=tabletop colspan=5>Ranks [51,100]</th>
+				<th class=tabletop colspan=5>Ranks [101,150]</th>
+				<th class=tabletop colspan=5>Ranks [151,200]</th>
+			</tr>
+			<tr>
+				<th>Total</th>
+				<th>InPlay</th>
+				<th>63d</th>
+				<th>128d</th>
+				<th>&gt;128d</th>
+				<th>Total</th>
+				<th>InPlay</th>
+				<th>63d</th>
+				<th>128d</th>
+				<th>&gt;128d</th>
+				<th>Total</th>
+				<th>InPlay</th>
+				<th>63d</th>
+				<th>128d</th>
+				<th>&gt;128d</th>
+				<th>Total</th>
+				<th>InPlay</th>
+				<th>63d</th>
+				<th>128d</th>
+				<th>&gt;128d</th>
+				<th>Total</th>
+				<th>InPlay</th>
+				<th>63d</th>
+				<th>128d</th>
+				<th>&gt;128d</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
+<!-- old saftey table
+<table id=QF class="XTAB cell-border no-footer dataTable non-sortable">
+<thead>
+	<tr>
+		<th>year</th>
+		<th>quarter</th>
+		<th>start</th>
+		<th>end</th>
+		<th>total</th>
+		<th>APY >= SP500 + 5%</th>
+		<th>APY >= SP500</th>
+		<th>APY >= 10%</th>
+		<th>RTD >= SP500 + 5%</th>
+		<th>RTD >= SP500</th>
+		<th>RTD >= 10%</th>
+		<th>APY >= SP500 + 5%</th>
+		<th>APY >= SP500</th>
+		<th>APY >= 10%</th>
+		<th>RTD >= SP500 + 5%</th>
+		<th>RTD >= SP500</th>
+		<th>RTD >= 10%</th>
+	</tr>
+</thead>
+<tbody></tbody>
+</table>!-->
+
+<!-- Monster Table Container -->
+<div id=MSR_PAGE style="display:none">
+<table id=MSR class="XTAB context-menu-one cell-border no-footer dataTable non-sortable" style="width:100%;">
+<thead>
+	<tr class=trx>
+	<th colspan=13></th>
+	<th colspan=9>5% return - any day</th>
+	<th colspan=12>5% return - action 1</th>
+	<th colspan=12>5% return - action 4</th>
+	<th colspan=9>10% return - any day</th>
+	<th colspan=12>10% return - action 1</th>
+	<th colspan=12>10% return - action 4</th>
+	</tr>
+	<tr class=trx>
+	<th colspan=13></th>
+	<th colspan=2 scope=colgroup>2022</th>
+	<th colspan=2 scope=colgroup>2021</th>
+	<th colspan=2 scope=colgroup>2020</th>
+	<th colspan=3 scope=colgroup>Avg. days</th>
+	<th colspan=2 scope=colgroup>2022</th>
+	<th colspan=2 scope=colgroup>2021</th>
+	<th colspan=2 scope=colgroup>2020</th>
+	<th colspan=3 scope=colgroup>Avg. days</th>
+	<th colspan=3 scope=colgroup>Total</th>
+	<th colspan=2 scope=colgroup>2022</th>
+	<th colspan=2 scope=colgroup>2021</th>
+	<th colspan=2 scope=colgroup>2020</th>
+	<th colspan=3 scope=colgroup>Avg. days</th>
+	<th colspan=3 scope=colgroup>Total</th>
+	<th colspan=2 scope=colgroup>2022</th>
+	<th colspan=2 scope=colgroup>2021</th>
+	<th colspan=2 scope=colgroup>2020</th>
+	<th colspan=3 scope=colgroup>Avg. days</th>
+	<th colspan=2 scope=colgroup>2022</th>
+	<th colspan=2 scope=colgroup>2021</th>
+	<th colspan=2 scope=colgroup>2020</th>
+	<th colspan=3 scope=colgroup>Avg. days</th>
+	<th colspan=3 scope=colgroup>Total</th>
+	<th colspan=2 scope=colgroup>2022</th>
+	<th colspan=2 scope=colgroup>2021</th>
+	<th colspan=2 scope=colgroup>2020</th>
+	<th colspan=3 scope=colgroup>Avg. days</th>
+	<th colspan=3 scope=colgroup>Total</th>
+	</tr>
+	<tr>
+		<th>Stock</th>
+		<th>Price</th>
+		<th>Δ</th>
+		<th>Peak</th>
+		<th>one</th>
+		<th>two</th>
+		<th>a1ESP</th>
+		<th>a4ESP</th>
+		<th>YTD</th>
+		<th>Y1</th>
+		<th>Y2</th>
+		<th>Y3</th>
+		<th>Y4</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+		<th>'22</th>
+		<th>'21</th>
+		<th>'20</th>
+	</tr>
+	</thead>
+</table>
+</div><!-- #MSR_PAGE -->
+
+<div id=MSR2_PAGE style="display:none">
+<table id=MSR2 class="XTAB context-menu-one cell-border no-footer dataTable non-sortable" style="width:100%;">
+<thead>
+	<tr class=trx>
+		<th colspan=2></th>
+		<th colspan=4>Anyday</th>
+		<th colspan=5>Action1</th>
+		<th colspan=5>Action4</th>
+	</tr>
+	<tr>
+		<th>Stock</th>
+		<th>two</th>
+		<th>Anyday</th>
+		<th>AvgRet</th>
+		<th>Std</th>
+		<th>Avgdays</th>
+		<th>A1</th>
+		<th>AvgRet</th>
+		<th>Std</th>
+		<th>Avgdays</th>
+		<th>Total</th>
+		<th>A4</th>
+		<th>AvgRet</th>
+		<th>Std</th>
+		<th>Avgdays</th>
+		<th>Total</th>
+	</tr>
+</thead>
+</table>
+</div>
+
+<!-- ESP Page Container -->
+<div id=ESP_PAGE style="display:none">
+<!-- ESP input Boxes -->
+<div id=btesp>
+	<div id=tickdiv>
+		<input onkeyup=tickesp() id=tickesp placeholder=Ticker>
+	</div>
+	<div id=mindiv>
+		<input type=text placeholder="Start Date" onkeyup=minesp() id=minesp>
+	</div>
+	<div id=maxdiv>
+		<input placeholder="End Date" type=text onkeyup=maxesp() id=maxesp>
+	</div>
+	<div id=seldiv>
+		<div class=esp-month>
+		<ul>
+			<li onclick=esp_month(0)>January</li>
+			<li onclick=esp_month(1)>February</li>
+			<li onclick=esp_month(2)>March</li>
+			<li onclick=esp_month(3)>April</li>
+			<li onclick=esp_month(4)>Mary</li>
+			<li onclick=esp_month(5)>June</li>
+			<li onclick=esp_month(6)>July</li>
+			<li onclick=esp_month(7)>August</li>
+			<li onclick=esp_month(8)>September</li>
+			<li onclick=esp_month(9)>October</li>
+			<li onclick=esp_month(10)>November</li>
+			<li onclick=esp_month(11)>December</li>
+		</ul>
+		</div>
+	</div>
+</div>
+<table id=ESP class="XTAB cell-border no-footer dataTable non-sortable" style="width:100%">
+	<caption id=CPL>Radar Table</caption>
+	<thead>
+	<tr>
+		<th>Ticker</th>
+		<th>Date</th>
+		<th>Rank</th>
+		<th>Price</th>
+		<th>Daily</th>
+		<th>Close</th>
+		<th>Peak</th>
+		<th>1</th>
+		<th>2</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>#</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>#</th>
+		<th>act</th>
+		<th>ESP</th>
+		<th>a1esp</th>
+		<th>a1s</th>
+		<th>a4esp</th>
+		<th>a4s</th>
+		<th>next</th>
+		<th>nxt cl</th>
+		<th>1d</th>
+		<th>2d</th>
+		<th>3d</th>
+		<th>4d</th>
+		<th>5d</th>
+		<th>6d</th>
+		<th>7d</th>
+		<th>8d</th>
+		<th>9d</th>
+		<th>10d</th>
+		<th>11d</th>
+		<th>12d</th>
+		<th>13d</th>
+		<th>14d</th>
+		<th>15d</th>
+	</tr>
+	</thead>
+</table>
+</div><!-- #ESP_PAGE -->
+
+<!-- SB150 Table -->
+<div id=SB_PAGE style="display:none">
+<table id=SB150 class="SBTAB cell-border no-footer dataTable non-sortable" style="width:70%">
+<caption id=CPL>SB-150</caption>
+<thead>
+	<tr>
+		<th colspan=9></th>
+		<th colspan=12>5% return - action 1</th>
+		<th colspan=12>5% return - action 4</th>
+	</tr>
+	<tr>
+		<th></th>
+		<th colspan=8></th>
+		<th colspan=2 scope=colgroup>2022</th>
+		<th colspan=2 scope=colgroup>2021</th>
+		<th colspan=2 scope=colgroup>2020</th>
+		<th colspan=2 scope=colgroup>2019</th>
+		<th colspan=4 scope=colgroup>Total</th>
+		<th colspan=2 scope=colgroup>2022</th>
+		<th colspan=2 scope=colgroup>2021</th>
+		<th colspan=2 scope=colgroup>2020</th>
+		<th colspan=2 scope=colgroup>2019</th>
+		<th colspan=4 scope=colgroup>Total</th>
+	</tr>
+	<tr>
+		<th></th>
+		<th>Ticker</th>
+		<th>Rank</th>
+		<th>Price</th>
+		<th>Daily Δ</th>
+		<th>Pk Δ</th>
+		<th>Peak</th>
+		<th>One</th>
+		<th>Two</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>22</th>
+		<th>21</th>
+		<th>20</th>
+		<th>19</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>22</th>
+		<th>21</th>
+		<th>20</th>
+		<th>19</th>
+	</tr>
+</thead>
+</table>
+</div> <!-- SB150 -->
+
+<!-- SB1293 Table -->
+<div id=SB1K_PAGE style="display:none">
+<table id=SB1K class="SBTAB cell-border no-footer dataTable non-sortable" style="width:70%">
+<caption id=CPL>SB-1277</caption>
+<thead>
+	<tr>
+		<th colspan=9></th>
+		<th colspan=12>5% return - action 1</th>
+		<th colspan=12>5% return - action 4</th>
+	</tr>
+	<tr>
+		<th></th>
+		<th colspan=8></th>
+		<th colspan=2 scope=colgroup>2022</th>
+		<th colspan=2 scope=colgroup>2021</th>
+		<th colspan=2 scope=colgroup>2020</th>
+		<th colspan=2 scope=colgroup>2019</th>
+		<th colspan=4 scope=colgroup>Total</th>
+		<th colspan=2 scope=colgroup>2022</th>
+		<th colspan=2 scope=colgroup>2021</th>
+		<th colspan=2 scope=colgroup>2020</th>
+		<th colspan=2 scope=colgroup>2019</th>
+		<th colspan=4 scope=colgroup>Total</th>
+	</tr>
+	<tr>
+		<th></th>
+		<th>Ticker</th>
+		<th>Rank</th>
+		<th>Price</th>
+		<th>Daily Δ</th>
+		<th>Pk Δ</th>
+		<th>Peak</th>
+		<th>One</th>
+		<th>Two</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th class=totals>22</th>
+		<th class=totals>21</th>
+		<th class=totals>20</th>
+		<th class=totals>19</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th>1Q</th>
+		<th>2Q</th>
+		<th class=totals>22</th>
+		<th class=totals>21</th>
+		<th class=totals>20</th>
+		<th class=totals>19</th>
+	</tr>
+</thead>
+</table>
+</div> <!-- SB1293 Table -->
+
+<!-- Price Monster -->
+<div id=CMTDIV style="display:none">
+<table id=CMT class="SBTAB cell-border no-footer dataTable non-sortable" style="width:65%">
+<thead>
+	<tr>
+		<th>Rank</th>
+		<th>Stock</th>
+		<th>Date</th>
+		<th>Two</th>
+		<th>High</th>
+		<th>Low</th>
+		<th>Close</th>
+		<th>Daily</th>
+		<th>3 Day</th>
+		<th>5 Day</th>
+		<th>8 Day</th>
+		<th>13 Day</th>
+		<th>21 Day</th>
+		<th>Buy</th>
+		<th>Buy Δ</th>
+		<th>Sell</th>
+		<th>Sell Δ</th>
+	</tr>
+</thead>
+</table>
+</div>

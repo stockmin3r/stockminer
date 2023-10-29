@@ -1,0 +1,257 @@
+/***************************************************
+ * filename: mainpage/stockminer/css/watchlists.css
+ * License:  Public Domain
+ **************************************************/
+.watchlist_main{
+	width:19%;
+	margin-right:10px;
+	float:right;
+}
+.watchbox{
+	margin:0 auto;
+	background-color:#2f3136;
+	border:2px solid #202225;
+	resize:both;
+}
+.watchbox h2 {
+	text-align:center;
+	margin-top:5px;
+	color:white;
+	margin-bottom:-23px;
+}
+.watchbox table td.control {background:none}
+.greenbox {border:2px solid green;background-color:green}
+.redbox   {border:2px solid brown;background-color:brown}
+.watchmod{
+	color:white;
+	font-weight:bold;
+	padding:1px 5px;
+	text-align:center;
+	display:inline-block;
+	cursor:pointer;
+	margin-bottom:20px;
+	margin-left:4px;
+	margin-top:30px;
+	margin-right:-8px;
+	font-size:12px;
+}
+.exec{
+	color:white;
+	font-weight:bold;
+	padding:3px 4px;
+	text-align:center;
+	display:inline-block;
+	cursor:pointer;
+	font-size:12px;
+}
+#wops              {margin:0 auto}
+.wtick             {margin-left:10px;width:3rem}
+.condselect        {color:white;border:2px outset grey}
+.condarg           {width:2.3rem}
+.watchbox input    {font-weight:bold;border:1px solid black}
+.context-menu-list {
+	background:none !important;
+	border:1px inset brown;
+	margin-left:-1px !important;
+	margin-top:26px !important;
+	width:180px !important;
+}
+/* Tools Menu */
+.context-menu-root *                  {color:white;background-color:#202225 !important}
+.context-menu-item span:hover         {color:#821eda !important}
+.context-menu-root .context-menu-list {width:135px !important;min-width:100px !important}
+.tools {color:red;position:absolute;margin-top:-5px;cursor:pointer;font-size:17px;margin-left:5px}
+.t2    {margin-top:15px !important}
+.space {padding-top:20px;background-color:#2f3136}
+.button{
+	cursor:pointer;
+	width:60px;
+	height:60px;
+	color:white;
+	display:inline-block;
+	font-size:20px;
+	line-height:60px;
+	font-weight:bold;
+	-webkit-transform: rotate(45deg);
+	transform: rotate(45deg);
+	-webkit-transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.expand .button {
+	-webkit-transform: rotate(630deg);
+	transform: rotate(630deg);
+	-webkit-transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.wcontainer {
+	margin:auto;
+	left:0;
+	right:0;
+	top:5vh;
+	background-color:#821eda;
+	border-radius:50%;
+	width:60px;
+	max-width:60px;
+	height:60px;
+	text-align:center;
+	box-shadow:0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	overflow:hidden;
+	-webkit-transition:all 0.2s 0.45s, height 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0.25s, max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0.35s, width 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0.35s;
+	transition:all 0.2s 0.45s, height 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0.25s, max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0.35s, width 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0.35s;
+}
+.wcontainer.expand {
+	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.17);
+	border-radius: 0;
+	width: 100%;
+	height: 500px;
+	max-width: 800px;
+	-webkit-transition: all 0.2s, max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, height 0.3s ease 0.25s;
+	transition: all 0.2s, max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, height 0.3s ease 0.25s;
+}
+.content {
+	-webkit-transform: translateY(100%);
+	transform: translateY(100%);
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	text-align:left;
+	-webkit-transition: opacity 0.2s 0.2s, -webkit-transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: opacity 0.2s 0.2s, -webkit-transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s 0.2s;
+	transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s 0.2s, -webkit-transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.expand .content {
+	-webkit-transform: translateY(0px);
+	transform: translateY(0px);
+	opacity: 1;
+	-webkit-transition: opacity 0s, -webkit-transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s;
+	transition: opacity 0s, -webkit-transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s;
+	transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s, opacity 0s;
+	transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s, opacity 0s, -webkit-transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.05s;
+}
+.content .head {padding:0 0 20px 0}
+.content .body {
+	color: #000;
+	color: rgba(0, 0, 0, 0.87);
+	background-color: #FFF;
+	width: 100%;
+	height: 100%;
+	padding: 10px 0;
+	box-sizing: border-box;
+}
+
+#upload-tickers          {width:250px;height:255px;margin-left:40%;margin-top:60px}
+#upload-tickers textarea {height:130px;width:80%;margin:0 auto;display:block}
+#upload-tickers h2       {text-align:center}
+#upload-tickers .QBTN    {display:block;margin:0 auto;margin-top:10px}
+#upload-csv     textarea {height:300px;width:85%;color:green;font-weight:bold}
+#upload-csv              {width:400px;height:480px;margin:0 auto;position:relative;text-align:center}
+.upload-box {
+	position:absolute!important;
+	z-index:2;
+	color:white;
+	background-color:#323130;
+	border:5px solid #202225;
+}
+#upload-box textarea {background-color:#202225;color:white;margin:0 auto;display:block}
+ 		#upload-box button   {margin:0 auto;display:block;margin-top:5px}
+#upload-csv .QBTN {
+	display:block;
+	margin:0 auto;
+	margin-top:15px;
+}
+#upload-csv-file {
+	display:inline!important;
+	position:absolute;
+	background-color:red!important;
+	margin-top:40px;
+	margin-left:-110px!important;
+	width:105px;
+	cursor:pointer;
+	opacity:0;
+}
+.upload-select {
+	color:white;
+}
+.upload-arrow {
+	font-size:42px;
+	cursor:pointer;
+	color:cyan;
+	margin-top:5px!important;;
+	display:block;
+	margin:0 auto;
+	height:48px;
+	width:44px;
+	border-radius:50%;
+	cursor:pointer;
+	border:1px solid grey;
+	background-color:#3F51B5;
+}
+
+.tclose              {cursor:pointer;position:absolute;top:0;right:4px;font-weight:bold;color:red;font-size:20px}
+.ORC {
+	padding:8px;
+	font-weight:bold;
+	border-radius:26px;
+	color:green;
+	width:38px;
+	margin:0 auto;
+	margin-top:10px;
+	background-color:yellow;
+	margin-bottom:-5px;
+}
+
+#share {
+	position:absolute!important;
+	z-index:2;
+	margin-top:60px;
+	margin-left:40%;
+	color:white;
+	background-color:#323130;
+	border:5px solid #202225;
+	width:265px;
+	height:210px;
+}
+
+#share button {
+	color:white;
+	width:100px;
+	font-size:18px;
+	margin:0 auto;
+	display:block;
+	margin-top:5%;
+	border:1px solid #821eda;
+	background-color:black;
+}
+#share h3        {margin-bottom:0px}
+#share input     {margin-top:5px;display:block;margin-left:15px;}
+#share label     {text-align:center;margin-top:5%;margin-right:15px;font-weight:bold}
+.sharebody       {margin-top:10px;background-color:#323130;}
+.sharebody .tick {margin-left:-5px}
+
+.iwatch          {line-height:2}
+.sclose {
+	position:absolute;
+	top:0;
+	right:0;
+	font-weight:bold;
+	color:white;
+	margin-right:-.5rem;
+	width:24px;
+	height:24px;
+	cursor:pointer
+}
+.sclose:hover,
+.sclose:focus {color:red;text-decoration:none;cursor:pointer}
+.close{
+	font-weight:700;
+	color:#fff;
+	position:absolute;
+	right:0;
+	width:24px;
+	height:24px;
+	margin-top:-6px;
+	cursor:pointer
+}
+.close:hover {color:red}
+@keyframes rotate  {0% {transform:rotate(0deg);}100%{transform: rotate(360deg);}}

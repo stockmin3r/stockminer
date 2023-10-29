@@ -1,0 +1,263 @@
+/**********************************************
+ * filename: backpage/monster/backpage.css
+ * License:  Public Domain
+ *********************************************/
+
+/* Tables */
+.GTAB thead {background:linear-gradient(to left, #821eda 32%, #c555d5 113%);color:white}
+#HL         {margin-top:1.5%}
+
+td.control{
+	background-image:url("data:image/svg+xml,%3Csvg width='20' height='13' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Crect fill='none' id='canvas_background' height='15' width='22' y='-1' x='-1'/%3E%3Cg display='none' overflow='visible' y='0' x='0' height='100%25' width='100%25' id='canvasGrid'%3E%3Crect fill='url(%23gridpattern)' stroke-width='0' y='0' x='0' height='100%25' width='100%25'/%3E%3C/g%3E%3C/g%3E%3Cg%3E%3Cpath id='svg_1' d='m2.87398,4.58724l4.40781,0l0,-3.73897l4.52158,0l0,3.73897l4.40781,0l0,3.83547l-4.40781,0l0,3.73897l-4.52158,0l0,-3.73897l-4.40781,0l0,-3.83547z' stroke-width='0.5' stroke='%23000000' fill='%23821eda'/%3E%3C/g%3E%3C/svg%3E");
+	background-repeat:no-repeat;
+	background-position:center;
+	cursor:pointer;
+}
+.control {width:10px}
+
+/* Signal Minitable */
+#CSIG thead {line-height:2;font-size:14px}
+#CSIG{
+	float:left;
+	text-align:center;
+	font-weight:bold;
+	cursor:pointer;
+	color:white;
+	background-color:#202225;
+	font-size:12.5px;
+	border:2px solid #2f3136;
+	line-height:0.8;
+}
+#mini thead {line-height:2;font-size:14px}
+#mini{
+	background-color:#202225;
+	text-align:center;
+	margin-top:-1.5%;
+	margin-left:10px;
+	border:2px solid #2f3136;
+	line-height:0.81;
+	color:white;
+	float:left;
+	font-size:12.5px;
+	font-weight:bold;
+}
+
+/* Color Tables */
+#CTAB    {width:60%;font-size:15px}
+#CTAB td {color:black !important}
+
+/* SB Table */
+.SBTAB{
+	text-align:center;
+	font-weight:bold;
+	margin:0 auto;
+	margin-top:15px;
+	color:black;
+	font-size:12.5px;
+	background-color:#2f3136;
+	width:750px;
+	border:2px solid #202225;
+	line-height:0.8;
+}
+.SBTAB .xls tr td            {background-color:white !important}
+.SBTAB thead                 {color:white;top:0}
+.SBTAB thead th              {font-weight:bold !important;color:white;background-color:#18191b;position:sticky;top:0}
+.SBTAB tbody td              {background-color:white}
+.SBTAB .xls td               {background-color:white !important}
+.SBTAB .xls td,th.lightgreen {background-color:#32CD32 !important}
+.SBTAB .xls td,th.darkgreen  {color:white !important;background-color:#006400}
+.SBTAB .xls td,th.yellow     {color:black !important;background-color:yellow !important}
+.SBTAB .xls th.blue          {color:white !important;background-color:dodgerblue}
+.SBTAB .xls td.orange        {background-color:orange !important}
+.SBTAB .xls td.yellow        {background-color:yellow !important}
+.SBTAB .xls td.grn           {background-color:green !important}
+
+.xls th {color:white;background-color:#181717 !important}
+.xls    {border:2px solid #2f3136}
+.xls td {
+	background-color:#18191b;
+	border:1px solid rgb(128, 128, 128, 0.2) !important;
+	font-size:16px;
+	font-weight:400;
+	line-height:normal;
+	padding-bottom:8px;
+	padding-left:5px;
+	padding-right:5px;
+	border-collapse:collapse;
+	border-spacing:2px 2px;
+	padding-top:8px;
+}
+
+/* Popup XLS Buttons */
+.icon{
+	position:relative;
+	padding:10px;
+	background-color:#821eda;
+	color:white;
+	background-image:none;
+	border-color: #007bff;
+	cursor:pointer;
+	padding:.5rem 1rem;
+	border:2px solid #202225;
+	font-size:1.25rem;
+	line-height:1.5;
+	margin-left:5px;
+	border-radius:.3rem;
+	transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.icon:before{
+	content:'';
+	position:absolute;
+	right:16px;
+	top:50%;
+	margin-top:-12px;
+	width:16px;
+	height:16px;
+	border:2px solid;
+	border-left-color:transparent;
+	border-right-color:transparent;
+	border-radius:50%;
+	opacity:0;
+	transition:opacity 0.5s;
+	animation:0.8s linear infinite rotate;
+}
+.icon:not(:disabled):not(.disabled) {cursor:pointer}
+.icon:hover          {color:#fff;background-color: #202225;border-color:purple;}
+.icon.sending        {pointer-events:none;cursor:not-allowed}
+.icon.sending:before {transition-delay:0.5s;transition-duration:1s;opacity:1}
+
+/* LightBox */
+#lbxc {
+    background:black;
+	position:absolute;
+	margin-left:96.5%;
+	margin-top:-5%;
+	display:block;
+    font-size:2.5em;
+	font-weight:bold;
+	width:78px;
+    border-radius:5px;
+}
+#stockbox       {position:fixed;top:0;left:0;z-index:10000;width:100%;height:100%;background-color:#0D0D0D;overflow-y:auto;overflow-x:hidden}
+#stockbox  *    {color:white}
+#stocksig2      {margin:0 auto;margin-top:5px;width:250px}
+#stockesp1      {margin-left:150px}
+#stockesp2      {margin-left:10px}
+#stockesp3      {margin-left:10px}
+.rsig           {display:inline-block}
+.sig_mid span   {display:inline-block;width:65px}
+.sigaction      {float:right}
+.sig_right span {display:inline-block;width:65px}
+.sigtitle       {font-size:22px;margin-bottom:20px}
+*, ::after, ::before {box-sizing: border-box}
+#stockhead      {margin-top:20px;height:100px}
+#stocktitle     {border:2px solid #36393f;font-size:24px;border-radius:12px;padding:5px;min-width:500px;max-width:600px;margin-top:-25px;background-color:#181717;float:left}
+#stocksig       {margin:0 auto;width:200px}
+#stocksig span  {display:inline-block;padding:10px;padding-right:15px;border-radius:8px;padding-left:15px;border:1px solid #36393f}
+#stocktwo       {margin-left:15px}
+#stockstats     {float:left;width:800px}
+#stats2         {margin-top:20px}
+#stats3         {margin-top:20px}
+.lbox           {display:inline-block;width:20%}
+.rbox           {display:inline;margin-left:30%}
+#abox           {float:right;margin-right:20px}
+.sig_left       {color:white;font-weight:bold;display:inline;margin-right:150px;width:100px}
+.sig_mid        {display:inline;margin-right:50px}
+.sig_pc         {display:inline;color:white}
+.sig_right      {display:inline-block;margin-left:30px}
+#stockbox       {margin-left:10px}
+/* Lightbox Chart Container */
+#chart          {width:100%;height:700px;border:2px solid #2f3136 !important}
+/* Lightbox Scatter Table */
+#SCTAB          {text-align:center;table-layout:fixed;margin:0 auto;margin-bottom:50px;margin-top:20px}
+#SCTAB th       {background-color:#2f3136 !important}
+#SCTAB tbody tr {background-color:#181717 !important}
+/* Lightbox Earnings Table */
+#ETAB           {margin:0 auto;padding-bottom:40px}
+#ETAB th        {text-align:center}
+/* Lightbox Quarter Table */
+.QTABLE           {clear:both;margin:0 auto;margin-top:20px;margin-bottom:50px;text-align:center;margin-top:200px}
+/* Lightbox Dialog Background color and size */
+.modal-header   {border-bottom:none;background-color:#0D0D0D}
+.modal-body     {background-color:#0D0D0D;height:100%}
+.modal-backdrop {background: none;}
+.drag{
+	position:absolute;
+	z-index:9;
+	width:80px;
+	height:20px;
+	cursor:move;
+	border-bottom:1px solid #18191c;
+	background-color:#2f3136;
+	border-radius:26px;
+	margin-left:340px;
+	margin-top:-20.6px;
+}
+
+/* Table Colors */
+.darkgreen   {background-color:#006400 !important;color:white !important}
+.totals      {background-color:#292b2f !important;color:white !important;font-weight:bold;}
+.orange      {background-color:orange !important; color:black !important}
+.O           {background-color:orange !important; color:black !important}
+.o           {color:orange !important;font-weight:bold !important}
+.e           {background-color:#202225 !important}
+.grey2       {background-color:#202225 !important}
+.grey        {background-color:grey !important;color:black}
+.lightgreen  {background-color:#32CD32 !important;color:black !important}
+.green       {background-color:green !important;  color:black !important}
+.green2      {color:green !important;font-weight:bold !important}
+.g           {color:green !important;font-weight:bold !important}
+.G           {background-color:green !important;color:white !important;font-weight:bold !important}
+.L           {background-color:#66FF33 !important;color:black !important;font-weight:bold !important}
+.y           {color:yellow !important;font-weight:bold !important}
+.Y           {background-color:yellow !important;color:black !important;font-weight:bold !important}
+.yellow      {color:black !important;background-color:yellow !important;font-weight:bold !important}
+/* Red */
+.R           {background-color:red !important;color:black !important;font-weight:bold !important}
+.red         {background-color:red !important;color:white !important;font-weight:bold !important}
+.r           {color:red   !important}
+.red2        {color:red   !important}
+.brown       {color:brown !important;font-weight:bold !important}
+.brown2      {background-color:brown !important}
+.B           {background-color:dodgerblue !important;color:white !important;font-weight:bold !important}
+.blue        {background-color:dodgerblue !important;color:white !important}
+.w           {background-color:white   !important;color:black !important;font-weight:bold !important}
+.white       {background-color:white   !important;color:black !important;font-weight:bold !important}
+
+#QF_PAGE .S  {background-color:#808080!important}
+#QF_PAGE .P  {background-color:#FF9966!important}
+#QF_PAGE .g0 {background-color:#00B050!important}
+#QF_PAGE .g1 {background-color:#66FF33!important}
+#QF_PAGE .g2 {background-color:#66FF66!important}
+#QF_PAGE .Y  {background-color:#FF0!important}
+#QF_PAGE .O  {background-color:orange!important}
+
+#COLVAR {
+	margin:0 auto;
+	margin-top:10px;
+	margin-bottom:20px;
+	font-weight:bold;
+}
+#COLVAR td {padding: 8px}
+
+/* Highcharts */
+.cdl.highcharts-plot-background {height:80px !important;max-height:80px !important}
+.cdl.highcharts-title           {font-weight:bold;fill:dodgerblue !important}
+.cdl.highcharts-axis-title      {font-weight:bold;font-family:Arial;fill:white !important}
+.cdl .highcharts-point          {stroke:rgb(30, 144, 255, 1);fill:rgb(30, 144, 255, 0.5)}
+
+
+/* ****************
+ * Candle Monster *
+ *****************/
+#CDL {width:30%;margin:0 auto}
+#CDL td:nth-child(1){
+	color:white !important;
+	font-weight:bold;
+	text-align:left;
+	padding-left:5px;
+	width:30%;
+	background-color:#292b2f !important;
+}
+/* import html/css/paid/*.css pages here */
+/* $monster.css */

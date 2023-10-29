@@ -1,0 +1,74 @@
+<div id=main style="display:none">
+	<div id=lowcaps>
+		<table id=LG class="MTAB cell-border no-footer dataTable non-sortable" style="width:95%">
+			<caption>Lowcap Gainers</caption>
+			<thead><tr><th>Ticker</th><th>Price</th><th>Daily Δ</th><th>$Vol</th></tr></thead>
+		</table>
+		<table id=LL class="MTAB cell-border no-footer dataTable non-sortable" style="width:95%">
+			<caption>Lowcap Losers</caption>
+			<thead><tr><th>Ticker</th><th>Price</th><th>Daily Δ</th><th>$Vol</th></tr></thead>
+		</table>
+	</div>
+	<div id=highcaps style="display:none">
+		<table id=HG class="MTAB cell-border no-footer dataTable non-sortable" style="width:95%">
+			<caption>Highcap Gainers</caption>
+			<thead><tr><th>Ticker</th><th>Rank</th><th>Price</th><th>Daily Δ</th><th>$Vol</th></tr></thead>
+		</table>
+		<table id=HL class="MTAB cell-border no-footer dataTable non-sortable" style="width:95%">
+			<caption>Highcap Losers</caption>
+			<thead><tr><th>Ticker</th><th>Rank</th><th>Price</th><th>Daily Δ</th><th>$Vol</th></tr></thead>
+		</table>
+	</div>
+</div>
+
+<div id=crypto style="display:none">
+	<table id=CG class="MTAB cell-border no-footer dataTable non-sortable" style="width:95%">
+		<caption>Crypto Gainers</caption>
+		<thead><tr><th>Coin</th><th>Price</th><th>Daily Δ</th><th>$Vol</th></tr></thead>
+	</table>
+	<table id=CL class="MTAB cell-border no-footer dataTable non-sortable" style="width:95%">
+		<caption>Crypto Losers</caption>
+		<thead><tr><th>Coin</th><th>Price</th><th>Daily Δ</th><th>$Vol</th></tr></thead>
+	</table>
+</div>
+
+<!-- ToolBox -->
+<div class=watchbox style="display:none">
+	<h2>ToolBox</h2>
+	<span class=close onclick=qclose()>✖</span>
+	<span class=tools>🛠</span>
+	<div class=wcontainer><span class=button>✖</span>
+		<div class=space>
+			<div class="content body"></div>
+		</div>
+	</div>
+</div>
+
+<!-- Save Watchlist -->
+<div id=share style="display:none">
+	<h3 class=stitle>Save Watchlist</h3>
+	<span class=sclose onclick=wsave_close()>&times;</span>
+	<div class=sharebody>
+		<input id=watchname class=iwatch type=text placeholder="Watchlist Name"/>
+		<button type=button onclick=watchlist_save(1)>Save</button>
+		<label class=checkbox>
+			<input type=checkbox class=checkbox_input id="cshare"/>
+			<span class=checkbox_ctrl onclick="check(1)" title="Export your Watchlist for other Traders to see"><span class="check untick" onclick=check()>&check;</span></span>
+			<span>Public</span>
+		</label>
+	</div>
+</div>
+
+<div id=wget-url style="display:none">
+	<span class=QCLOSE onclick=qclose()>✖</span>
+	<h3>Remote Table Scan</h3>
+	<input type=text placeholder="URL"/>
+	<div class="wget-exec minibat" onclick=wget_url_onclick() title=Scan></div>
+</div>
+
+<div id=wget-import style="display:none">
+	<span class=QCLOSE onclick=qclose()>✖</span>
+	<h3>Resources</h3>
+	<div class=uentries></div>
+	<div class=uimport onclick=wget_import_onclickRPC()>Import</div>
+</div>

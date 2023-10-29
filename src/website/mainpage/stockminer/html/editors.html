@@ -1,0 +1,278 @@
+<!-- Code Editor -->
+<div id=editor style="display:none">
+	<h2>CSS Table Styler</h2>
+	<span class=QCLOSE onclick=editor_close()>✖</span>
+	<div class=editor-tabs>
+		<span class=editor-tab onclick='Editor(0, "html")'>HTML</span>
+		<span class=editor-tab onclick='Editor(0, "css")'>CSS</span>
+		<span class=editor-tab onclick='Editor(0, "js")'>JavaScript</span>
+	</div>
+	<span id=utsave onclick=css_save()>Save</span>
+	<input type=text id=css-class value=myStyle onkeyup=editor_keyup()>
+	<div id=css-editor class=UTL>
+		.myStyle {
+			font-weight:bold;
+			cursor:pointer;
+			font-size:11px;
+			border:2px solid #2f3136!important
+		}
+		.myStyle td {
+			background-color:#18191b!important;
+			color:white;
+			line-height:0.3;
+			border:1px solid rgb(128, 128, 128, 0.2)!important
+		}
+		.myStyle thead {
+			background:linear-gradient(to left, #821eda 32%, #c555d5 113%);
+			color:white
+		}
+		.myStyle th    {padding:10px 18px !important}
+	</div>
+	<div id=js-editor   class=UTL style="display:none"></div>
+	<div id=html-editor class=UTL style="display:none"></div>
+	<div class=UTR>
+	</div>
+</div>
+
+<!-- Canvas Designer -->
+<div class=canvas style="display:none">
+	<section class=design-surface>
+		<canvas class=temp-canvas></canvas>
+		<canvas class=main-canvas></canvas>
+	</section>
+    <section class=tool-box>
+        <div class=Tpencil    title="Pencil"          onclick=ctool(0)>🖊</div>
+        <div class=Tmarker    title="Marker"          onclick=ctool(1)>🖌</div>
+        <div class=Teraser    title="Erase drawings"  onclick=ctool(2)>💣</div>
+        <div class=Tarrow     title="Draw Arrows"     onclick=ctool(3)>↗</div>
+        <div class=Ttext      title="Write text"      onclick=ctool(4)>TᏆ</div>
+        <div class=Timage     title="Add image"       onclick=ctool(5)>🗻</div>
+        <div class=Tpdf       title="Add pdf"         onclick=ctool(6)>📋</div>
+        <div class=Tline      title="Draw Lines"      onclick=ctool(7)>/</div>
+        <div class=Trect      title="Rectangle"       onclick=ctool(9)>▬</div>
+        <div class=Tarc       title="Arc"             onclick=ctool(10)></div>
+        <div class=TqCurve    title="Quadratic curve" onclick=ctool(11)></div>
+        <div class=Tbezier    title="Bezier curve"    onclick=ctool(12)></div>
+        <div class=TdragLast  title="Drag/move last path" onclick=ctool(13)>✋</div>
+        <div class=TdragAll   title="Drag/move all paths" onclick=ctool(14)>✋</div>
+        <div class=Tundo      title="Undo: Remove recent shapes">↶</div>
+        <div class=TlineWidth title="Set line-width"></div>
+        <div class=colors     title="Set foreground and background colors"></div>
+        <div class=extra      title="Extra options"></div>
+        <div class=zoomUp     title="Zoon-In"></div>
+        <div class=zoomDown   title="Zoom-Out"></div>
+    </section>
+    <section class=line-width-container class=context-popup>
+        <label for=line-width-text>Line Width:</label>
+        <input id=line-width-text class=line-width-text type=text value=2>
+        <div   id=line-width-done class=btn-007>Done</div>
+    </section>
+    <section class=colors-container class="context-popup colors-container" style="display:none">
+        <div class=input-div>
+            <label for=stroke-style>Stroke Style:</label>
+            <input id=stroke-style type=color value=#6c96c8>
+        </div>
+        <div class="input-div">
+            <label for="fill-style">Fill Style:</label>
+            <input id="fill-style" type="color" value="#ffffff">
+        </div>
+        <div id="colors-done" class="btn-007">Done</div>
+    </section>
+    <section class="marker-container" class="context-popup colors-container" style="display:none">
+        <div class="input-div">
+            <label for="marker-stroke-style">Thickness:</label>
+            <select id="marker-stroke-style" value="8">
+                <option value='8'>8</option>
+                <option value='9'>9</option>
+                <option value='10'>10</option>
+                <option value='11'>11</option>
+                <option value='12'>12</option>
+                <option value='14'>14</option>
+                <option value='16'>16</option>
+                <option value='18'>18</option>
+                <option value='20'>20</option>
+                <option value='22'>22</option>
+                <option value='22'>22</option>
+                <option value='24'>24</option>
+                <option value='26'>26</option>
+                <option value='28'>28</option>
+                <option value='36'>36</option>
+                <option value='36'>36</option>
+                <option value='48'>48</option>
+                <option value='72'>72</option>
+            </select>
+        </div>
+        <div class="input-div" id='marker-color-container'>
+            <label for="marker-fill-style">Fill Color:</label>
+            <div id="marker-selected-color"></div>
+            <div id="marker-fill-colors" class='context-popup'>
+                <div class="top">
+                    <div id="marker-selected-color-2"></div>
+                    <input id="marker-fill-style" type="text" value="FF7373">
+                </div>
+                <table id="marker-colors-list"></table>
+            </div>
+        </div>
+        <div id="marker-done" class="btn-007">Done</div>
+    </section>
+    <section class="pencil-container context-popup colors-container" style="display:none">
+        <div class="input-div">
+            <label for="pencil-stroke-style">Thickness:</label>
+            <select class="pencil-stroke-style">
+                <option value='1'>1</option>
+                <option value='2'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+                <option value='5' selected>5</option>
+                <option value='6'>6</option>
+                <option value='7'>7</option>
+                <option value='8'>8</option>
+                <option value='9'>9</option>
+                <option value='10'>10</option>
+                <option value='11'>11</option>
+                <option value='12'>12</option>
+                <option value='14'>14</option>
+                <option value='16'>16</option>
+                <option value='18'>18</option>
+                <option value='20'>20</option>
+                <option value='22'>22</option>
+                <option value='22'>22</option>
+                <option value='24'>24</option>
+                <option value='26'>26</option>
+                <option value='28'>28</option>
+                <option value='36'>36</option>
+                <option value='36'>36</option>
+                <option value='48'>48</option>
+                <option value='72'>72</option>
+            </select>
+        </div>
+        <div class="input-div" id='pencil-color-container'>
+            <label for="pencil-fill-style">Fill Color:</label>
+            <div id="pencil-selected-color"></div>
+            <div id="pencil-fill-colors" class='context-popup'>
+                <div class="top">
+                    <div id="pencil-selected-color-2"></div>
+                    <input class="pencil-fill-style" type="text" value="6699FF">
+                </div>
+                <table id="pencil-colors-list">
+
+                </table>
+            </div>
+        </div>
+        <div id="pencil-done" class="btn-007">Done</div>
+    </section>
+
+	<section class="pdf-page-container">
+		<img class="pdf-prev">
+		<select class="pdf-pages-list"></select>
+		<img class="pdf-next">
+		<img class="pdf-close">
+	</section>
+    <section class="arc-range-container" class="arc-range-container" style="display:none">
+        <input class="arc-range" class="arc-range" type="text" value="2">
+        <input type="checkbox" class="is-clockwise" checked="" class="allow-select">
+        <label for="is-clockwise">Clockwise?</label>
+        <div class="arc-range-container-guide">Use arrow keys ↑↓</div>
+    </section>
+    <section class="code-container" style="display:none">
+        <textarea id="code-text" class="code-text allow-select"></textarea>
+    </section>
+
+    <section class="preview-panel" style="display: none;" style="display:none">
+        <div class="design-preview" class="preview-selected">Preview</div>
+        <div class="code-preview">Code</div>
+    </section>
+
+    <section class="options-container" style="display:none">
+        <div>
+            <input type="checkbox" class="is-absolute-points" checked="">
+            <label for="is-absolute-points">Absolute Points</label>
+        </div>
+        <div>
+            <input type="checkbox" class="is-shorten-code" checked="">
+            <label for="is-shorten-code">Shorten Code</label>
+        </div>
+    </section>
+
+    <ul class="fontSelectUl" style="display: none; position: absolute; top: 0; left: 0; width: 166px;" style="display:none">
+        <li>Arial</li>
+        <li>Arial Black</li>
+        <li>Comic Sans MS</li>
+        <li>Courier New</li>
+        <li>Georgia</li>
+        <li>Tahoma</li>
+        <li>Times New Roman</li>
+        <li>Trebuchet MS</li>
+        <li>Verdana</li>
+    </ul>
+
+    <ul class="fontSizeUl" style="display: none; position: absolute; top: 0; left: 0; width: 50px; text-align: center;" style="display:none">
+        <li>15</li>
+        <li>17</li>
+        <li>19</li>
+        <li>20</li>
+        <li>22</li>
+        <li>25</li>
+        <li>30</li>
+        <li>35</li>
+        <li>42</li>
+        <li>48</li>
+        <li>60</li>
+        <li>72</li>
+    </ul>
+	<section class="context-popup additional-container" style="display:none">
+        <div>
+            <label for="lineCap-select">Line Cap:</label>
+            <select class="lineCap-select">
+                <option>round</option>
+                <option>butt</option>
+                <option>square</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="lineJoin-select">Line Join:</label>
+            <select class="lineJoin-select">
+                <option>round</option>
+                <option>bevel</option>
+                <option>miter</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="globalAlpha-select">globalAlpha:</label>
+            <select id="globalAlpha-select">
+                <option>1.0</option>
+                <option>0.9</option>
+                <option>0.8</option>
+                <option>0.7</option>
+                <option>0.6</option>
+                <option>0.5</option>
+                <option>0.4</option>
+                <option>0.3</option>
+                <option>0.2</option>
+                <option>0.1</option>
+                <option>0.0</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="globalCompositeOperation-select">globalCompositeOperation:</label>
+            <select id="globalCompositeOperation-select">
+                <option>source-atop</option>
+                <option>source-in</option>
+                <option>source-out</option>
+                <option selected="">source-over</option>
+                <option>destination-atop</option>
+                <option>destination-in</option>
+                <option>destination-out</option>
+                <option>destination-over</option>
+                <option>lighter</option>
+                <option>copy</option>
+                <option>xor</option>
+            </select>
+        </div>
+
+        <div id="additional-close" class="btn-007">Done</div>
+    </section>
+</div>

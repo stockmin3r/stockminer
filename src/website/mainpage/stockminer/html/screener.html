@@ -1,0 +1,612 @@
+<div class="watchmgr screener" style="display:none">
+	<div class=whdr>
+		<div class=wpre>Presets:
+			<select class=screener-select onchange="wtabselect()">
+				<option value=0>New Preset</option>
+			</select>
+		</div>
+		<span class="links link-cyan">⚙</span>
+		<div class=links-menu style="display:none">
+			<div class=link-cyan   title="Link with Cyan Objects"   onclick=screener_setlink("cyan")>⚙</div>
+			<div class=link-white  title="Link with White Objects"  onclick=screener_setlink("white")>⚙</div>
+			<div class=link-orange title="Link with Orange Objects" onclick=screener_setlink("orange")>⚙</div>
+			<div class=link-green  title="Link with Green Objects"  onclick=screener_setlink("green")>⚙</div>
+			<div class=link-red    title="Link with Red Objects"    onclick=screener_setlink("red")>⚙</div>
+		</div>
+		<div class=wstrash title=Reset onclick=wtrash()>🗑</div><div class=wsbomb title="Delete Preset" onclick=wbomb()>💣</div>
+		<div class=wnew><input class=wnewname type=text placeholder="Preset Name"><div class=wsave>Save</div></div>
+		<div class=watch-control>
+			<button class="on wbtn" onclick="wcat(-1)">All</button>
+			<button class=wbtn onclick="wcat(400,500)">Trend</button>
+			<button class=wbtn onclick="wcat(100,200)">Technical</button>
+			<button class=wbtn onclick="wcat(200,299)">Algo</button>
+			<button class=wbtn onclick="wcat(300,400)">Fundamentals</button>
+			<button class=wbtn onclick="wcat(500,600)">Options</button>
+		</div>
+	</div>
+	<div id=WSRC class=wsrc>
+		<ul class="sort">
+		<li v=915>Date</li>
+		<li v=900>Ticker</li>
+		<li v=901>Price</li>
+		<li v=916>PT - Price Target</li>
+		<li v=902>Rank</li>
+		<li v=903>Delta</li>
+		<li v=904>Vol</li>
+		<li v=905>Open</li>
+		<li v=906>High</li>
+		<li v=907>Low</li>
+		<li v=908>PClose</li>
+		<li v=909>Open% - %Chg from previous close to Today's Open</li>
+		<li v=910>High% - %Chg from previous close to Today's High</li>
+		<li v=911>Low%  - %Chg from previous close to Today's Low</li>
+		<li v=912>Peak  - 52 Week High</li>
+		<li v=913>Peak% - % Chg from peak</li>
+		<li v=914>VS - Volume Spike	</li>
+
+		<!-- Trend -->
+		<li v=400>D↑         - count of consecutive up days </li>
+		<li v=401>D↓         - count of consecutive down days</li>
+		<li v=402>W↑         - count of consecutive up weeks</li>
+		<li v=403>W↓         - count of consecutive down weeks</li>
+		<li v=404>%D↑        - percentage of up days in the year </li>
+		<li v=405>%D↓        - percentage of down days in the year </li>
+		<li v=406>BIX        - has to stock beaten the SPX? % delta from SPX</li>
+		<li v=418>Q1         - AnyDay % of days stock gained 5% within Q1 (63 days, 2021)</li>
+		<li v=419>Q2         - AnyDay % of days stock gained 5% within Q2 (126 days, 2021)</li>
+		<li v=420>Q1         - AnyDay % of days stock gained 5% within Q1 (63 days, 2020)</li>
+		<li v=421>Q2         - AnyDay % of days stock gained 5% within Q2 (126 days, 2020)</li>
+		<li v=422>Q1         - AnyDay % of days stock gained 5% within Q1 (63 days, 2019)</li>
+		<li v=423>Q2         - AnyDay % of days stock gained 5% within Q2 (126 days, 2019)</li>
+		<li v=424>Q1         - AnyDay % of days stock gained 10% within Q1 (63 days, 2021)</li>
+		<li v=425>Q2         - AnyDay % of days stock gained 10% within Q2 (126 days, 2021)</li>
+		<li v=426>Q1         - AnyDay % of days stock gained 10% within Q1 (63 days, 2020)</li>
+		<li v=427>Q2         - AnyDay % of days stock gained 10% within Q2 (126 days, 2020)</li>
+		<li v=428>Q1         - AnyDay % of days stock gained 10% within Q1 (63 days, 2019)</li>
+		<li v=429>Q2         - AnyDay % of days stock gained 10% within Q2 (126 days, 2019)</li>
+		<li v=430>'21        - AvgDays stock took to gain 5% (2021)</li>
+		<li v=431>'20        - AvgDays stock took to gain 5% (2020)</li>
+		<li v=432>'19        - AvgDays stock took to gain 5% (2019)</li>
+		<li v=433>'21        - AvgDays stock took to gain 10% (2021)</li>
+		<li v=434>'20        - AvgDays stock took to gain 10% (2020)</li>
+		<li v=435>'19        - AvgDays stock took to gain 10% (2019)</li>
+
+
+		<li v=800>Candle     - Candlestick Type</li>
+		<li v=851>D1         - 1 day after signal</li>
+		<li v=852>D2         - 2 days after signal</li>
+		<li v=853>D3         - 3 days after signal</li>
+		<li v=854>D4         - 4 days after signal</li>
+		<li v=855>D5         - 5 days after signal</li>
+		<li v=856>D6         - 6 days after signal</li>
+		<li v=857>D7         - 7 days after signal</li>
+		<li v=858>D8         - 8 days after signal</li>
+		<li v=859>D9         - 9 days after signal</li>
+		<li v=860>D10        - 10 days after signal</li>
+		<li v=865>D15        - 15 days after signal</li>
+		<li v=871>D21        - 21 days after signal</li>
+		<li v=899>Bull/Bear  - Bullish (1), Bearish (0)</li>
+		
+		<!-- Technical Indicators -->
+		<li v=100>MA200 - Moving Average 200</li>
+		<li v=101>MA100 - Moving Average 100</li>
+		<li v=102>MA50  - Moving Average 50</li>
+		<li v=103>MA20  - Moving Average 20</li>
+		<li v=190>EMA10</li>
+		<li v=191>EMA20</li>
+		<li v=192>EMA50</li>
+		<li v=193>EMA100</li>
+		<li v=194>EMA200</li>
+		<li v=195>MFI2</li>
+		<li v=104>VWAP</li>
+		<li v=105>AV(5d)   - Average Volume over 5 days</li>
+		<li v=106>AV(10d)  - Average Volume over 10 days</li>
+		<li v=107>AV(21d)  - Average Volume over 21 days</li>
+		<li v=108>AV(3mo)  - Average Volume over 3 months</li>
+		<li v=109>ADI</li>
+		<li v=110>OBV</li>
+		<li v=111>CMF</li>
+		<li v=112>FI</li>
+		<li v=113>MFI</li>
+		<li v=114>EM</li>
+		<li v=115>VPT</li>
+		<li v=116>NVI</li>
+		<li v=117>VWAP</li>
+		<li v=118>ATR</li>
+		<li v=119>BBM</li>
+		<li v=120>BBH</li>
+		<li v=121>BBL</li>
+		<li v=122>BBW</li>
+		<li v=123>BBP</li>
+		<li v=124>BBHI</li>
+		<li v=125>BBLI</li>
+		<li v=126>KCC</li>
+		<li v=127>KCH</li>
+		<li v=128>KCL</li>
+		<li v=129>KCW</li>
+		<li v=130>KCP</li>
+		<li v=131>KCHI</li>
+		<li v=132>KCLI</li>
+		<li v=133>DCL</li>
+		<li v=134>DCH</li>
+		<li v=135>DCM</li>
+		<li v=136>DCW</li>
+		<li v=137>DCP</li>
+		<li v=138>UI</li>
+		<li v=139>MACD</li>
+		<li v=140>MACDs Sig</li>
+		<li v=141>MACDd Diff</li>
+		<li v=142>SMAf - SMA Fast</li>
+		<li v=143>SMAs - SMA Slow</li>
+		<li v=144>EMAs - EMA Slow</li>
+		<li v=145>ADX</li>
+		<li v=146>ADXp - ADX Position</li>
+		<li v=147>ADXn - ADX Neg</li>
+		<li v=148>VTXp - Vortex Position</li>
+		<li v=149>VTXn - Vortex Neg</li>
+		<li v=150>VTXd - Vortex Diff</li>
+		<li v=151>TRIX</li>
+		<li v=152>MIDX - Mass Index</li>
+		<li v=153>CCI</li>
+		<li v=154>DPO</li>
+		<li v=155>KST</li>
+		<li v=156>KSTs - KST Sig</li>
+		<li v=157>KSTd - KST Diff</li>
+		<li v=158>ICHc - Ichimoku Conv</li>
+		<li v=159>ICHb - Ichimoku Base</li>
+		<li v=160>ICHa - Ichimoku a</li>
+		<li v=161>ICHb - Ichimoku b</li>
+		<li v=162>vICHa - Visual Ichimoku a</li>
+		<li v=163>vICHb - Visual Ichimoku b</li>
+		<li v=164>ARup - Aroon Up</li>
+		<li v=165>ARdw - Aroon Down</li>
+		<li v=166>ARi  - Aroon Indicator</li>
+		<li v=167>PSARup - PSAR Up</li>
+		<li v=168>PSARdw - PSAR Down</li>
+		<li v=169>PSARui - PSAR Up Indicator</li>
+		<li v=170>PSARdi - PSAR Down Indicator</li>
+		<li v=171>STC</li>
+		<li v=172>RSI</li>
+		<li v=173>sRSI - Stochastic RSI</li>
+		<li v=174>sRSIk - Stochastic RSI k</li>
+		<li v=175>sRSId - Stochastic RSI d</li>
+		<li v=176>TSI</li>
+		<li v=177>UO</li>
+		<li v=178>StoK - Stochastic K</li>
+		<li v=179>StoD - Stochastic D</li>
+		<li v=180>WR - Williams R%</li>
+		<li v=181>AO</li>
+		<li v=182>KAMA</li>
+		<li v=183>ROC</li>
+		<li v=184>PPO</li>
+		<li v=185>PPOs - PPO Sig</li>
+		<li v=186>PPOh - PPO Hist</li>
+		<li v=187>DR</li>
+		<li v=188>DLR</li>
+		<li v=189>CR</li>
+
+
+		<li v=700>MACD</li>
+		<li v=701>RSI</li>
+		<li v=702>Aroon</li>
+		<li v=703>Stoch</li>
+		<li v=704>BB</li>
+		<li v=705>CCI</li>
+		<li v=706>Keltner</li>
+
+		<!-- Fundamentals -->
+		<li v=300>Earnings - Earnings Date</li>
+		<li v=313>ED - Days to/from Earnings Date</li>
+		<li v=301>Sector</li>
+		<li v=302>Dividend Yield</li>
+		<li v=303>Div</li>
+		<li v=304>Xdate</li>
+		<li v=305>Annual Revenue</li>
+		<li v=306>EPS</li>
+		<li v=307>Value at Risk (VaR)</li>
+		<li v=308>Market Cap</li>
+		<li v=309>PEG Ratio</li>
+		<li v=310>Price to Book ratio (PBR)</li>
+		<li v=311>Profit Margin %</li>
+		<li v=312>ROA</li>
+
+		<!-- Algorithmic -->
+
+<li v=286>Sig - Signal</li>
+<li v=285>⟑ - peak or not</li>
+<li v=278>1YPPR - One Year Peak Price</li>
+<li v=279>P10LIMIT - Limit Price level</li>
+<li v=280>P10DELTA - % Away from being a P10 buy</li>
+<li v=281>peak%P₁ₒ - 10th percentile %Peak</li>
+<li v=282>peak%P₅ - 5th percentile %Peak</li>
+<li v=283>last_peak - last peak date</li>
+<li v=284>P₁ₒOrP₅ - 10th or 5th percentile</li>
+<li v=226>RTD - Return to Date</li>
+<li v=227>Streak</li>
+<li v=228>DIR - Streak Direction (up or down)</li>
+<li v=229>Buy - Buy Price level</li>
+<li v=230>BuyDelta - % Away from being a buy</li>
+<li v=231>Sell - Sell Price level</li>
+<li v=232>SellDelta - % Away from being a sell</li>
+<li v=233>FIB</li>
+<li v=234>FIBDIR - direction (up or down)</li>
+<li v=235>BuyFIB - Buy Price Level</li>
+<li v=236>BuyDeltaFIB - % Away from being a buy</li>
+<li v=237>SellFIB - Sell Price Level</li>
+<li v=238>SellDeltaFIB - % Away from being a sell</li>
+<li v=239>Mean - associated average</li>
+<li v=240>STD - Standard Deviation</li>
+<li v=212>A1ESP - Action 1 ESP</li>
+<li v=213>A1 - Action 1</li>
+<li v=214>A1Same</li>
+<li v=215>A1Result</li>
+<li v=216>A4ESP - Action 4 ESP</li>
+<li v=217>A4 - Action 4</li>
+<li v=241>Var90 - Parametric Value at Risk 90%</li>
+<li v=242>Var95 - Parametric Value at Risk 95%</li>
+<li v=243>Var99 - Parametric Value at Risk 99%</li>
+<li v=244>Var99Pot - Potential on Parametric Value at Risk 99%</li>
+<li v=245>1YA - One Year Ago</li>
+<li v=246>1YP - One Year pk %</li>
+<li v=247>YTD - Year to Date</li>
+<li v=218>1d - 1 Day Return</li>
+<li v=219>3d - 3 Day Return</li>
+<li v=220>5d - 5 day Return</li>
+<li v=221>8d - 8 day Return</li>
+<li v=222>13d - 13 day Return</li>
+<li v=223>21d - 21 day Return</li>
+<li v=224>42d - 42 day Return</li>
+<li v=225>63d - 63 day Return</li>
+<li v=200>#days5% - # Days to reach 5%</li>
+<li v=201>#days10% - # Days to reach 10%</li>
+<li v=202>#days15% - # Days to reach 15%</li>
+<li v=203>#days20% - # Days to reach 20%</li>
+<li v=204>return5% - associated return >= 5 %</li>
+<li v=205>return10% - associated return >= 10 %</li>
+<li v=206>return15% - associated return >= 15 %</li>
+<li v=207>return20% - associated return >= 20 %</li>
+<li v=208>Max5% - max days elapsed towards 5%</li>
+<li v=209>Max10% - max days elapsed towards 10%</li>
+<li v=210>Max15% - max days elapsed towards 15%</li>
+<li v=211>Max20% - max days elapsed towards 20%</li>
+<li v=248>#Sig21A1 - number of A1 signals (offset 21)</li>
+<li v=249>#Sig42A1 - number of A1 signals (offset 42)</li>
+<li v=250>#Sig63A1 - number of A1 signals (offset 63)</li>
+<li v=251>MX5%21A1 - max days to return 5% (offset 21)</li>
+<li v=252>MX5%42A1 - max days to return 5% (offset 42)</li>
+<li v=253>MX5%63A1 - max days to return 5% (offset 63)</li>
+<li v=254>SX5%21A1 - success rate to return 5% (offset 21)</li>
+<li v=255>SX5%42A1 - success rate to return 5% (offset 42)</li>
+<li v=256>SX5%63A1 - success rate to return 5% (offset 63)</li>
+<li v=257>MX10%21A1 - max days to return 10% (offset 21)</li>
+<li v=258>MX10%42A1 - max days to return 10% (offset 42)</li>
+<li v=259>MX10%63A1 - max days to return 10% (offset 63)</li>
+<li v=260>SX10%21A1 - success rate to return 10% (offset 21)</li>
+<li v=261>SX10%42A1 - success rate to return 10% (offset 42)</li>
+<li v=262>SX10%63A1 - success rate to return 10% (offset 63)</li>
+<li v=263>#Sig21A4 - number of A4 signals (offset 21)</li>
+<li v=264>#Sig42A4 - number of A4 signals (offset 42)</li>
+<li v=265>#Sig63A4 - number of A4 signals (offset 63)</li>
+<li v=266>MX5%21A4 - max days to return 5% (offset 21)</li>
+<li v=267>MX5%63A4 - max days to return 5% (offset 42)</li>
+<li v=268>MX5%42A4 - max days to return 5% (offset 63)</li>
+<li v=269>SX5%21A4 - success rate to return 5% (offset 21)</li>
+<li v=270>SX5%42A4 - success rate to return 5% (offset 42)</li>
+<li v=271>SX5%63A4 - success rate to return 5% (offset 63)</li>
+<li v=272>MX10%21A4 - max days to return 10% (offset 21)</li>
+<li v=273>MX10%42A4 - max days to return 10% (offset 42)</li>
+<li v=274>MX10%63A4 - max days to return 10% (offset 63)</li>
+<li v=275>SX10%21A4 - success rate to return 10% (offset 21)</li>
+<li v=276>SX10%42A4 - success rate to return 10% (offset 42)</li>
+<li v=277>SX10%63A4 - success rate to return 10% (offset 63)</li>
+
+
+		<li v=500>Contract Name</li>
+		<li v=501>Price</li>
+		<li v=515>Delta</li>
+		<li v=502>Bid</li>
+		<li v=503>Ask</li>
+		<li v=504>OI (Open Interest)</li>
+		<li v=505>IV (Implied Volatility)</li>
+		<li v=506>VOL</li>
+		<li v=507>Strike</li>
+		<li v=508>Hold (Holding Period)</li>
+		<li v=509>RC (Return Called)</li>
+		<li v=510>RU (Return Unchanged)</li>
+		<li v=511>APR (APR Called)</li>
+		<li v=512>%OTM</li>
+		<li v=513>ND (Net Debit)</li>
+		<li v=514>NDP (Net Debit Percent)</li>
+		</ul>
+	</div>
+	<div class=wmid>
+		<button class=wmadd>Add</button>
+		<button class=wmrem>Remove</button>
+		<button class=wmcol onclick=tableColors_onclick()>Colors</button>
+	</div>
+	<div class=wdst>
+		<ul id=WDST class="sort">
+			<li t=T v=900>Ticker</li>
+			<li t=P v=901>Price</li>
+			<li t=D v=903>Delta</li>
+			<li t=V v=904>Vol</li>
+		</ul>
+	</div>
+</div>
+
+<div class="showtime screener" style="display:none">
+	<h2>Watchlist Filter</h2>
+	<span class=showtime-watchlists-title>Watchlists:</span>
+	<select class=showtime-watchlists-select></select>
+	<span class=showtime-delay-title>Delay:</span>
+	<input class=showtime-delay-input type=text title="How long a scene lasts for" value=10>
+	<div class=whdr>
+		<div class=watch-control>
+		</div>
+		<div class=stockvid>
+			<div class=start onclick=Showtime_Play() title="Play Video"></div>
+			<div class=stop  onclick=Showtime_Stop() title=Stop></div>
+		</div>
+	</div>
+	<div class=wsrc>
+		<ul class="stocklist"></ul>
+	</div>
+	<div class=wdst></div>
+</div>
+
+<div class=pubwatch-quad style="display:none">
+	<span class=alerts onclick=alerts()>⏰</span>
+	<select class=watchlist-select onchange=watchlists_onchange()>
+		<option value=1>Public Watchlists</option>
+		<option value=0>My Watchlists</option>
+	</select>
+	<table id=PUB class="PTAB cell-border dataTable">
+		<thead>
+		<tr>
+			<th>Watchlist</th>
+			<th>Creator</th>
+			<th>Tickers</th>
+			<th>Alerts</th>
+		</tr>
+		</thead>
+	</table>
+	<table id=PATAB class="PTAB cell-border dataTable">
+		<thead>
+		<tr>
+			<th>Stock</th>
+			<th>Type</th>
+			<th>Condition</th>
+			<th>Arg</th>
+		</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
+
+<div class=theme-quad style="display:none">
+	<table id=Styles class="PTAB cell-border dataTable">
+		<thead>
+		<tr>
+			<th>Style</th>
+			<th>Creator</th>
+			<th>Type</th>
+			<th>Rating</th>
+		</tr>
+		</thead>
+	</table>
+</div>
+
+<div class=watchtable-tools style="display:none">
+	<span  class=watchtable-new   onclick=watchlist_new()      title="Clear all stocks from this Watchlist">New</span>
+	<span  class=watchtable-bulk  onclick=watchlist_bulk()     title="Load multiple tickers at once">Load</span>
+	<!--<img   class=watchtable-add   onclick=watchlist_addstock() title="Add stock to Watchlist" src=/img/open.png>
+	<img   class=watchtable-del   onclick=watchlist_delstock() title="Delete Stock from Watchlist" src=/img/close.png>-->
+	<span  class=watchtable-save  onclick=watchlist_save()     title="Save Watchlist">💾</span>
+	<!--<span  class=watchtable-theme onclick=CSSEditor()          title="Create your own Table Style"></span>-->
+	<input class=watchtable-input type=text placeholder=Ticker>
+</div>
+
+<div class=opmorph style="display:none">
+	<div class=morphadd>
+		<input class=morphtick type=text placeholder=Contract>
+		<button class=morphspan onclick=addContract()>Add Contract</button>
+	</div>
+</div>
+
+<div class=XLS-mod style="display:none">
+	<input class=XLS-ticker type=text placeholder=Ticker>
+	<select class=XLS-presets></select>
+	<span class=XLS-rows-hdr>ROWS:</span>
+	<input class=XLS-rows-input type=text placeholder="1-max">
+	<span class=XLS-load title="Load XLS" onclick=loadXLS()></button>
+</div>
+
+<div class="indi-mod" style="display:none">
+	<div class=prelist>
+		<table class=DTAB>
+			<thead>
+				<tr>
+					<td>Active</td>
+					<td>Name</td>
+					<td>Indicators</td>
+					<td>Active On</td>
+					<td>&times;</td>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+</div>
+
+<!-- StockPage Bull/Bear Screener -->
+<div class=BB-screener style="display:none"></div>
+<div class=DQ-control style="display:none">
+	<label class=checkbox onclick=stockview(0)>
+		<input type=checkbox class=checkbox_input>
+		<span class=checkbox_ctrl></span>
+		<span>Technicals</span>
+	</label>
+	<label class=checkbox onclick=stockview(2)>
+		<input type=checkbox class=checkbox_input>
+		<span class=checkbox_ctrl></span>
+		<span>Fundamentals</span>
+	</label>
+	<label class=checkbox onclick=stockview(1)>
+		<input type=checkbox class=checkbox_input>
+		<span class=checkbox_ctrl></span>
+		<span>Algorithmic</span>
+	</label>
+</div>
+
+<!-- StockPage AnyDay Tables -->
+<table class="ANYTAB XTAB" style="display:none">
+	<thead>
+		<tr class=trx>
+			<th colspan=9>5% return - any day</th>
+			<th colspan=9>10% return - any day</th>
+		</tr>
+		<tr class=trx>
+			<th colspan=2 scope=colgroup>2020</th>
+			<th colspan=2 scope=colgroup>2019</th>
+			<th colspan=2 scope=colgroup>2018</th>
+			<th colspan=3 scope=colgroup>AvgDays</th>
+			<th colspan=2 scope=colgroup>2020</th>
+			<th colspan=2 scope=colgroup>2019</th>
+			<th colspan=2 scope=colgroup>2018</th>
+			<th colspan=3 scope=colgroup>AvgDays</th>
+		</tr>
+		<tr>
+			<th>1Q</th><th>2Q</th><th>1Q</th><th>2Q</th><th>1Q</th><th>2Q</th>
+			<th>'20</th><th>'19</th><th>'18</th>
+			<th>1Q</th><th>2Q</th><th>1Q</th><th>2Q</th><th>1Q</th><th>2Q</th>
+			<th>'20</th><th>'19</th><th>'18</th>
+		</tr>
+		</thead>
+		<tbody></tbody>
+</table>
+<!-- StockPage Trend Table -->
+<table class="TREND XTAB" style="display:none">
+	<thead>
+		<tr>
+			<th>1d</th>
+			<th>3d</th>
+			<th>5d</th>
+			<th>8d</th>
+			<th>13d</th>
+			<th>21d</th>
+			<th>42d</th>
+			<th>63d</th>
+		</tr>
+	</thead>
+</table>
+
+	<!-- SigMon -->
+	<table id=SIGMON class="XTAB cell-border dataTable" style="display:none">
+	<thead>
+		<tr>
+			<th>Rank</th>
+			<th>Sym</th>
+			<th>SigDate</th>
+			<th>Price</th>
+			<th>Peak%</th>
+			<th>D1</th>
+			<th>D3</th>
+			<th>D5</th>
+			<th>D8</th>
+			<th>D13</th>
+			<th>D21</th>
+		</tr>
+	</thead>
+	</table>
+
+<!-- unfinished -->
+<div class=style-mod style="display:none">
+	<div class=whdr>
+		<div class=temp-control>
+			<button class="on wbtn" onclick="template(0)">Quad</button>
+			<button class=wbtn onclick="template(1)">Chart</button>
+			<button class=wbtn onclick="template(2)">Watchlist</button>
+			<button class=wbtn onclick="template(3)">MainPage</button>
+			<button class=wbtn onclick="template(4)">Indicators</button>
+			<button class=wbtn onclick="template(5)">Publisher</button>
+			<button class=wbtn onclick="template(6)">Portfolio</button>
+			<button class=wbtn onclick="template(7)">Help</button>
+		</div>
+	</div>
+	<div class=template></div>
+	<div class=temp-obj>
+		<div class=obj-name>New Workspace</div>
+		<div class="wsnew-edit obj">❖</div>
+	</div>
+	<div class=temp-mod>
+		<div class=emod style="color:white;font-weight:bold">Set Color</div><input class=cblock type=color value="#5f679F" onchange=tmpcol()>
+		<div class=esave><input class=stylename placeholder="Style Name"><div class="wsave styleSave" onclick=SaveStyle()>Save</div></div>
+	</div>
+</div>
+
+<!-- unfinished -->
+<div class="opmgr screener" style="display:none">
+	<div class=whdr>
+		<div class=wpre>Presets:
+			<select class=screener-select onchange="wtabselect()">
+				<option value=0>New Preset</option>
+			</select>
+		</div>
+		<div class=wstrash title=Reset onclick=wtrash()>🗑</div><div class=wsbomb title="Delete Preset" onclick=wbomb()>💣</div>
+		<div class=wnew><input class=wnewname type=text placeholder="Preset Name"><div class=wsave>Save</div></div>
+		<div class=watch-control>
+			<button class="on wbtn" onclick="wcat(-1)">All</button>
+			<button class=wbtn onclick="wcat(0,600)">Greeks</button>
+		</div>
+	</div>
+	<div class=wsrc>
+		<ul class="sort">
+		<li v=500>Contract</li>
+		<li v=501>Price</li>
+		<li v=512>%Chg</li>
+		<li v=503>Strike</li>
+		<li v=504>Bid</li>
+		<li v=505>Ask</li>
+		<li v=506>OI</li>
+		<li v=507>IV</li>
+		<li v=508>VOL</li>
+		<li v=509>Hold (Holding Period)</li>
+		<li v=510>RC (Return Called)</li>
+		<li v=511>RU (Return Unchanged)</li>
+		<li v=512>APR (APR Called)</li>
+		<li v=513>%OTM</li>
+		<li v=514>ND (Net Debit)</li>
+		<li v=515>NDP (Net Debit Percent)</li>
+		<li v=516>Delta</li>
+		<li v=517>Gamma</li>
+		<li v=518>Theta</li>
+		</ul>
+	</div>
+	<div class=wmid><button class=wmadd>Add</button><button class=wmrem>Remove</button></div>
+	<div class=wdst>
+		<ul class="sort">
+		<li v=500>Contract</li>
+		<li v=501>Price</li>
+		<li v=515>%Chg</li>
+		</ul>
+	</div>
+</div>
+
+<div id=XLS-load-ticker class=tpop style="display:none">
+	<input type=text placeholder=Ticker>
+	<div class=tload onclick=XLS_loadTicker_onclick()>Load</div>
+</div>
+
+<div id=color-diag style="display:none">
+	<div class=color-hdr>
+		<div class=color-scheme>Color Scheme:<select class=cs-select><option value=0 onchange=tableColors_scheme()>Stockminer</option></select></div>
+		<div class=column-text>Column:<span class=column-name></span></div>
+		<button class=column-save onclick=tableColors_save()>Apply</button>
+		<span class=column-close onclick=tableColors_close()>×</span>
+	</div>
+</div>
+
+<div class=color-rule style="display:none">
+	Cell Value between <input class=color-from type="text"/> and <input type=text class="color-to"/> <input type=color onchange=tableColors_onchange() value=#FF3406 class="color-box"/>
+	<select class=color-bg><option value=1>Background</option><option value=0>Text</option></select>
+</div>

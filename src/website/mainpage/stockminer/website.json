@@ -1,0 +1,170 @@
+{
+	"init_mainpage":   "init_stockminer",
+	"@gridmain":       "gridmain   {grid-template-columns:20vw 1fr;grid-column-gap:10px} .gridmain .quad{max-height:93vh;width:calc(80vw-10px)}",
+	"@mainchart":      ".mainchart {height:87vh;width:calc(80vw - 20px);border:2px solid #2f3136!important} [class^='grid'] .mainchart {height:auto;width:auto}.qmax .mainchart {width:calc(100vw - 20px)}",
+	"@TableStyleGreen":"thead:background:linear-gradient(to left, #821eda 32%, #c555d5 113%);color:green}",
+
+	BlankSpace:[{name:'Chart',    type:"img"},{name:'Watchtable',type:"img"},
+				{name:'XLS',      type:"img"},{name:'Screener',  type:"img"},
+				{name:'Showtime', type:"img"},
+				{name:'Picture',  type:"icon", icon: "📷", click:"upbox(1,3)"},
+				{name:'Document', type:"icon", icon: "📝", click:"upbox(2,8)"},
+				{name:'Video',    type:"icon", icon: "🎥", click:"upbox(3,20)"}
+	],
+	QuadVerse:[{
+		title:"Screener",
+		image:"screener.png",
+		paid:"",
+		class:" Screener",
+		QuadSpace:[{
+			title:"Stocks",
+			grid:"gridmain",
+			quads:[{
+				workspace: [{mod:"addTable",  title:"Lowcaps",  args:{id:"LG,LL", params:{
+																							columns:[["T","P","D","V"],["T","P","D","V"]],
+																							order:[2,2],
+																							slope:["desc","asc"]
+																							}}},
+							{mod:"addTable",  title:"Highcaps", args:{id:"HG"}, click:"highcaps()"}]
+			},{
+				workspace: [{mod:"addChart",  title:"Chart",    args:{class:"mainchart"}, style:"@gridmain,@mainchart"}]
+			}]
+		},{
+			title:"Screener",
+			grid: "grid50",
+			click:"screener",
+			quads: [{
+				workspace:  [{mod:"screener_workspace",   title:"Columns", args:{"watchtable":"morphtab","type":"stocks"}},
+							 {mod:"showtime_workspace",   title:"Showtime",click:"showtime_stocks_onclick()"}]
+			},{
+				workspace: [{mod:"watchlist_workspace",   title: "Watchlists"},
+							  {mod:"addStyleMod",         title: "Styles"},
+							  {mod:"addIndiMod",          title: "Indicators"},
+							  {mod:"addScriptMod",        title: "Scripts"}]
+			},{
+				workspace: [{mod: "watchtable_workspace",  "title": "Watchtable", "args":{"class":"stocktab","watchtable":"morphtab"}}]
+			},{
+				workspace: [{mod: "addBlankspace","title": "New Tab"}]
+			}]
+		},{
+			"title":  "Price Action",
+			"grid":   "grid100",
+			"click":  "ufo",
+			"quads":  [{"workspace":  [{"mod": "addUFO", "title": "UFO", "grid": "grid13"}]}]
+		},{
+			"title":  "Volume",
+			"grid":   "grid100",
+			"click":  "vfo",
+			"quads":  [{"workspace":  [{"mod": "addVFO", "title": "VFO", "grid": "grid13"}]}]
+		},{
+			"title":  "Candles",
+			"grid":   "grid100 candles",
+			"click":  "candles",
+			"quads":  [{"workspace":  [{"mod": "addCandles", "title": "Candles"}]}]
+		}]
+	},{
+		title:"Options",
+		init: "options",
+		class:" OpVerse",
+		image:"opverse.png",
+		paid: "",
+		QuadSpace: [{
+			title:"Options",
+			grid: "opgrid",
+			quads: [{
+				class    : "OpLQ LQ",
+				workspace: [{"mod": "addTable", "title": "OI",
+							   "args": {
+									"caption": "Open Interest Leaders",
+									"class":   "OpCALL",
+									"id":      "#OIC"
+								}
+							},{"mod": "addTable", "title": "VOL",
+							   "args": {
+									"caption": "Volume Leaders",
+									"class":   "OpCALL",
+									"id":      "#VOLC"
+								}}]
+			},{
+				"class"    : "OpMQ MQ",
+				"workspace": [{"mod": "addOpChart", "title": "Chart",         "click":"opchart()"},
+							  {"mod": "addTable",   "title": "OpChain",       "click":"opchain()","args": {"id": "#OPCH"}},
+							  {"mod": "addTable",   "title": "Covered Calls", "click":"opcc()",   "args": {"id": "#OPCC"}}]
+			},{
+				"class"    : "OpRQ RQ",
+				"workspace": [{"mod": "addTable", "title": "OI",
+							   "args": {
+									"caption": "Open Interest Leaders",
+									"class":   "OpPUT",
+									"id":      "#OIP"
+								}
+							},{"mod": "addTable", "title": "VOL",
+							   "args": {
+									"caption": "Volume Leaders",
+									"class":   "OpPUT",
+									"id":      "#VOLP"
+								}}]
+			},{
+				"class"    : "OpDQ DQ",
+				"workspace": [{"mod": "addOpTools", "title":"History"}]
+			}]
+		},{
+			"title":  "Screener",
+			"grid":   "grid50",
+			"quads":[{
+				"workspace":  [{"mod": "screener_workspace", "title": "OpConf",  "args":{"watchtable":"optab","type":"options","div":".opmgr"}},
+							   {"mod": "addBlankspace",      "title": "OpSearch"}]
+			},{
+				"workspace":  [{"mod": "addOpLists",         "title": "OpLists"}]
+			},{
+				"workspace":  [{"mod": "addOpTable",         "title": "OpTable", "args":{}}]
+			},{
+				"workspace":  [{"mod": "addBlankspace",      "title": "New Tab"}]
+			}]
+		}]
+	},{
+		"title":"Crypto",
+		"paid":"",
+		"class":" crypto",
+		"init":"chartspace",
+		"image":"chartspace.png",
+		"QuadSpace":[{
+			"title":"Backtest",
+			"grid":"grid100",
+			"click":"backtest",
+			"quads":[{
+				"workspace": [{"mod": "addTable", "title": "Crypto",  "args": {"id": "#crypto"}}]
+			},{
+				"workspace": [{"mod": "empty", "title": "Chart"}]
+			}]
+		}]
+	},{
+		"title":"ChartSpace",
+		"image":"chartspace.png",
+		"paid":"",
+		"class":" cspace",
+		"init":"chartspace",
+		"QuadSpace":[{
+			"title":"Tech",
+			"grid":"grid100",
+			"click":"quadspace_load",
+			"noload":"1",
+			"quads":[{
+				"workspace":[{"title": "Tech", "grid":"grid2x2", "obj":[{"chart":"AAPL"},{"chart":"AMZN"},{"chart":"GOOG"},{"chart":"MSFT"}]}]
+			}]
+		}]
+	},{
+		"title":"Profile",
+		"squeakpage":1,
+		"paid":"",
+		"class":" profile",
+		"init":"profile",
+		"QuadSpace": [{
+			"title":"Squeak",
+			"grid":"gridSQ",
+			"quads":[{"workspace": [{"mod": "addSQL",           "title": "Channels"}]},
+					 {"workspace": [{"mod": "profile_workspace","title": "Profile"}]},
+					 {"workspace": [{"mod": "addSQR",           "title": "Recent"}]}]
+		}]
+	}]
+}

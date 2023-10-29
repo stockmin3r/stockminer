@@ -1,0 +1,34 @@
+<div id=admin style="display:none">
+        <table class=STAB>
+                <tbody>
+                        <tr>
+                                <td>New Ranks</td>
+                                <td><input id=admin-ranks-file type=file value="Path to Ranks.csv"></td>
+                                <td class=qact onclick=newranks()>Set</td>
+                        </tr>
+                        <tr>
+                                <td>Max Ranks</td>
+                                <td><input id=admin-max-ranks type=text value="200"></td>
+                                <td class=qact onclick=maxranks()>Set</td>
+                        </tr>                   
+                        <tr>
+                                <td>Verifier</td>
+                                <td>Run EOD Price Verifier</td>
+                                <td>Run EOD Price Verifier</td>
+                                <td class=qact onclick=verify()>Run</td>
+                        </tr>
+                        <tr>
+                                <td>Create user</td>
+                                <td><input id=new-uid type=text placeholder=Username:></td>
+                                <td><input id=new-pwd type=text placeholder=Password:></td>
+                                <td class=qact onclick=newuser()>Create</td>
+                        </tr>
+                        <tr>
+                                <td>Live Mode</td>
+                                <td>Turn ON Live Mode</td>
+                                <td class=qact onclick=live()>Run</td>
+                        </tr>
+                </tbody>
+        </table>
+        <div id=admin-status></div>
+</div>

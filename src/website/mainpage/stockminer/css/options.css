@@ -1,0 +1,10 @@
+/***********************************************
+ * filename: mainpage/stockminer/css/options.css
+ * License:  Public Domain
+ **********************************************/
+.OPTAB   td:nth-child(1) {text-align:left}
+#OPCHAIN td              {cursor:default !important}
+#OPCHAIN td:nth-child(7) {color:limegreen;cursor:pointer !important;background-color:#282828 !important}
+#OPCH .NTM               {background-color:#41411E !important}
+#OPCH .OTM               {background-color:#411919 !important}
+#OPCH .ITM               {background-color:#193219 !important}

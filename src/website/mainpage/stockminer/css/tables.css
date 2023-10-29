@@ -1,0 +1,528 @@
+/***********************************************
+ * filename: mainpage/stockminer/css/tables.css
+ * License:  Public Domain
+ **********************************************/
+/********************************
+ *   Quad 1: Watchlists & Alerts
+ *******************************/
+.pubwatch-quad td  {cursor:pointer}
+#PUB               {margin:0 auto;float:left;margin-left:19%}
+#PATAB             {float:left;margin-left:10px;font-size:11px;color:white}
+.alerts            {margin-left:4.5rem;position:absolute;font-size:28px;cursor:pointer;margin-top:20px}
+.watchlist-select  {color:dodgerblue;margin-left:1rem;position:absolute;margin-top:7%}
+.highlight td      {background:#2f1236 !important}
+table .highlight td{background:#2f1236 !important}
+
+.boxmain.boxtick   {color:yellow !important}
+.indi-mod          {margin:0 auto}
+
+/***********************
+ *   Quad 2: WatchTable
+ **********************/
+.WBOX {margin-top:60px!important}
+.watchtable-tools button {margin-left:2%;color:#5f679F;width:100px;font-size:14px;font-weight:bold;border:1px inset #5f679F;background-color:#111000;margin-bottom:3%}
+.watchtable-tools  {
+	position:absolute;
+	margin:0 auto;
+	margin-left:30%;
+	margin-bottom:40px;
+	width:400px;
+	height:50px;
+	border:2px solid grey;
+	background-position:center center;
+	background-image:url("/img/bg2.jpg");
+	background-color:none
+}
+.watchtable-tools span {display:inline-block;cursor:pointer}
+.watchtable-new  {
+	color:white;
+	color:orangered;
+	text-decoration: underline;
+	font-weight:bold;
+	width:34px;
+	height:32px;
+}
+.watchtable-bulk {
+	font-weight:bold;
+	text-decoration:underline;
+	margin-top:15px;
+	font-size:16px;
+	width:32px;
+	color:orangered;
+	height:32px;
+}
+.watchtable-add {
+	position:absolute;
+	margin-left:200px;
+	width:20px;
+	height:20px;
+	cursor:pointer;
+}
+.watchtable-del {
+	position:absolute;
+	margin-top:28px;
+	margin-left:200px;
+	width:20px;
+	height:20px;
+	cursor:pointer;
+}
+.watchtable-save {
+	position:absolute;
+	margin-left:265px;
+	margin-top:5px;
+	font-size:32px;
+	font-weight:bold;
+	text-align:center;
+	width:45px;
+}
+.watchtable-theme {
+	position:absolute;
+	margin-left:281px;
+	margin-top:5px;
+	font-size:27px;
+	font-weight:bold;
+	text-align:center;
+}
+.watchtable-input {
+	position:absolute;
+	width:70px!important;
+	border-radius:26px;
+	margin-left:95px;
+	margin-top:10px;
+	line-height:2;
+}
+
+/****************
+ *   Quad 3
+ ***************/
+.XLS-mod {
+	margin:0 auto;
+	width:650px;
+	border: 2px solid grey;
+	height:50px;
+	color:white;
+	font-weight:bold;
+	background-position: center center;
+	background-image: url("https://wallpapercave.com/wp/wp2963685.jpg");
+}
+.XLS caption       {margin-bottom:0px}
+.XLS-mod input     {width:55px}
+.XLS-presets       {position:absolute;margin-top:10px;margin-left:110px;width:90px;color:grey;border-radius:26px}
+.XLS-rows-hdr      {position:absolute;margin-top:5px;margin-left:470px;font-size:12px}
+.XLS-rows-input {
+	position:absolute;
+	margin-top:22px;
+	margin-left:465px!important;
+	border-radius:26px;
+}
+.XLS-ticker {
+	position:absolute;
+	border-radius:26px;
+	margin-top:12px;
+	margin-left:300px!important;
+}
+.XLS-load {
+	position:absolute;
+	margin-left:605px;
+	font-size:36px;
+	color:green;
+	cursor:pointer;
+	width:48px;
+	height:48px;
+	background-image:url("data:image/svg+xml,%3Csvg width='48' height='48' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Cpath d='m8.94249,22.3686l15,-16.4604l15,16.4604l-7.5,0l0,16.5396l-15,0l0,-16.5396l-7.5,0z' stroke='%23000' fill='%2300bf00'/%3E%3C/g%3E%3C/svg%3E")
+}
+
+/* XLS */
+.XLS thead th       {position:sticky;top:0}					
+.XLS th             {color:white;padding:8px;background-color:#23234F}
+.XLS td             {background-color:white}
+.XLS {
+	border-collapse:collapse;
+	font-size:12.5px;
+	font-family:Arial;
+	line-height:0.8;
+	color:black;
+	border:2px solid #2f3136;
+}
+.XLS td{
+	border:1px solid rgb(128, 128, 128, 0.2)!important;
+	font-size:16px;
+	line-height:normal;
+	padding-top:8px;
+	padding-bottom:8px;
+	padding-left:5px;
+	padding-right:5px;
+	border-collapse:collapse;
+	border-spacing:2px 2px
+}
+
+/* Table Styles */
+.PTAB        {font-weight:bold;cursor:pointer;font-size:14px;margin-left:10px}
+.PTAB thead  {color:white;background:linear-gradient(to left, dodgerblue 20%, #821eda 90%)}
+.PTAB td     {background:linear-gradient(to left, #202225 100%, #2f3136 10%);color:white;line-height:0.3;border:1px solid rgb(128, 128, 128, 0.2)!important}
+.PTAB td:nth-child(1) {color:dodgerblue}
+.PTAB td:nth-child(2) {color:orange!important}
+
+/* Alerts, Indicators */
+.DTAB        {font-size:12px;border-spacing:0;font-weight:bold}
+.DTAB thead  {background:linear-gradient(to left, #821eda 32%, #c555d5 113%)}
+.DTAB td     {border:1px solid rgb(128, 128, 128, 0.2) !important;padding: 8px 8px}
+.DTAB select {width:100%;color:grey}
+/* Main Page Table */
+.MTAB        {font-weight:bold;cursor:pointer;font-size:11px;margin-left:10px;border: 2px solid #2f3136 !important}
+.MTAB td     {background-color:#18191b !important;color:white;line-height:0.3;border:1px solid rgb(128, 128, 128, 0.2) !important}
+.MTAB thead  {background:linear-gradient(to left, #821eda 32%, #c555d5 113%);color:white}
+.MTAB th     {padding:10px 18px !important}
+
+/* DataTables */
+table.dataTable          {margin:0 auto;border-collapse:separate;border-spacing:0}
+table.dataTable thead    {cursor:pointer;background-repeat:no-repeat;background-position:center right}
+table.dataTable thead th {padding:10px 18px}
+table.dataTable tbody td {padding:8px 10px}
+table.dataTable,
+table.dataTable th,
+table.dataTable td       {box-sizing:content-box}
+.WBOX thead th:nth-child(1) {padding:10px 10px!important}
+
+
+.XTAB thead  {background:linear-gradient(to left, #821eda 32%, #c555d5 113%);color:white;z-index:1}
+.XTAB td     {background-color:#18191b;border:1px solid rgb(128, 128, 128, 0.2) !important;color:white;}
+.XTAB        {width:100%;font-size:14px}
+
+.XTAB i  {color:green;position:absolute;font-size:15px;display:block;margin-top:-18px;margin-left:5px;}
+.XTAB h3 {position:absolute;margin-left:-1px;font-size:15px;margin-top:-18px;display:block;color:red;margin-left:5px}
+.XTAB tr td:first-child  {background-color:#18191b !important}
+.XTAB tbody td           {text-align:right}
+.XTAB td:nth-child(2)    {text-align:left!important}
+.XTAB td:first-child     {text-align:right}
+.GTAB                    {width:98% !important}
+#SIGMON thead            {position:sticky;top:0}
+#SIGMON                  {width:80% !important}
+.candy-table td          {white-space:nowrap}
+
+.AIRTAB i  {color:green;position:absolute;font-size:15px;display:block;margin-top:-18px;margin-left:-5px;}
+.AIRTAB h3 {position:absolute;margin-left:-1px;font-size:15px;margin-top:-18px;display:block;color:red;margin-left:-5px}
+.AIRTAB th      {color:yellow}
+.AIRTAB .trx th {color:gold!important}
+.AIRTAB td {text-align:right}
+
+.AIRTAB::before {
+	content: "";
+	background-image:url('https://www.globalhealthnow.org/sites/default/files/styles/embedded_image/public/images/2018-07/Airplane-Sunset-iStock-629868310-Web.jpg?itok=RF2DVyux');
+	background-repeat: no-repeat;
+	background-size:100% 100%;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+	opacity: 0.15;	
+}
+.AIRTAB    {font-family:Lato,position:relative}
+.AIRTAB td {color:white}
+.AIRTAB th {color:white}
+
+#boarding-time {
+	position:absolute;
+	top:0;
+	right:0;
+	margin-top:50px;
+	margin-right:75px;
+	font-size:52px;
+	color:white;
+	z-index:10000;
+	font-family:airfont;
+}
+.sig {
+	content:'';
+	display:block;
+	height:1px;
+	width:1px;
+	border-radius:100%;
+	background :#ddd;
+	margin:auto;
+	margin-top:5px;
+	box-shadow:0 0 20px gold,0 0 150px gold, inset 0 20px 20px 40px whitesmoke, inset 30px 0 35px 50px ivory;
+	transition:1s;
+}
+.sig:hover:before {
+	box-shadow:0 0 50px tomato,0 0 30px orange, inset 0 10px 10px 20px #ddd, inset 30px 0 35px 50px #ccc;
+	background:#aaa;
+	transition:1s;
+}
+.HIGHLIGHT td {color:gold!important}
+
+
+/* Option Call Tables */
+.OPTAB          {font-weight:bold;cursor:pointer;font-size:11px;margin-left:10px;border: 2px solid #2f3136 !important}
+.OPTAB  td      {line-height:0.4;border:1px solid rgb(128, 128, 128, 0.1);font-family:"Liberation Mono",Consolas;font-size:13px;text-align:right}
+.OpCALL td      {background:linear-gradient(45deg, rgba(4,5,5,1) 90%, rgba(10,20,18,1) 99%, rgba(4,32,22,1) 96%, rgba(6,47,55,1) 100%);color:darkcyan;}		
+.OpPUT  td      {background:linear-gradient(45deg, rgba(4,5,5,1) 96%, rgba(64,0,8,1) 92%, rgba(14,19,25,1) 93%, rgba(32,4,7,1) 96%, rgba(55,6,6,1) 100%);color:brown}
+.OpCALL th      {color:#00e6e6}
+.OpPUT  th      {color:#FF3406}
+.OpCALL caption {color:#00e6e6 !important}
+.OpPUT  caption {color:#FF3406 !important}
+.OpCALL .optick {color:#07AD73;font-weight:bold}
+.OpPUT  .optick {color:#FF3406;font-weight:bold}
+.opstrike       {color:silver}
+#OPCH th        {color:darkcyan;font-weight:bold}
+#OPCH td        {color:white;font-weight:normal}
+
+/* Scripting */
+#scripts                 {overflow:auto}
+.STAB                    {width:80%;margin:0 auto;color:white;border:none;text-align:left}
+.STAB td                 {border:none}
+.STAB td:first-child     {color:orange}
+.STAB tr:hover           {background-color:#821eda}
+#admin .STAB {
+	width:650px;
+	margin-top:10px;
+	font-size:17px;
+}
+.qact        {color:green;font-weight:bold;cursor:pointer}
+
+.trx th      {color:white !important;background-color:#2f3136;top:0}
+.ANYTAB      {margin:0 auto;width:97%!important}
+.ANYTAB th   {color:black}
+.ETAB th     {padding:18px;color:white;font-size:14px !important}
+.ETAB        {margin:0 auto;width:50% !important;color:white;font-size:15px}
+.ETAB td:nth-child(2),.ETAB td {text-align:center !important}
+
+.WhiteTables  td {color:black;font-weight:bold;background-color:white}
+.WhiteTables  td:first-child {background-color:white !important}
+.DarkTables   td {color:white;font-weight:bold}
+.GreenTables  td {color:#07AD73;font-weight:bold}
+.BlueTables   td {color:dodgerblue;font-weight:bold}
+.PurpleTables td {color:#821eda;font-weight:bold}
+
+/* Table Colors */
+.darkgreen   {background-color:#006400;color:white !important}
+.lightgreen  {background-color:#66FF33;color:black}
+.green       {background-color:green !important;color:black !important}
+.orange      {background-color:orange;color:black}
+.grey        {background-color:grey;color:black}
+.yellow      {background-color:yellow !important;color:black !important}
+.white       {background-color:white !important;color:black !important}
+.blue        {background-color:dodgerblue !important;color:white !important}
+.cyan        {background-color:darkcyan;color:white !important}
+.grn         {background-color:#32CD32;color:black !important}
+.empty       {background-color:initial}
+.org         {background-color:orange}
+.LG          {background-color:limegreen !important}
+.OR          {background-color:orange !important}
+.BR          {background-color:brown !important}
+.Y           {background-color:yellow !important}
+.W           {background-color:white !important}
+.RED         {background-color:red !important}
+.GR          {background-color:green !important}
+.DG          {background-color:darkgreen !important}
+.PR          {background-color:#821eda !important}
+
+.green2      {color:green !important;font-weight:bold}
+.limegreen2  {color:limegreen!important}
+.DG2         {color:darkgreen!important;font-weight:bold}
+.brown       {color:brown !important;font-weight:bold !important}
+.RED2        {color:brown !important}
+.GR2         {color:green !important}
+.PR2         {color:#821eda!important}
+.R2          {color:red!important}
+.orange2     {color:#FF3406!important}
+.cyan2       {color:#00e6e6}
+.blue2       {color:#5f679F}
+.yellow2     {color:yellow!important}
+.purple      {color:purple}
+.hide        {opacity:0}
+.vhide       {display:none}
+.vshow       {display:block!important}
+
+.color-rule input {
+	color:#821eda
+}
+#color-diag {
+	position:absolute;
+	background:black;
+	margin-left:20vw;
+	margin-top:50vh;
+	border:2px solid #114c20;
+	color:white;
+	font-family:'Lato';
+	width:500px;
+}
+.column-close {position:absolute;top:0;right:0;font-size:24px;cursor:pointer}
+.color-hdr {
+	font-weight:700;
+	letter-spacing:2px;
+	font-size:15px;
+	height:45px;
+	padding:10px 8px 0px;
+	border-bottom:1px solid #821eda;
+	color:#3f8f8f;
+}
+.color-hdr select {
+	color:whitesmoke;
+	margin-left:10px;
+}
+.color-new{
+	width:30px;
+	height:40px;
+	line-height:18px;
+	margin-left:10px;
+	font-size:18px !important;
+}
+.color-scheme {
+	float:left;
+}
+.column-text {
+	float:left;
+	margin-left:10px;
+	margin-top:3px;
+}
+.column-name {
+	margin-left:10px;
+	color:darkcyan;
+}
+.column-save{
+	float:left;
+	margin-left:20px;
+	background-color: black;
+	border:1px solid #821eda;
+	padding-right:15px;
+	padding-left:15px;
+	color:grey;
+	font-size: 14px;
+}
+.color-rule {
+	padding:8px;
+	color:#3f8f8f;
+	clear:both;
+}
+.color-rule select {
+	margin-left:45px;
+	color:orange;
+}
+.color-rule input {
+	width:40px;
+}
+.color-box {
+	border:none;
+	position:absolute;
+	height:35px;
+	margin-top:-5px;
+	background-color:transparent
+}
+
+/* Dynamic Table Fetching (unsafe) */
+#wget-url {
+	position:relative;
+	color:white;
+	margin:0 auto;
+	width:500px;
+	height:auto;
+	margin-top:50vh;
+	border:2px solid #FF3406;
+	background:rgb(2,0,36);
+	background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%);
+}
+#wget-url h3 {
+	margin-top:25px;
+}
+#wget-url input {
+	display:block;
+	margin:0 auto;
+	margin-top:65px;
+	width:90%;
+	line-height:1.8;
+}
+
+.wget-exec {
+	margin-top:10px;
+	height:60px;
+	cursor:pointer;
+}
+
+#wget-import {
+	position:relative;
+	color:white;
+	margin:0 auto;
+	width:500px;
+	height:180px;
+	margin-top:50vh;
+	border:2px solid #FF3406;
+	background:rgb(2,0,36);
+	background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%);	
+}
+#wget-import .loading:after {
+	margin-left:12vw;
+	margin-top:-10px;
+}
+
+#uentry   {width:80%}
+.uentries {margin-top:50px;margin-left:25%;font-size:22px}
+.uinfo    {font-style:italic;color:silver}
+.uname    {width:90px;display:inline-block}
+
+.uimport {
+  display: flex;
+  align-items: center;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 0.7em 1.4em 0.7em 1.1em;
+  color: white;
+  background: #ad5389;
+  background: linear-gradient(0deg, rgba(20,167,62,1) 0%, rgba(102,247,113,1) 100%);
+  border: none;
+  box-shadow: 0 0.7em 1.5em -0.5em #14a73e98;
+  letter-spacing: 0.05em;
+  border-radius: 20em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+	width:100px;
+	margin:0 auto;
+	margin-top:25px;
+	margin-bottom:10px;
+}
+
+.uimport:hover  {box-shadow: 0 0.5em 1.5em -0.5em #14a73e98}
+.uimport:active {box-shadow: 0 0.3em 1em -0.5em #14a73e98}
+
+#wget-import {
+	color:white;
+	margin:0 auto;
+	width:500px;
+	height:auto;
+	margin-top:50vh;
+	border:2px solid #FF3406;
+	background:rgb(2,0,36);
+	background:linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%);	
+}
+
+/* Watchtable/XLS Menu Link (wheel icon) */
+.tlink       {font-size:18px;color:transparent}
+.links       {position:absolute}
+.link-cyan   {text-shadow:0 0 0 cyan}
+.link-orange {text-shadow:0 0 0 orange}
+.link-red    {text-shadow:0 0 0 red}
+.link-green  {text-shadow:0 0 0 lightgreen}
+.link-white  {text-shadow:0 0 0 white}
+.screener .links {
+	margin-top:32px;
+	margin-left:5px;
+	font-size:20px;
+	color:transparent;
+	cursor:pointer
+}
+.links-menu {
+	z-index:1000000;
+	margin-top:35px;
+	font-size:32px;
+	position:absolute;
+	color:transparent;
+	text-align:center;
+	background-position: right left;
+	background-image: url("https://wallpapercave.com/wp/wp2963685.jpg");	
+	width:48px;
+}
+.links-menu div {cursor:pointer}

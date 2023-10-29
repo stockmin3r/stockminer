@@ -1,0 +1,239 @@
+<!-- Load Tickers/CSVs/Resources -->
+<div id=upload-tickers class=upload-box style="display:none">
+	<span class=tclose onclick=bulk_close()>×</span>
+	<h2>Load Tickers</h2>
+	<div class=sharebody>
+		<textarea spellcheck=false placeholder="Load one or more tickers into your watchlist (separated by lines,spaces or commas)" class=tickarea></textarea>
+		<button class=QBTN onclick=bulk_addstocks()>Load</button>
+	</div>
+</div>
+<div id=upload-csv class=upload-box style="display:none">
+	<span class=tclose onclick=qclose()>×</span>
+	<h2 class=stitle>Upload CSV</h2>
+	<div class=sharebody>
+		<textarea placeholder="Copy/Paste CSV into textarea or Upload a CSV from file"></textarea>
+		<select class=upload-select>
+			<option value=0>Line Chart</option>
+			<option value=1>CandleStick</option>
+			<option value=2>Bar Chart</option>
+			<option value=3>Pie Chart</option>
+		</select>
+		<input type=file id=upload-csv-file autocomplete='off'/><button class=QBTN>File Select</button>
+		<span class=upload-arrow title="Upload CSV" onclick=upload_csv()>⇧</span>
+	</div>
+</div>
+
+<div id=charts style="display:none">
+	<span class=charts-candle onclick=gui_chart_onclick('candle')>Candle</span>
+	<span class=charts-candle onclick=gui_chart_onclick('line')>Line</span>
+	<span class=charts-candle onclick=gui_chart_onclick('bar')>Bar</span>
+</div>
+
+<!-- Loading Animations -->
+<div id=load></div>
+
+<!--
+<div class="matrix-loader M">
+  <ul>
+	<li></li><li></li><li></li><li></li><li></li>
+	<li></li><li></li><li></li><li></li><li></li>
+	<li></li><li></li><li></li><li></li><li></li>
+	<li></li><li></li><li></li><li></li><li></li>
+	<li></li><li></li><li></li><li></li><li></li>
+  </ul>
+</div>
+-->
+<div id=INDI class=INDI style="display:none">
+	<img src="/img/logo2.png">
+	<span class="iclose" onclick=closeindi()>&times;</span>
+	<div class=box>
+		<div class=boxmenu>
+			<ul>
+				<li class=boxmain onclick="indicator('mm')">Indicators</li>
+				<li class=boxmain onclick="indicator('add')">Add Ticker</li>
+				<li class=boxmain onclick="indicator('PRE')">Presets</li>
+				<li onclick="indicator('ad')">AC/DS</li>
+				<li onclick="indicator('aroon')">Aroon</li>
+				<li onclick="indicator('aroonoscillator')">Aroon Oscillator</li>
+				<li onclick="indicator('atr')">ATR</li>
+				<li onclick="indicator('bb')">Bollinger Bands</li>
+				<li onclick="indicator('cci')">CCI</li>
+				<li onclick="indicator('cmo')">CMO</li>
+				<li onclick="indicator('cmf')">Chaikin Money Flow</li>
+				<li onclick="indicator('dmi')">DMI</li>
+				<li onclick="indicator('dpo')">DPO</li>
+				<li onclick="indicator('ema')">EMA</li>
+				<li onclick="indicator('keltnerchannels')">Keltner Channels</li>
+				<li onclick="indicator('macd')">MACD</li>
+				<li onclick="indicator('obv')">OBV</li>
+				<li onclick="indicator('psar')">PSAR</li>
+				<li onclick="indicator('rsi')">RSI</li>
+				<li onclick="indicator('sma')">SMA</li>
+				<li onclick="indicator('supertrend')">Supertrend</li>
+				<li onclick="indicator('stochastic')">Stochastic</li>
+				<li onclick="indicator('vwap')">VWAP</li>
+				<li onclick="indicator('williamsr')">Williams %R</li>
+			</ul>
+		</div>
+		<!-- RHS Content -->
+		<div class=rhs>
+		<div class="imenu mm">
+			<div class=menutitle>Enabled Indicators</div><div class=l></div>
+			<select class=series-select></select>
+			<div class=enabled>
+				<table class=DTAB>
+					<thead>
+						<tr>
+							<td>Indicator</td>
+							<td></td>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+			<div class=presets>Save Preset<input type=text class=prename placeholder="Preset Name"><div class=savepre onclick=indi_save_preset()>Save</div></div>
+		</div>
+		<div class="imenu PRE" style="display:none">
+			<div class=menutitle>Saved Presets</div><div class=l></div>
+			<div class=prelist>
+				<table class=DTAB>
+					<thead>
+						<tr>
+							<td>Active</td>
+							<td>Name</td>
+							<td>Indicators</td>
+							<td>Active On</td>
+							<td>&times;</td>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+		<div class="imenu add" style="display:none">
+			<div class=menutitle>Add Ticker To Chart</div><div class=l></div>
+			<input type=text class=add-ticker placeholder=Ticker>
+		</div>
+		<div class="imenu sma" style="display:none">
+			<div class=menutitle>Simple Moving Average</div><div class=l></div>
+			<span>Series</span><select class=sma-select></select>
+			<span>Period</span><input type=text class=period value=14>
+		</div>
+		<div class="imenu ema" style="display:none">
+			<div class=menutitle>Exponential Moving Average</div><div class=l></div>
+			<span>Series</span><select class=ema-select></select>
+			<span>Period</span><input type=text class=period value=14>
+		</div>
+		<div class="imenu dpo" style="display:none">
+			<div class=menutitle>Detrended Price Oscillator</div><div class=l></div>
+			<span>Series</span><select class=dpo-select></select>
+			<span>Period</span><input type=text class=period value=20>
+		</div>
+		<div class="imenu dmi" style="display:none">
+			<div class=menutitle>Directional Movement Index</div><div class=l></div>
+			<span>Series</span><select class=dmi-select></select>
+			<span>Period</span><input type=text class=period value=20>
+		</div>
+		<div class="imenu bb" style="display:none">
+			<div class=menutitle>Bollinger Bands</div><div class=l></div>
+			<span>Series</span><select class=bb-select></select>
+			<span>Period</span><input type=text class=period value=20>
+			<span>Standard Deviation</span><input type=text class=bb-std value=2>
+		</div>
+		<div class="imenu psar" style="display:none">
+			<div class=menutitle>Parabolic SAR</div><div class=l></div>
+			<span>Series</span><select class=psar-select></select>
+			<span>Initial Acceleration</span><input type=text class=initialAccelerationFactor value=0.02>
+			<span>Max Acceleration</span><input type=text class=maxAccelerationFactor value=0.2>
+			<span>Increment</span><input type=text class=increment value=0.02>
+		</div>
+		<div class="imenu rsi" style="display:none">
+			<div class=menutitle>RSI</div><div class=l></div>
+			<span>Series</span><select class=rsi-select></select>
+			<span>Period</span><input type=text class=period value=14>
+		</div>
+		<div class="imenu stochastic" style="display:none">
+			<div class=menutitle>Stochastic Oscillator</div><div class=l></div>
+			<span>Series</span><select class=stochastic-select></select>
+			<span>K</span><input type=text class=period value=14>
+			<span>D</span><input type=text class=period value=3>
+		</div>
+		<div class="imenu keltnerchannels" style="display:none">
+			<div class=menutitle>Keltner Channels</div><div class=l></div>
+			<span>Series</span><select class=keltnerchannels-select></select>
+			<span>Period</span><input type=text class=period value=20>
+			<span>ATR Period</span><input type=text class=periodATR value=10>
+			<span>ATR Multiplier</span><input type=text class=multiplierATR value=2>
+		</div>
+		<div class="imenu macd" style="display:none">
+			<div class=menutitle>MACD</div><div class=l></div>
+			<span>Series</span><select class=macd-select></select>
+			<span>Fast Length</span><input type=text class=shortPeriod value=12>
+			<span>Slow Length</span><input type=text class=longPeriod value=26>
+			<span>Signal Smoothing</span><input type=text class=signalPeriod value=9>
+			<div class=macd-style>
+				<span>Histogram Up</span>  <input type=color value="#008000" onchange='macd("zones",0)'>
+				<span>Histogram Down</span><input type=color value="#FF0000" onchange='macd("zones",1)'>
+				<span>MACD Line</span>     <input type=color value="#1e90ff" onchange='macd("macdLine",2)'>
+				<span>Signal Line</span>   <input type=color value="#ffa500" onchange='macd("signalLine",1)'>
+			</div>
+		</div>
+		<div class="imenu supertrend" style="display:none">
+			<div class=menutitle>Supertrend</div><div class=l></div>
+			<span>Series</span><select class=supertrend-select></select>
+			<span>Period</span><input type=text class=period value=10>
+			<span>Multiplier</span><input type=text class=multiplier value=3>
+		</div>
+		<div class="imenu vwap" style="display:none">
+			<div class=menutitle>VWAP</div><div class=l></div>
+			<span>Series</span><select class=vwap-select></select>
+			<span>Period</span><input type=text class=period value=30>
+		</div>
+		<div class="imenu obv" style="display:none">
+			<div class=menutitle>On Balance Volume</div><div class=l></div>
+			<span>Series</span><select class=obv-select></select>
+		</div>
+		<div class="imenu ad" style="display:none">
+			<div class=menutitle>Accumulation/Distribution</div><div class=l></div>
+			<span>Series</span><select class=ad-select></select>
+			<span>Period</span><input type=text class=period value=14>
+		</div>
+		<div class="imenu atr" style="display:none">
+			<div class=menutitle>Average True Range</div><div class=l></div>
+			<span>Series</span><select class=atr-select></select>
+			<span>Period</span><input type=text class=period value=14>
+		</div>
+		<div class="imenu aroon" style="display:none">
+			<div class=menutitle>Aroon</div><div class=l></div>
+			<span>Series</span><select class=aroon-select></select>
+			<span>Period</span><input type=text class=period value=25>
+		</div>
+		<div class="imenu aroonoscillator" style="display:none">
+			<div class=menutitle>Aroon Oscillator</div><div class=l></div>
+			<span>Series</span><select class=aroonoscillator-select></select>
+			<span>Period</span><input type=text class=period value=25>
+		</div>
+		<div class="imenu cci" style="display:none">
+			<div class=menutitle>Commodity Channel Index</div><div class=l></div>
+			<span>Series</span><select class=cci-select></select>
+			<span>Period</span><input type=text class=period value=30>
+		</div>
+		<div class="imenu cmo" style="display:none">
+			<div class=menutitle>Chande Momentum Oscillator</div><div class=l></div>
+			<span>Series</span><select class=cmo-select></select>
+			<span>Period</span><input type=text class=period value=20>
+		</div> 
+		<div class="imenu cmf" style="display:none">
+			<div class=menutitle>Chaikin Money Flow</div><div class=l></div>
+			<span>Series</span><select class=cmf-select></select>
+			<span>Period</span><input type=text class=period value=14>
+		</div>
+		<div class="imenu williamsr" style="display:none">
+			<div class=menutitle>William's %R</div><div class=l></div>
+			<span>Series</span><select class=williamsr-select></select>
+			<span>Period</span><input type=text class=period value=14>
+		</div>
+		</div>
+		<button type="button">Add</button>
+	</div><!-- #box -->
+</div><!-- #INDI_MENU -->

@@ -1,0 +1,172 @@
+/***********************************************
+ * filename: mainpage/stockminer/css/chart.css
+ * License:  Public Domain
+ **********************************************/
+@media screen and (min-width: 2560px) {}
+
+/* Highcharts */
+.highcharts-title                                   {font-weight:bold;fill:#821eda !important}
+.highcharts-axis-title                              {font-weight:bold;font-family:Arial;fill:white !important}
+.highcharts-scrollbar                               {display:none}
+.highcharts-title                                   {cursor:pointer}
+.highcharts-vbp-series .highcharts-point            {height:21px}
+.highcharts-vbp-series .highcharts-shadow           {height:22px}
+.highcharts-column-series .highcharts-point         {stroke:rgb(30, 144, 255, 1);fill:rgb(30, 144, 255, 0.5)}
+.highcharts-candlestick-series .highcharts-point    {stroke:rgb(254, 55, 57, 1);fill:rgb(254, 55, 57, 0.5)}
+.highcharts-candlestick-series .highcharts-point-up {stroke:rgb(61, 207, 121, 1);fill:rgb(61, 207, 121, 0.5)}
+.highcharts-grid-line                               {opacity:0.2}
+
+/* Indicator Colors */
+.macd-style       {margin-left:200px;margin-top:-85%;font-size:14px;width:140px}
+.macd-style span  {margin-top:23px}
+.macd-style input {width:40px;cursor:pointer;margin-top:10px;border:none !important;background-color:#323130}
+
+/* Icons */
+.ic3    {opacity:0.5;color:grey !important}
+.svg    {cursor:pointer;font-weight:bold;font-size:17px !important;color:#821eda};
+.ctools {font-weight:normal !important}
+
+/* MiniCharts */
+.minibox {border:2px inset #36393f;height:310px;margin-top:16px}
+.megabox {border:2px inset #36393f;height:865px}
+.lbx     {height:60px;width:100%;cursor:pointer;background-color:#2f3136}
+.mpr     {color:white;font-size:32px;font-weight:bold;text-align:center}
+.mpc     {color:green;font-weight:bold;text-align:center}
+
+#charts {
+	background-color:#202225;
+	width:400px;
+	height:200px;
+	position:absolute;
+	margin-top:40vh;
+	margin-left:40%!important;
+	border-radius:26px;
+	color:white;
+}
+#charts span {
+	padding:20px;
+	background-color:#36393f;
+	border-radius:26px;
+	margin:0 auto;
+	margin-top:60px;
+	margin-left:40px;
+	display:inline-block;
+	cursor:pointer;
+}
+
+/* Frequency */
+.gridmain [class^='grid'] .freq {
+	margin-top:0.5rem !important;
+	margin-left:37rem !important;
+	top:auto;
+	right:auto;
+}
+.freq {
+	position:absolute;
+	top:0;
+	right:0;
+	z-index:10000;
+	margin-top:55px;
+	margin-right:2.4vw;
+	color:#821eda;
+	border:1px solid purple;
+}
+
+/* Candles */
+#bulls td:nth-child(n+7) {font-size:28px !important}
+#bears td:nth-child(n+7) {font-size:28px !important}
+
+.BE0  {background-image:url("data:image/svg+xml,%3Csvg width='64' height='64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Crect id='svg_1' height='14.49978' width='8.24991' y='24.74942' x='12.62522' stroke='%23000000' fill='%2300ff00'/%3E%3Cpath id='svg_6' d='m33.87492,59.74907l0,-5.49994' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Crect id='svg_8' height='43.37461' width='8.24991' y='10.62453' x='29.49996' stroke='%23000000' fill='%23ff0000'/%3E%3Cpath id='svg_12' d='m16.62518,49.37408l-0.125,-9.62489' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_13' d='m16.62518,24.24942l-0.125,-9.62489' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_2' d='m33.87492,10.12437l0,-5.49994' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3C/g%3E%3C/svg%3E")}
+.BE1  {background-image:url("data:image/svg+xml,%3Csvg width='64' height='64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Crect id='svg_3' height='27.53642' width='10.46958' y='17.33609' x='15.39994' stroke='%23000' fill='%23ff0000'/%3E%3Crect id='svg_5' height='51.55908' width='10.46958' y='5.57574' x='39.13576' stroke='%23000' fill='%2300bf00'/%3E%3Cline id='svg_6' y2='11.67104' x2='20.63472' y1='17.4078' x1='20.63472' stroke='%23000' fill='none'/%3E%3Cline id='svg_7' y2='45.08764' x2='20.84985' y1='50.8244' x1='20.84985' stroke='%23000' fill='none'/%3E%3Cline id='svg_8' y2='57.34995' x2='44.58568' y1='60.50517' x1='44.58568' stroke='%23000' fill='none'/%3E%3Cline id='svg_10' y2='2.9942' x2='44.22713' y1='5.2172' x1='44.22713' stroke='%23000' fill='none'/%3E%3C/g%3E%3C/svg%3E")}
+.MS1  {background-image:url("data:image/svg+xml,%3Csvg width='64' height='64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Crect id='svg_1' height='24.99972' width='8.24991' y='14.24948' x='12.62522' stroke='%23000000' fill='%23ff0000'/%3E%3Crect id='svg_3' height='3.87496' width='8.24991' y='42.62416' x='28.62504' stroke='%23000000' fill='%2300ff00'/%3E%3Cpath id='svg_4' d='m32.62499,42.12416l-0.125,-12.37486' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_5' d='m32.74999,59.37396l-0.125,-12.37486' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_6' d='m46.62484,38.6242l0,-5.49994' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Crect id='svg_8' height='24.99972' width='8.24991' y='7.62455' x='42.24988' stroke='%23000000' fill='%2300ff00'/%3E%3Cline id='svg_11' y2='2.12461' x2='46.24984' y1='7.12456' x1='46.24984' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_12' d='m16.62518,49.37408l-0.125,-9.62489' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_13' d='m16.62518,13.74948l-0.125,-9.62489' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3C/g%3E%3C/svg%3E")}
+.HC0  {background-image:url("data:image/svg+xml,%3Csvg width='64' height='64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Crect id='svg_1' height='33.47598' width='8.24991' y='12.64078' x='12.4932' stroke='%23000000' fill='%2300ff00'/%3E%3Cpath id='svg_6' d='m33.87492,41.85445l0,-18.20398' opacity='undefined' stroke='%23ff0000' fill='none'/%3E%3Cpath id='svg_13' d='m16.6322,6.97166' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_3' d='m16.62518,52.31907l-0.125,-5.82925' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_2' d='m16.62518,12.18356l-0.125,-5.82925' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cline id='svg_4' y2='32.42806' x2='39.92148' y1='32.42806' x1='27.64318' stroke='%23ff0000' fill='none'/%3E%3C/g%3E%3C/svg%3E")}
+.HC1  {background-image:url("data:image/svg+xml,%3Csvg width='64' height='64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Crect id='svg_1' height='33.47598' width='8.24991' y='12.64078' x='12.4932' stroke='%23000000' fill='%237fff00'/%3E%3Cpath id='svg_6' d='m33.87492,41.85445l0,-18.20398' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_13' d='m16.6322,6.97166' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_3' d='m16.62518,52.31907l-0.125,-5.82925' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cpath id='svg_2' d='m16.62518,12.18356l-0.125,-5.82925' opacity='undefined' stroke='%23007f7f' fill='none'/%3E%3Cline id='svg_4' y2='32.42806' x2='39.92148' y1='32.42806' x1='27.64318' stroke='%23007f7f' fill='none'/%3E%3C/g%3E%3C/svg%3E")}
+.DCC0 {background-image:url("data:image/svg+xml,%3Csvg width='64' height='64' xmlns='http://www.w3.org/2000/svg'%3E%3Cg%3E%3Crect fill='%2300ff00' stroke='%23000000' x='12.62522' y='20.43024' width='8.24991' height='18.55719' id='svg_1'/%3E%3Cpath fill='none' stroke='%23007f7f' opacity='undefined' d='m33.87492,37.62965l0,-2.09695' id='svg_6'/%3E%3Crect fill='%23ff0000' stroke='%23000000' x='29.49996' y='10.62453' width='8.24991' height='24.39641' id='svg_8'/%3E%3Cpath fill='none' stroke='%23007f7f' opacity='undefined' d='m16.62518,19.93024l-0.125,-5.82925' id='svg_13'/%3E%3Cpath fill='none' stroke='%23007f7f' opacity='undefined' d='m16.62518,45.32176l-0.125,-5.82925' id='svg_3'/%3E%3Cpath fill='none' stroke='%23007f7f' opacity='undefined' d='m33.87492,10.14399l0,-2.09695' id='svg_4'/%3E%3C/g%3E%3C/svg%3E")}
+
+/* ************
+ * DIALOG BOX *
+ *************/
+#ALERTS{
+	position:absolute !important;
+	z-index:1000;
+	margin-top:2.2%;
+	margin-left:30%;
+	background-color:#323130;
+	width:550px;
+	height:550px;
+}
+#ALERTS img {
+	width:28%;
+	height:25%;
+	margin-top:-4%;
+	margin-bottom:-3%;
+
+}
+#ALERTS label  {display:inline-block}
+#ALERTS button {width: 120px !important}
+.V             {width:230px;float:left;margin-top:15px}
+.vbx           {display:inline-block}
+.arg           {width:80px !important}
+.info          {font-weight:normal}
+
+.boxmenu {
+	width:160px;
+	height:400px;
+	float:left;
+	margin-left:10px;
+	font-weight:bold;
+	font-size:14px;
+	overflow:auto;
+	border:2px solid #585A5E;
+}
+.box{
+	width:590px;
+	height:100%;
+}
+.rhs{
+	float:right;
+	margin-right:20px;
+	width:65%;
+	height:70%;
+}
+.rhs span           {display:block;width:140px;margin-top:20px}
+.rhs input          {line-height:1.5;display:block;width:40%!important;margin-top:5%}
+.rhs .checkbox_ctrl {width:20px !important}
+.box select         {width:40%;display:block;margin-top:5px;color:grey}
+.box button         {color:white;width:100px;margin-left:25%;font-size:18px;margin-top:25px;border:1px solid #821eda;background-color:black}
+.boxmain            {color:orange !important}
+.box ul             {line-height:1.5}
+.box ul li          {color:white;cursor:pointer;width:127%;padding-left:10px;display:block;margin-left:-38%}
+.box button         {color:green;width:100px;margin-left:25%;font-size:18px;margin-top:20px;border:1px solid #821eda;border-radius:26px;background-color:black}
+.del                {color:red!important}
+.imenu              {color:white;margin-top:-8%;font-weight:bold}
+.imenu .wadd        {color:dodgerblue;margin-top:15%}
+.imenu select       {color:dodgerblue}
+.menutitle          {margin-bottom:10px}
+
+/*******************
+ *    INDICATORS
+ ******************/
+.INDI{
+	position:absolute !important;
+	z-index:1000;
+	margin-top:2.2%;
+	background-color:#323130;
+	width:550px;
+	height:500px;
+}
+.INDI img {
+	width:28%;
+	height:25%;
+	margin-top:-4%;
+	margin-bottom:-3%;
+}
+
+.mm .DTAB {position:absolute;margin-top:20px}
+
+/* Candles QuadSpace menu */
+.cdiv {
+	text-align:center;
+	margin-top:10px;
+	margin-bottom:20px;
+}

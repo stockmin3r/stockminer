@@ -1,0 +1,53 @@
+<div id=MENU>
+	<img id=logo class="qpop logoi" title="Show QuadVerses" src=/img/logo.png>
+	<div id=spx>
+		<div class=iname>SPX</div>
+		<div id=spx-ipc class=ipc></div>
+		<div id=spx-ipr class=ipr></div>
+	</div>
+	<div id=ndx>
+		<div class=iname>NDX</div>
+		<div id=ndx-ipc class=ipc></div>
+		<div id=ndx-ipr class=ipr></div>
+	</div>
+	<div id=dow>
+		<div class=iname>DOW</div>
+		<div id=dow-ipc class=ipc></div>
+		<div id=dow-ipr class=ipr></div>
+	</div>
+	<div id=XLK>
+		<div class=iname>XLK</div>
+		<div id=XLK-ipc class=ipc></div>
+		<div id=XLK-ipr class=ipr></div>
+	</div>
+	<nav>
+		<ul class=menu><li><span class="mtitle">Stockminer</span></li></ul>
+	</nav>
+	<div id=gridspace  onclick=gridspace()   title="QuadSpace"></div>
+	<div id=minispace  title="QuadSpace Presets" class=qpop></div>
+	<div id=version    onclick=emsg()        title="Unstable">v0.90 (DeathLoop)</div>
+	<div id=LOGIN      onclick=login()>Login</div>
+	<div id=help       onclick="help(1)"     title="Help Pointers">❓</div>
+	<!-- NOTIFICATIONS -->
+	<div id=bell title=Notifications>🔔<ul class=navbar-nav><li class="dropdown open"><ul id=nlist class="dropdown-menu dropdown-notification" style="display:none"></ul></li></ul></div>
+	<!-- Search Box -->
+	<div id=sbox>
+		<div><input placeholder="Search Ticker" id=query type=text>
+			<input id=sbtn type=submit value=Search onclick="sbox()">
+		</div>
+		<div id=autoq style="display:none"></div>
+	</div>
+
+	<div id=notify style="display:none">
+		<div id=notify-hdr>Notifications <span id=notify-count></span></div>
+		<table id=NTAB>
+			<tbody></tbody>
+		</table>
+	</div>
+
+	<!-- ToolTips -->
+	<div class="maintips tip-qverse toolt1p" style="display:none"><span class=toolt1ptext>Click to pop out all the QuadVerse Presets</span></div>
+	<div class="maintips tip-cspace toolt1p" style="display:none"><span class=toolt1ptext>Shortcut to ChartSpace where you can load multiple tickers alongside each other in a grid</span></div>
+	<div class="maintips tip-indi toolt1p"   style="display:none"><span class=toolt1ptext>Chart Indicator Menu</span></div>
+	<div class="maintips tip-help toolt1p"   style="display:none"><span class=toolt1ptext>Different quadspace pages have different help tips. Clicking on Help a second time will remove the tips</span></div>
+</div> <!-- #MENU -->

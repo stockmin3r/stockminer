@@ -1,0 +1,155 @@
+<!-- QuadVerse Pages -->
+<div id=desktops style="display:none"></div>
+
+<!-- QuadVerse Template + Container -->
+<div id=QUADVERSE style="display:none">
+	<div class=quadverse>
+		<!-- QuadSpace tab -->
+		<div class="QSP chrome-tabs chrome-tabs-dark-theme" style="--tab-content-margin: 9px" data-chrome-tabs-instance-id="0">
+			<div class=wspanel></div>
+			<span  class=wspub title="New QuadSpace" onclick="qpublish()"></span>
+			<span id=QNEW class=wsnew title="New QuadSpace" onclick="W.qspace()">❖</span>
+			<span id=MX   class=max   onclick="MaxQuads()" title=Maximize>❐</span>
+		</div>
+		<!-- MasterSpace Controls (Ancient relic, will be removed soon) -->
+		<div id=ctrl style="display:none">
+			<span id=wsnew title="New QuadSpace" onclick="W.qspace()">❖</span>
+			<div id=cbox>
+				<select id=selspace class=ws-select onchange=cspace()>
+					<option value=0>Add Chart</option>
+					<option value=1>Add Watchlist</option>
+					<option value=2>New Workspace</option>
+					<option value=3>Add Table</option>
+				</select>
+				<input type=text name=wstock id=wstock placeholder=Ticker>
+				<input id=wsexec class=wsbtn type=submit value=Exec style="display:inline" onclick=wsexec()>
+			</div>
+			<div id=grids>
+				<div id=grid1 onclick="grid(100,1)"></div>
+				<div id=grid2 onclick="grid(50,2)"></div>
+				<div id=grid3 onclick="grid(33,3)"></div>
+				<div id=grid4 onclick="grid(25,4)"></div>
+				<div id=grid5 onclick="grid(12,5)"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id=ufo style="display:none">
+	<select id=ufo-select class=ws-select autocomplete="off" onchange=ufoload()>
+		<option value=0 selected>Lowcaps</option>
+		<option value=1>Highcaps</option>
+		<option value=2>Multiday Gainers</option>
+		<option value=3>Multiday Losers</option>
+	</select>
+</div>
+
+
+<!-- QuadSpace -->
+<div class="quadspace grid50" style="display:none">
+	<div class="quad ui-draggable ui-draggable-handle" style="display:block;position:relative">
+		<div class="chrome-tabs chrome-tabs-dark-theme" style="--tab-content-margin: 9px" data-chrome-tabs-instance-id="0">
+			<div class=wspanel></div>
+			<span class=wsnew title="New Workspace">❖</span>
+			<span class=max title=Maximize>❐</span>
+		</div>
+	</div>
+	<div class=quad style="display:block">
+		<div class="chrome-tabs chrome-tabs-dark-theme" style="--tab-content-margin: 9px" data-chrome-tabs-instance-id="0">
+			<div class=wspanel></div>
+			<span class=wsnew title="New Workspace">❖</span>
+			<span class=max title=Maximize>❐</span>
+		</div>
+	</div>
+</div>
+
+<!-- Publish QuadSpace into a Custom User QuadVerse -->
+<div id=QPUB style="display:none">
+	<h3>Publish QuadVerse</h3>
+	<span class=QCLOSE onclick=qclose()>✖</span>
+	<div id=QINFO>Here you can create your own QuadVerse Page to share with your friends where it can be accessed via a URL. For example if you decided to make a QuadVerse dedicated to BioTech you could name it "BioTechStocks" and access it via https://stockminer.org/username/BioTechStocks which you can share with your friends. The QuadVerse will be fully interactive and any change you make in its layout and its contents will be visible by everybody else that is viewing it. A valid name must not contain spaces or special characters. Once you click on Publish you will be redirected to https://stockminer.org/username/YourQuadVerse
+	</div>
+	<div id=QPIC>QuadVerse Picture
+		<select id=QSEL onchange=qpic_onchange()>
+			<option value=0>Upload</option>
+			<option value=1>Mouse</option>
+			<option value=2>Bat</option>
+			<option value=3>Bird</option>
+			<option value=4>Dolphin</option>
+			<option value=5>Shark</option>
+			<option value=6>Unicorn</option>
+		</select>
+	</div>
+	<input type=file id=QUPLOAD class="upload-file disabled" disabled=1 value="Upload picture from Hard Drive">
+	<input type=text id=QNAME placeholder="QuadVerse Name">
+	<div id=QDEPLOY class=QBTN onclick=qdeploy()>Publish</div>
+</div>
+
+<div id=upload style="display:none">
+	<h2>Load Picture</h2>
+	<span class=CLOSE onclick=qclose()>✖</span>
+	<div class=upload-url>Upload from URL:<input type=text class=upload-URL placeholder=URL></div>
+	<div class=upload-file>Upload from File:<input type=file class=upload-file value="Upload from Hard Drive"></div>
+	<div class=QBTN onclick="upload()">Upload</div>
+</div>
+
+<!-- Squeak -->
+<div class=SQ style="display:none">
+	<div class=SQ-HEAD>
+		<div class=sq-bg><img></div>
+		<div class=sq-pic onclick=profileconf()><img></div>
+		<div class=sq-name></div>
+		<div class=sq-desc></div>
+		<div class=sq-info>
+			<div class=sq-loc></div>
+			<div class=sq-url></div>
+			<div class=sq-joined></div>
+		</div>
+		<div class=sq-stat></div>
+		<span class=sq-follow onclick=follow()>Follow</span>
+	</div>
+	<!-- Compose Squeak -->
+	<div id=compose>
+		<div id=compose-msgbox>
+			<textarea id=compose-textarea placeholder="Compose Squeak"></textarea>
+		</div>
+		<div id=compose-panel>
+			<span id=compose-blob><input type=file id=cfile-pic>🖼</span>
+			<span id=compose-blob><input type=file id=cfile-vid>📹</span>
+			<span id=compose-blob   onclick=squeak_chart_onclick() help="Create Chart from CSV">📊</span>
+			<span id=compose-python onclick=squeak_pyscript_onclick() help="Share a PyScript App (HTML file or python code)">
+			<span id=compose-squeak onclick=squeak_send_onclick()>Send</span>
+		</div>
+	</div>
+	<div class=SQ-SQUEAKS></div>
+</div>
+
+<div id=MOUSECONF style="display:none">
+	<div class=bat></div>
+	<div class=mouse></div>
+	<div class=bird></div>
+	<div class=dolph></div>
+	<div class=shark></div>
+	<div class=uni></div>
+	<div class=P0></div>
+	<div class=P1></div>
+	<div class=P2></div>
+	<div class=P3></div>
+	<div class=P4></div>
+	<div class=P5></div>
+	<span class=QBTN>Save</div>
+</div>
+
+<!-- Squeak Config -->
+<div id=SQ-CONF style="display:none">
+	<h3>Fill in your Profile</h3>
+	<span class=QCLOSE onclick=qclose()>✖</span>
+	<div id=sq-conf-pic onclick=propic()><input type=file id=PUPLOAD><img id=PIMG></div>
+	<div id=sq-conf-pics class=minimouse onclick=mouseconf()></div>
+	<div id=sq-conf-name><span class=sq-text>Full Name/Nickname:</span><input type=text></div>
+	<div id=sq-conf-loc><span class=sq-text>Location:</span><input type=text></div>
+	<div id=sq-conf-url><span class=sq-text>URL:</span><input type=text></div>
+	<div id=sq-conf-desc><span class=sq-text>Description:</span><textarea></textarea></div>
+	<div id=sq-conf-bg><span class=sq-text>Background Image:</span><input tye=file id=BGUPLOAD></div>
+	<div id=sq-conf-apply class=QBTN onclick=setprofile()>Save</div>
+</div>

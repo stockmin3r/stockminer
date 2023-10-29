@@ -1,0 +1,71 @@
+/***********************************************
+ * filename: mainpage/stockminer/css/help.css
+ * License:  Public Domain
+ **********************************************/
+.toolt1p              {position:absolute}
+.toolt1p .toolt1ptext {
+			width:220px;
+			background-color:green;
+			color:white;
+			font-size:12px;
+			font-weight:bold;
+			text-align:center;
+			border-radius:26px;
+			padding:5px;
+			position:absolute;
+			z-index:100;
+}
+.arrow              {stroke:rgb(0,128,0);stroke-width:2}
+.qhelp              {position:absolute;z-index:100;top:0;right:0}
+/* QuadVerse */
+.arrow-qverse       {top:0;right:0;margin-right:28vw;margin-top:20px}
+.tip-qverse         {top:0;right:0;margin-right:37vw;margin-top:7.3%}
+/* ChartSpace */
+.arrow-cspace       {top:0;right:0;margin-right:35vw;margin-top:20px}
+.tip-cspace         {top:0;right:0;margin-right:52vw;margin-top:4.5%}
+/* Indicator */
+.arrow-indi         {top:0;right:0;margin-right:65vw;margin-top:9%}
+.tip-indi           {top:0;right:0;margin-right:65.2vw;margin-top:12.5%}
+/* Help */
+.arrow-help         {top:0;right:0;margin-right:3.8vw;margin-top:10px}
+.tip-help           {top:0;right:0;margin-right:20.5vw;margin-top:4.5%}
+
+#helpvid {
+	position:absolute;
+	background-color:#202225;
+	width:600px;
+	height:500px;
+	overflow:auto;
+	margin-left:40vw;
+	margin-top:30vh;
+	padding:10px;
+	border:13px solid transparent;
+	border-image:url(https://wallpapercave.com/wp/wp2963685.jpg) 40 round;
+	color:white;
+	grid-template-columns:1fr 1fr;
+}
+#helpvid h3 {
+	position:absolute;
+	text-decoration:underline;
+	margin-left:40%;
+}
+.helpvid h4 {
+	position:absolute;
+	margin-top:210px;
+}
+.helpvid{
+	margin-top:30px;
+	width:200px;
+	height:200px;
+	border:2px solid silver;
+	cursor:pointer;
+	border-radius:26px;
+}
+
+.helpvid video {
+	position;absolute;
+	width:200px;
+	border-radius:26px;
+	object-fit:fill;
+	height:200px;
+}
