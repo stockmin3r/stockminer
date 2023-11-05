@@ -1,0 +1,95 @@
+[lockfree]
+https://preshing.com/20130529/a-lock-free-linear-search/
+https://preshing.com/20130605/the-worlds-simplest-lock-free-hash-table/
+https://arxiv.org/pdf/2010.14189.pdf  # Jiffy: A Fast, Memory Efficient, Wait-Free Multi-Producers Single-Consumer Queue [Nov-2020]
+https://lumian2015.github.io/lockFreeProgramming/lock-free-vs-spin-lock.html # lockfree vs spinlock
+https://preshing.com/20120612/an-introduction-to-lock-free-programming/
+https://preshing.com/20120515/memory-reordering-caught-in-the-act/
+https://preshing.com/20120913/acquire-and-release-semantics/
+https://iris-project.org/pdfs/2021-cpp-ms-queue-final.pdf
+https://www.slideshare.net/23derevo/nonblocking-michaelscott-queue-algorithm
+https://people.csail.mit.edu/shanir/publications/Baskets%20Queue.pdf
+https://gist.github.com/glampert/c40f2584d2fbc72316e1c8a6ef1c0436 # atomic lockless linked list
+https://gist.github.com/jserv/c3823ea893e08607b432827a11ec4b69#file-free_later-c lockfree hashmap
+https://gist.github.com/larytet/c306d470f7b032c796efad15dcd609a9 # lockfree hashtable
+
+[queues]
+https://arxiv.org/pdf/2010.14189.pdf # Jiffy - Wait Free Queue
+http://chaoran.me/assets/pdf/wfq-ppopp16.pdf # WFQ
+https://github.com/max0x7ba/atomic_queue/tree/master # c++14 lockless queue
+https://www.slideshare.net/SandeepJoshi55/lockless-77026307 # lockless data structures
+https://people.csail.mit.edu/edya/publications/OptimisticFIFOQueue-journal.pdf
+https://people.csail.mit.edu/shanir/publications/Baskets%20Queue.pdf
+https://github.com/chaoran/fast-wait-free-queue/
+
+[cryptography]
+https://00f.net/2018/10/18/on-user-authentication/ # hydrogen client auth + terrarium link
+https://github.com/fastly/terrarium-templates/tree/master/105_access_control_example # OPRF WASM AUTH (typescript)
+https://tozny.com/blog/secure-authentication-libsodium/
+https://eprint.iacr.org/2018/163 # OPAQUE - uses an OPRF
+https://build-your-own.org/blog/20230110_alt_ssh/
+https://stackoverflow.com/questions/65314524/openssl-generate-ed25519-keypair-c
+https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/congruence-modulo
+https://blog.pinterjann.is/ed25519-certificates.html
+
+[ZKP]
+https://github.com/LeastAuthority/moonmath-manual/releases/latest/download/main-moonmath.pdf # math prereqs for ZKP
+https://www.zeroknowledgeblog.com # zk-SNARKS
+https://medium.com/starkware/arithmetization-i-15c046390862 # zk-STARKS
+
+[EventLoops/Scheduling]
+https://dotnettutorials.net/lesson/chaining-tasks-by-using-continuation-tasks/
+https://topic.alibabacloud.com/a/implementation-of-nginx-timer-and-usage-of-scheduled-events_8_8_31813369.html # Implementation of nginx timer and usage of Scheduled Events
+https://blog.insiderattack.net/event-loop-and-the-big-picture-nodejs-event-loop-part-1-1cb67a182810 # Event Loop and the Big Picture — NodeJS Event Loop Part 1
+https://www.dynatrace.com/news/blog/all-you-need-to-know-to-really-understand-the-node-js-event-loop-and-its-metrics/
+
+[atomic]
+https://geidav.wordpress.com/2016/03/12/important-properties-of-spinlocks/
+https://geidav.wordpress.com/2016/03/23/test-and-set-spinlocks/
+https://arangodb.com/2021/02/cpp-memory-model-migrating-from-x86-to-arm/
+https://lwn.net/Articles/790464/ # Detecting and handling split locks
+
+[hash]
+https://github.com/google/highwayhash # hash flooding
+
+[perf]
+https://medium.com/geekculture/rdtsc-the-only-way-to-benchmark-fc84562ef734  # Why RDTSC is the only way to benchmark
+
+[consensus]
+https://www.alibabacloud.com/blog/paxos-raft-epaxos-how-has-distributed-consensus-technology-evolved_597127
+
+[perf-crypto]
+https://www.xmodulo.com/check-aes-ni-enabled-openssl.html
+
+[wasm]
+https://rob-blackbourn.github.io/blog/webassembly/wasm/array/arrays/javascript/c/2020/06/07/wasm-arrays.html
+
+[event loops]
+https://www.nginx.com/blog/thread-pools-boost-performance-9x/
+
+[io_uring]
+https://unixism.net/loti/what_is_io_uring.html
+https://kernel.dk/io_uring.pdf
+https://github.com/espoal/awesome-iouring
+https://developers.redhat.com/articles/2023/04/12/why-you-should-use-iouring-network-io
+https://github.com/libuv/libuv/commit/d2c31f429b87b476a7f1344d145dad4752a406d4 # io_uring initial libuv patch
+https://github.com/zzzxxx00019/sehttpd-IO_URING/tree/master/src
+https://chompie.rip/Blog+Posts/Put+an+io_uring+on+it+-+Exploiting+the+Linux+Kernel
+https://pabloariasal.github.io/2022/11/12/couring-1/ # c++20
+
+[windows IoRing]
+https://windows-internals.com/i-o-rings-when-one-i-o-operation-is-not-enough/
+https://windows-internals.com/ioring-vs-io_uring-a-comparison-of-windows-and-linux-implementations/
+https://windows-internals.com/one-i-o-ring-to-rule-them-all-a-full-read-write-exploit-primitive-on-windows-11/
+https://windows-internals.com/wp-content/uploads/2022/07/ioring_preregistered.png
+https://github.com/yardenshafir/IoRing_Demos/blob/main/IoRingPerf/IoRingPerf/Source.cpp
+
+[makefiles]
+https://yuukidach.github.io/p/makefile-for-projects-with-subdirectories/
+
+[ai]
+https://analyticsindiamag.com/cosine-similarity-in-machine-learning/
+https://tivadardanka.com/blog/linear-algebra-in-machine-learning
+https://math.stackexchange.com/questions/317114/what-is-the-purpose-of-subtracting-the-mean-from-data-when-standardizing
+https://machinelearningmastery.com/learning-curves-for-diagnosing-machine-learning-model-performance/
+

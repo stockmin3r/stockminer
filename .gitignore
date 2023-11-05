@@ -18,6 +18,7 @@ www/key.pem
 !www/video/*
 !www/img/*
 !www/nginx.conf
+!doc/notes/links.txt
 src/test/
 __pycache__/
 __pyccel__/
