@@ -2,51 +2,6 @@
 #include <extern.h>
 #include <lmdb.h>
 
-/*
- * Eventually there will be multiple different databases with mdbx to be added next
- * Currently, just wrappers for LMDB
- */
-
-#define DATABASE_NAME(database)                      \
-({                                                   \
-	switch (database) {                              \
-		case DATABASE_USERS:                         \
-				db_name = "users.db";                \
-				DATABASE = LMDB_DATABASE_USERS;      \
-				break;                               \
-		case DATABASE_QUADVERSE:                     \
-				db_name = "quadverse.db";            \
-				DATABASE = LMDB_DATABASE_QUADVERSE;  \
-				break;                               \
-		case DATABASE_WATCHLISTS:                    \
-				DATABASE = LMDB_DATABASE_WATCHLISTS; \
-				db_name = "watchlists.db";           \
-				break;                               \
-	}                                                \
-	(const char *)db_name;                           \
-})
-
-struct db_task {
-		uint32_t               database;   // USERS | QUADVERSE | WATCHLISTS
-        uint32_t               engine;     // FILE  | LMDB
-		uint32_t               op;         // Database Operation (DB_APPEND|DB_OVERWRITE,...)
-        char                  *key;        // key (NULL for FILE storage "engine")
-        void                  *value;      // value
-        uint64_t               vsize;      // size of value
-		struct connection     *connection; // connection making the task (can be NULL)
-		db_callback_t          callback;   // (if set) called when db op is complete
-};
-
-struct db_queue {
-        struct db_task        *task;
-        TAILQ_ENTRY(db_queue)  tasks;
-};
-
-typedef struct db_queue        db_queue_t;
-typedef struct db_task         db_task_t;
-
-TAILQ_HEAD(, db_queue)         db_queue_head;
-
 /* DB Names */
 enum {
 	DATABASE_USERS,          // struct user array
@@ -65,6 +20,53 @@ enum {
 	DB_APPEND,
 	DB_OVERWRITE
 };
+
+static int DATABASE_ENGINE = DATABASE_FILE; // Database "engine"
+
+/*
+ * Eventually there will be multiple different databases with mdbx to be added next
+ * Currently, just wrappers for LMDB
+ */
+
+#define DATABASE_NAME(database)                      \
+({                                                   \
+    switch (database) {                              \
+        case DATABASE_USERS:                         \
+                db_name = "users.db";                \
+                DATABASE = LMDB_DATABASE_USERS;      \
+                break;                               \
+        case DATABASE_QUADVERSE:                     \
+                db_name = "quadverse.db";            \
+                DATABASE = LMDB_DATABASE_QUADVERSE;  \
+                break;                               \
+        case DATABASE_WATCHLISTS:                    \
+                DATABASE = LMDB_DATABASE_WATCHLISTS; \
+                db_name = "watchlists.db";           \
+                break;                               \
+    }                                                \
+    (const char *)db_name;                           \
+})
+
+struct db_task {
+	uint32_t               database;   // USERS | QUADVERSE | WATCHLISTS
+	uint32_t               engine;     // FILE  | LMDB
+	uint32_t               op;         // Database Operation (DB_APPEND|DB_OVERWRITE,...)
+	char                  *key;        // key (NULL for FILE storage "engine")
+	void                  *value;      // value
+	uint64_t               vsize;      // size of value
+	struct connection     *connection; // connection making the task (can be NULL)
+	db_callback_t          callback;   // (if set) called when db op is complete
+};
+
+struct db_queue {
+        struct db_task        *task;
+        TAILQ_ENTRY(db_queue)  tasks;
+};
+
+typedef struct db_queue        db_queue_t;
+typedef struct db_task         db_task_t;
+
+TAILQ_HEAD(, db_queue)         db_queue_head;
 
 static MDB_env *LMDB_DATABASE_USERS;        // Users.db
 static MDB_env *LMDB_DATABASE_QUADVERSE;    // Quadverse.db
@@ -224,6 +226,16 @@ void db_user_update(struct user *user)
 	db_enqueue(DATABASE_USERS, DATABASE_FILE, DB_OVERWRITE, NULL, user, sizeof(user), NULL, NULL);
 }
 
+void db_user_list(void)
+{
+	switch (DATABASE_ENGINE) {
+		case DATABASE_FILE: {
+			fdb_user_list();
+			break;
+		}
+	}
+}
+
 static void
 lmdb_set(int database, char *key, uint64_t key_size, void *value, uint64_t value_size)
 {
@@ -244,7 +256,7 @@ lmdb_set(int database, char *key, uint64_t key_size, void *value, uint64_t value
 	mdb_txn_begin (DATABASE, NULL, 0, &txn);
 	int rc = mdb_dbi_open  (txn, db_name, MDB_CREATE, &dbi);
 	rc     = mdb_put       (txn, dbi, &db_key, &db_value, 0);
-printf("rc2: %d\n", rc);	
+	printf("rc2: %d\n", rc);
 	mdb_txn_commit(txn);
 	mdb_dbi_close (DATABASE, dbi);
 

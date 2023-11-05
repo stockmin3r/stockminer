@@ -72,7 +72,7 @@ endif
 
 all:$(OBJ) $(EXE)
 
-$(OBJ):$(INCS) | libhydrogen lmdb queues wasm
+$(OBJ):$(INCS) | libhydrogen lmdb queues certs
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -86,6 +86,12 @@ lmdb:
 	@cd src/external/lmdb && make
 queues:
 	@cd src/external/queues && make
+
+certs: www/key.pem
+
+www/key.pem:
+	openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 -keyout www/key.pem -out www/cert.pem -subj '/CN=localhost/O=XX/C=XX'
+
 j:
 	make -j 12
 wasm:

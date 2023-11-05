@@ -6,6 +6,39 @@ struct colmap   COLMAP[256] = { 100, 999 };
 int             NR_COLUMNS = 1;
 pthread_mutex_t colmap_lock;
 
+void apc_www(struct connection *connection, char **argv)
+{
+	struct www *www      = NULL, *tmp;
+	char       *url      = argv[0];
+	char       *colors[] = { BOLDRED, BOLDGREEN, BOLDMAGENTA, BOLDCYAN, BOLDWHITE, BOLDYELLOW };
+	char        msg[512 KB];
+	char       *color;
+	int         nbytes, color_index = 0;
+
+	if (*url != '*')
+		HASH_FIND_STR(WWW_HASHTABLE, url, www);
+
+	if (!www) {
+		printf(BOLDRED "no entry for: %s" RESET "\n", url);
+		HASH_ITER(hh, WWW_HASHTABLE, www, tmp) {
+			printf(BOLDWHITE "URL: %s nr_tables: %d www: %p" RESET "\n", url, www->nr_tables, www);
+		}
+		return;
+	}
+
+	for (int x=0; x<www->nr_tables; x++) {
+		struct table *table = www->tables[x];
+		if (!table)
+			continue;
+		color  = colors[color_index++];
+		nbytes = snprintf(msg, sizeof(msg)-1, "%s%s" RESET, color, table->html);
+		if (color_index >= 6)
+			color_index = 0;
+		printf("%s\n", msg);
+	}
+	printf(BOLDGREEN "URL: %s nr_tables: %d www: %p" RESET "\n", url, www->nr_tables, www);
+}
+
 void rpc_wget_table(struct rpc *rpc)
 {
 	char          *packet        = rpc->packet;

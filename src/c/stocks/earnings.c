@@ -79,7 +79,7 @@ void rpc_stockpage_earnings(struct rpc *rpc)
 	if (!stock || !(ecount=stock->EARNINGS->nr_earnings))
 		return;
 
-	table_size = sprintf(table, "etab %s ", QGID);
+	table_size = snprintf(table, 32, "etab %s ", QGID);
 	e          = stock->EARNINGS;
 	for (x=0; x<ecount; x++) {
 		if (!strcmp(e->earn[x].date, e->next_earnings))
@@ -315,7 +315,7 @@ int earnings_table(struct stock *stock, char *table)
 int build_earnings(struct stock *stock)
 {
 	struct earn     *earn;
-	struct earnings stock_earnings;
+	struct earnings  stock_earnings;
 	struct mag      *mag;
 	char             path[256];
 	char             buf[1024];
@@ -329,7 +329,7 @@ int build_earnings(struct stock *stock)
 	if (!stock->mag)
 		return 0;
 	memset(&stock_earnings, 0, sizeof(stock_earnings));
-	sprintf(path, "data/stocks/stockdb/%s.edates", stock->sym);
+	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/%s.edates", stock->sym);
 	if (!fs_readfile_str(path, buf, sizeof(buf))) {
 		unlink(path);
 		return 0;
@@ -414,11 +414,11 @@ void build_stock_earnings()
 {
 	struct stock **stocks;
 	struct XLS    *XLS = CURRENT_XLS;
-	int nr_stocks, x;
+	int            nr_stocks;
 
 	stocks    = XLS->STOCKS_PTR;
 	nr_stocks = XLS->nr_stocks;
-	for (x=0; x<nr_stocks; x++)
+	for (int x=0; x<nr_stocks; x++)
 		build_earnings(stocks[x]);
 }
 
@@ -514,12 +514,12 @@ void cmd_dump_earnings(int sockfd)
 	struct stock    **stocks;
 	struct XLS       *XLS = CURRENT_XLS;
 	struct earnings  *e;
-	int               x, days, nr_stocks;
+	int               days, nr_stocks;
 
 	recv(sockfd, (void *)&days, 4, 0);
 	stocks    = XLS->STOCKS_PTR;
 	nr_stocks = XLS->nr_stocks;
-	for (x=0; x<nr_stocks; x++) {
+	for (int x=0; x<nr_stocks; x++) {
 		stock = stocks[x];
 		if (!stock || stock->EARNINGS->earning_days > days)
 			continue;

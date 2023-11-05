@@ -144,9 +144,11 @@ extern "C" {
 #endif
 
 typedef uint64_t packet_size_t;
-typedef uint16_t apc_t;           /* Admin Procedure Call */
-typedef uint32_t apc_result_t;    /* APC Integer Result */
 typedef uint16_t port_t;          /* TCP/UDP port type */
+
+#ifndef uid_t
+typedef uint32_t uid_t;
+#endif
 
 #ifndef KB
 #define KB * 1024

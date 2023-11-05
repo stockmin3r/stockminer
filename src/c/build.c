@@ -37,6 +37,7 @@ struct external_api {
 {"https://code.highcharts.com/stock/indicators/indicators-all",           "jLpemzsfcRDYsAbWw/hErdwRLuVk6AGjCCocwf3okb6JjF4JBuhMv0W7gDk+NPhP", LICENSE_HIGHCHARTS, !PERMISSIVE, !DEFER, },
 {"https://code.jquery.com/ui/1.13.2/jquery-ui",                           "4D3G3GikQs6hLlLZGdz5wLFzuqE9v4yVGAcOH86y23JqBDPzj9viv0EqyfIa6YUL", LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://unpkg.com/draggabilly@2.2.0/dist/draggabilly.pkgd",             "JvmwKtrs1CjFC41kayyey74PQsYWrxToeXr0tsEyeYgZwi2aT4XZccR8SFqcobPC", LICENSE_MIT,         PERMISSIVE, !DEFER, },
+{"https://cdn.plot.ly/plotly-2.26.0",                                     NULL,                                                               LICENSE_MIT,         PERMISSIVE, !DEFER, },
 /* CSS */
 {"https://swisnl.github.io/jQuery-contextMenu/dist/jquery.contextMenu.min.css",               NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css",                  NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },

@@ -160,6 +160,7 @@ void rpc_profile_set(struct rpc *rpc)
 	int             argc, len, msglen, error;
 
 	argc = cstring_split(profile, argv, 5, '`');
+	printf("argc: %d\n", argc);
 	if (!argc)
 		return;
 

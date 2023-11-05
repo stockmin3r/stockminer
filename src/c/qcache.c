@@ -1,4 +1,5 @@
 #include <conf.h>
+#include <extern.h>
 
 static __inline__ void qcache_path(struct session *session, char *path)
 {
@@ -738,3 +739,25 @@ int conf_styles(struct session *session, char *packet)
 	packet[packet_len++] = '@';
 	return (packet_len);
 }
+
+void apc_json_clear(struct connection *connection, char **argv)
+{
+	struct session *session = session_by_username(argv[0]);
+
+	if (!session) {
+		printf(BOLDRED "cmd_json_clear(): username: %s does not exist" RESET "\n", argv[0]);
+		return;
+	}
+	session->qcache = NULL;
+}
+
+void apc_obj_list(struct connection *connection, char **argv)
+{
+	struct object *obj = NULL;
+	struct object *tmp = NULL;
+
+	HASH_ITER(hh, Objects, obj, tmp) {
+		printf("obj: %p key: %s uid: %d\n", obj, obj->key, obj->uid);
+	}
+}
+

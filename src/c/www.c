@@ -145,7 +145,7 @@ websocket_process_request(struct connection *connection)
 	char           *msg;
 	char           *argv[MAX_RPC_ARGV];
 	char            msgbuf[2048];
-	int             nr_frames, argc;
+	int             nr_frames, argc, argc_max;
 
 	connection->packet_size = openssl_read_sync2(connection, connection->packet, sizeof(msgbuf)-10);
 	if (connection->packet_size <= 0)
@@ -159,14 +159,14 @@ websocket_process_request(struct connection *connection)
 		frame = &frames[x];
 		msg   = (char *)frame->data;
 		printf(BOLDCYAN "%s [%d] {%d}" RESET "\n", msg, connection->fd, nr_frames);
-
 		if ((request=www_request_hash(msg))) {
+			argc_max         = (request->argc_max==0) ? MAX_RPC_ARGV : (request->argc_max);
 			rpc.session      = connection->session;
 			rpc.connection   = connection;
 			rpc.packet       = connection->packet;
-			rpc.argc         = argc = cstring_split(msg, argv, request->argc_max, ' ');
+			rpc.argc         = argc = cstring_split(msg, argv, argc_max, ' ');
 			rpc.argv         = argv;
-			printf("argc: %d min: %d max: %d\n", argc, request->argc_min, request->argc_max);
+			printf("argc: %d min: %d max: %d acmax: %d\n", argc, request->argc_min, request->argc_max, argc_max);
 			if (request->argc_min && (argc > request->argc_max || argc < request->argc_min)) {
 				printf(BOLDRED "command error: %s" RESET "\n", argv[0]);
 				return false;
@@ -264,6 +264,11 @@ void www_load_website(struct server *server)
 	if (!WEBSITE)
 		return;
 	www_load_wasm();
+}
+
+void apc_reload_website(struct connection *connection, char **argv)
+{
+	www_load_website(&Server);
 }
 
 static void
@@ -961,6 +966,7 @@ void *init_www(void *args)
 	www_callback_t www_callback;
 	int            nr_www_threads;
 
+//	openssl_init();
 	www_init_requests();
 	www_load_website(&Server);
 	blob_load_images("www/img");

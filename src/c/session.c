@@ -133,6 +133,28 @@ void SESSION_UNLOCK()
 	mutex_unlock(&session_lock);
 }
 
+void apc_sessions(struct connection *connection, char **argv)
+{
+	struct session *session;
+	char           *buf    = malloc(32 KB);
+	char           *ptr    = buf;
+	int             nbytes = 0, size, max_size = 32 KB;
+
+	if (!buf)
+		return;
+
+	mutex_lock(&session_lock);
+	DLIST_FOR_EACH_ENTRY(session, &session_list, list) {
+		size     = snprintf(ptr+nbytes, MAX_USERNAME_SIZE+1, "%s\n", session->user->uname);
+		ptr     += size;
+		nbytes  += size;
+		printf("session user: %s (cookie(s) will go here) %p\n", session->user->uname, session);
+	}
+	mutex_unlock(&session_lock);
+
+	apc_send_result(connection, buf);
+}
+
 void session_set_config(struct connection *connection)
 {
 	struct session *session     = connection->session;

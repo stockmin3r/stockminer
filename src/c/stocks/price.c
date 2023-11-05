@@ -254,17 +254,17 @@ void wsj_get_EOD(struct stock *stock, char *page)
 	close(fd);
 }
 
-void wsj_update_EOD()
+void apc_update_WSJ(struct connection *connection, char **argv)
 {
 	struct stock *stock, *stocks;
 	struct WSJ   *WSJ;
 	struct XLS   *XLS = CURRENT_XLS;
 	char          page[128 KB];
-	int           x, nr_stocks;
+	int           nr_stocks;
 
 	stocks    = XLS->STOCKS_ARRAY;
 	nr_stocks = XLS->nr_stocks;
-	for (x=0; x<nr_stocks; x++) {
+	for (int x=0; x<nr_stocks; x++) {
 		stock = &stocks[x];
 		WSJ   = &stock->API.WSJ;
 		if (!WSJ || !WSJ->CLOSE)

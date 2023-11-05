@@ -1565,7 +1565,7 @@ void store_forkdb(char *forkpath, struct forkmem *FORKMEM, int nr_forks)
 	fs_writefile(forkpath, FORKDB, forkdb_size);
 }
 
-void update_forks_EOD()
+void apc_update_FORKS(struct connection *connection, char **argv)
 {
 	load_forks(CURRENT_XLS);
 	generate_monster_db(CURRENT_XLS);

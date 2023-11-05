@@ -14,12 +14,8 @@
 #include <stocks/stocks.h>
 
 #define LOCALHOST       0x0100007f
-
-#define NETCTL_PORT           7778
-#define TESTCTL_PORT          7779
-
+#define ADMIN_PORT            7778
 #define COOKIE_SIZE             15
-
 #define MAX_USERS            10000
 #define MAX_EMAIL_SIZE          63
 #define MAX_USERNAME_SIZE       63
@@ -170,7 +166,7 @@ struct user {
 	char                 uname[MAX_USERNAME_SIZE+1];
 	char                 pwhash[crypto_pwhash_STRBYTES];
 	unsigned int         logged_in;
-	unsigned int         uid;
+	uid_t                uid;
 	uint64_t             config;
 	time_t               last_login;
 	time_t               join_date;
@@ -502,6 +498,7 @@ struct session   *session_by_cookie       (char *cookie);
 struct session   *session_by_username     (char *username);
 struct session   *session_by_uid          (unsigned int uid);
 struct list_head *get_session_list        (void);
+void              apc_sessions            (struct connection *connection, char **argv);
 void              session_add             (struct session *session);
 void              session_destroy         (struct session *session);
 void              session_load_quadverse  (struct session *);
@@ -522,31 +519,33 @@ void             *db_thread               (void *args);
 void              db_user_add             (struct user *user, struct connection *connection);
 void              db_user_update_cb       (struct user *user);
 void              db_user_update          (struct user *user);
+void              db_user_list            (void);
 void             *db_submit_tasks         (void *args);
 
+/* fdb.c */
+void              fdb_user_list           (void);
+uid_t             fdb_user_uid            (char *username);
+
 /* price.c */
-void              wsj_update_EOD          (void);
+void              apc_update_EOD          (struct connection *connection, char **argv);
 void              wsj_update_stock        (char *ticker);
 void              wsj_get_EOD             (struct stock *stock, char *page);
 int               wsj_query               (struct stock *stock, char *url, int url_size, char *page, void (*query)(struct stock *stock, char *page));
 void              update_current_price    (struct stock *stock);
 int               update_allday_price     (struct XLS *XLS, struct stock *stock);
+int               load_ohlc               (struct stock *stock);
 double            price_by_date           (struct stock *stock, char *date);
 void              argv_wsj_allday         (char *ticker);
+void              init_ip                 (void);
+
+/* volume.c */
+char             *volume                  (uint64_t vol, char *buf);
 
 /* watchtable.c */
 void              init_watchtable(void);
 
-void  *init_www           (void *args);
-void   www_load_website   (struct server *server);
-int    load_ohlc          (struct stock *stock);
 double stock_intraday_low (struct stock *stock);
 size_t curl_get_data      (char *buf, size_t size, size_t count, void *data);
-void   init_time          (struct server *server);
-void   time_EOD           (void);
-void   set_current_minute (void);
-char  *volume             (uint64_t vol, char *buf);
-void   UPDATE_EOD         (void);
 
 /* algo.c */
 void   algorithm_mag1(struct stock *stock, struct mag *mag);
@@ -594,9 +593,11 @@ void qcache_save                     (struct session *session, struct qpage *qpa
 void session_load_qcache             (struct session *session);
 
 /* www.c */
-void www_send_backpage    (struct session *session, struct connection *connection, int send_qconf);
-int  www_new_websocket    (struct session *session, struct connection *connection);
-void init_ip              (void);
+void          www_send_backpage      (struct session *session, struct connection *connection, int send_qconf);
+int           www_new_websocket      (struct session *session, struct connection *connection);
+void         *init_www               (void *args);
+void          www_load_website       (struct server *server);
+void          apc_reload_website     (struct connection *connection, char **argv);
 
 /* profile.c */
 void              session_load_profile      (struct session *session);
@@ -688,22 +689,24 @@ int      zip_deflate    (char *page, char *page_gz, int page_len);
 int      zip_deflate2   (char *page, char *page_gz, int page_len);
 uint64_t zip_decompress2(unsigned char *page_gz, unsigned char *page, int compressed_size, int uncompressed_size);
 
-
 /* time.c */
-int      splitdate_MDY(char *date, int *year, int *month, int *day);
-int      splitdate_YMD(char *date, int *year, int *month, int *day);
-char    *MDY2YMD(char *from, char *to);
-time_t   str2unix(char *timestr);
-time_t   str2unix2(char *timestr);
-time_t   get_ny_time(char *timestr);
-time_t   get_current_time(char *timestr);
-char    *ny_date(char *buf);
-time_t   ny_time(char *timestr);
-time_t   get_timestamp(void);
-char    *unix2str(time_t timestamp, char *timestr);
-char    *unix2str2(time_t timestamp, char *timestr);
-char    *unix2str3(time_t timestamp, char *timestr);
-int      get_time(void);
+int      splitdate_MDY      (char *date, int *year, int *month, int *day);
+int      splitdate_YMD      (char *date, int *year, int *month, int *day);
+char    *MDY2YMD            (char *from, char *to);
+time_t   str2unix           (char *timestr);
+time_t   str2unix2          (char *timestr);
+time_t   get_ny_time        (char *timestr);
+time_t   get_current_time   (char *timestr);
+char    *ny_date            (char *buf);
+time_t   ny_time            (char *timestr);
+time_t   get_timestamp      (void);
+char    *unix2str           (time_t timestamp, char *timestr);
+char    *unix2str2          (time_t timestamp, char *timestr);
+char    *unix2str3          (time_t timestamp, char *timestr);
+int      get_time           (void);
+void     init_time          (struct server *server);
+void     time_EOD           (void);
+void     set_current_minute (void);
 
 /* lib.c */
 int64_t        fs_read                 (int, char *, int64_t);
@@ -754,6 +757,7 @@ void           DOUBLE_SORT_LOHI        (double array[], int n);
 void           DOUBLE_SORT_HILO        (double array[], int n);
 
 /* openssl.c */
+void               openssl_init               (void);
 struct ssl_server *openssl_server             (const char *cert, const char *key);
 void               openssl_server_sync        (www_callback_t callback, port_t port, bool create_thread);
 bool               openssl_connect_sync       (struct connection *connection, unsigned int ipaddr, unsigned short port);
@@ -792,9 +796,9 @@ struct table **LIBXLS_wget_table     (char *URL, int *ntables);
 int            LIBXLS_deftab         (char *packet, char *URL, char *QGID, char *table_names);
 void           LIBXLS_rpc_excel2table(struct session *session, struct connection *connection, char *excel_file, char *excel_filepath, int excel_size, char **subargv, void *(*completion)(struct job *job));
 
-/* users.c */
+/* user.c */
 struct user *search_user        (char *username);
-unsigned int uid_by_username    (char *username);
+uid_t        uid_by_username    (char *username);
 void         user_update        (struct user *user);
 void         init_users         (void);
 void         db_user_register_cb(struct connection *connnection, int result);
@@ -829,7 +833,13 @@ bool   base64_validate           (unsigned char *src, size_t len);
 
 /* apc.c */
 void   admin_client_loop         (void);
-void   apc_send_command          (apc_t apc);
+void   apc_send_command          (const char *command);
+void   apc_send_result           (struct connection *connnection, char *result);
+void   apc_exec                  (char *command);
+
+/* term.c */
+void terminal_loop(void);
+
 
 struct curldata {
     char         *memory;

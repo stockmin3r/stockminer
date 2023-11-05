@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'r':
 				/* reload src/website && www/hydrogen.wasm */
-				apc_send_command(APC_RELOAD_WEBSITE);
+				apc_send_command("reload");
 				exit(0);
 			case 'm':
 				build_mag(NULL, Server.XLS);

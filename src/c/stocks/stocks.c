@@ -138,8 +138,9 @@ void load_fundamentals(struct stock *stock)
 
 unsigned short stock_id(char *ticker)
 {
-	struct stock *stock = search_stocks(ticker);
-	if (!stock)
+	struct stock *stock;
+
+	if (unlikely(!ticker || !(stock=search_stocks(ticker))))
 		return -1;
 	return stock->id;
 }
@@ -407,11 +408,10 @@ void rpc_search(struct rpc *rpc)
 	websocket_send(rpc->connection, rpc->packet, packet_len-1);
 }
 
-void UPDATE_EOD()
+void apc_update_EOD(struct connection *connection, char **argv)
 {
 	struct XLS *XLS;
 	struct XLS *OLD_XLS = CURRENT_XLS;
-	int x;
 
 	printf(BOLDWHITE "UPDATE_EOD(): ENTER" RESET "\n");
 	XLS = load_stocks(XLS_DATA_SOURCE_WSJ, DATA_FORMAT_WEBSOCKET_INTERNAL);
@@ -424,7 +424,7 @@ void UPDATE_EOD()
 	create_stock_threads(XLS);
 
 	/* Kill old threads */
-	for (x=0; x<OLD_XLS->nr_stock_threads; x++)
+	for (int x=0; x<OLD_XLS->nr_stock_threads; x++)
 		XLS->stock_threads[x].stop = 1;
 
 	while (Server.stock_boot  != XLS->nr_stock_threads)  os_usleep(100000);

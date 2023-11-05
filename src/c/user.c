@@ -167,12 +167,26 @@ verify_username(char *username, int username_len)
 
 struct user *search_user(char *username)
 {
-	struct uhash *uhash   = NULL;
+	struct uhash *uhash = NULL;
+	struct user  *user  = NULL;
 
+	if (!username)
+		return (NULL);
+
+	mutex_lock(&user_lock);
 	HASH_FIND_STR(USER_HASHTABLE, username, uhash);
-	if (!uhash)
-		return NULL;
-	return uhash->session->user;
+	if (uhash)
+		user = uhash->session->user;
+	mutex_unlock(&user_lock);
+	return (user);
+}
+
+void apc_user_add(struct connection *connection, char **argv)
+{
+	struct rpc rpc = {0};
+
+	rpc.argv = argv;
+	rpc_user_register(&rpc);
 }
 
 void init_users()

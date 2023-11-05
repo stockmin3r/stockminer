@@ -469,7 +469,7 @@ int websocket_upload_object(struct session *session, struct connection *connecti
 			break;
 		case OBJTYPE_DOC:
 			strcpy(blob, HTTP_PDF);
-			hsize = sizeof(HTTP_PDF)-1;
+			hsize     = sizeof(HTTP_PDF)-1;
 			content_len_offset = PDF_OFFSET;
 			blob_type = "pdf";
 			blob_fmt  = "qupdate pdf {\"QGID\":\"%s\",\"URL\":\"%s\"}";

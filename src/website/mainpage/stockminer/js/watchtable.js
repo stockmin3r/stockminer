@@ -734,8 +734,8 @@ function realloc_watchtable(watchtable_id, columns, screener)
 }
 
 /* CALLERS:
- *  - TPLoad()       - WatchTable Preset Loader   - preset.js
- *  - loadScreener() - init of default #morphtab  - quadspace.js
+ *  - TPLoad()       - WatchTable Preset Loader   - watchtable.js
+ *  - loadScreener() - init of default #morphtab  - quadspace.js - XXX: must remove the static morphtab
  *      + (add column onclick button callback)
  *      + (del column onclick button callback)
  *      + .sort .sortable()

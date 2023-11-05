@@ -105,7 +105,7 @@ packet_size_t openssl_write_sync(struct connection *connection, char *packet, pa
 		i = SSL_write(connection->ssl, p, MIN(packet_size, 16 KB));
 		if (i == 0 || errno == EPIPE)
 			return -1;
-//		printf("len: %d vs: %d err: %d ERRNO: %s\n", i, packet_len, SSL_get_error(connection->ssl, i), strerror(errno));
+//		printf("len: %d vs: %d err: %d ERRNO: %s\n", i, packet_size, SSL_get_error(connection->ssl, i), strerror(errno));
 		if (i == -1) {
 			net_select_waitfd(connection->fd, 1);
 			continue;
@@ -153,6 +153,93 @@ packet_size_t openssl_read_http(struct connection *connection, char *buf, packet
 		return total_len;
 	}
 	return nbytes;
+}
+
+#define KEY_TYPE_RSA     1
+#define KEY_TYPE_ED25519 2
+
+EVP_PKEY *openssl_gen_key(int type)
+{
+	EVP_PKEY *pkey = EVP_PKEY_new();
+
+	if (!pkey)
+		return NULL;
+
+	switch (type) {
+		case KEY_TYPE_RSA:
+			RSA_generate_key(2048, RSA_F4, NULL, NULL);
+			break;
+	}
+	return (pkey);
+}
+
+// not working
+X509 *openssl_gen_cert(EVP_PKEY *pkey)
+{
+	X509 *x509 = X509_new();
+	if (!pkey || !x509)
+		return NULL;
+
+	// Serial number
+	ASN1_INTEGER_set(X509_get_serialNumber(x509), 1);
+
+	// Expiry (4 years)
+	X509_gmtime_adj(X509_get_notBefore(x509), 0);
+	X509_gmtime_adj(X509_get_notAfter(x509), (31536000L));
+
+    /* Set the Public Key for our Certificate */
+	X509_set_pubkey(x509, pkey);
+
+    /* We want to copy the subject name to the issuer name */
+	X509_NAME *name = X509_get_subject_name(x509);
+    
+    /* Country Code and Common Name */
+	X509_NAME_add_entry_by_txt(name, "C",  MBSTRING_ASC, (unsigned char *)"AU",        -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "O",  MBSTRING_ASC, (unsigned char *)"none",      -1, -1, 0);
+	X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, (unsigned char *)"localhost", -1, -1, 0);
+    
+    /* Issuer name */
+	X509_set_issuer_name(x509, name);
+
+	/* Sign the certificate with the private key (fails) */
+	if (!X509_sign(x509, pkey, EVP_sha256())) {
+        X509_free(x509);
+		return NULL;
+	}
+	return (x509);
+}
+
+void openssl_init(void)
+{
+	EVP_PKEY *pkey;
+	X509     *x509;
+	FILE     *key_pem;
+	FILE     *cert_pem;
+
+	if (fs_file_exists("www/key.pem") && fs_file_exists("www/cert.pem"))
+		return;
+
+	pkey = openssl_gen_key(KEY_TYPE_RSA);
+	x509 = openssl_gen_cert(pkey);
+	if (!pkey || !x509)
+		goto out_error;
+
+	key_pem  = fopen("www/key.pem", "wb");
+    cert_pem = fopen("www/cert.pem", "wb");
+	if (!key_pem || !cert_pem)
+		goto out_error;
+
+	if (!PEM_write_PrivateKey(key_pem, pkey, NULL, NULL, 0, NULL, NULL))
+		goto out_error;
+    fclose(key_pem);
+    
+	if (!PEM_write_X509(cert_pem, x509))
+		goto out_error;
+    fclose(cert_pem);
+	return;
+out_error:
+	printf(BOLDRED "[-] Failed to generate key/cert: [pkey: %p x509: %p key_pem: %p cert_pem: %p]" RESET "\n", pkey, x509, key_pem, cert_pem);
+	exit(-1);
 }
 
 int connection_ssl_recv(struct connection *connection)

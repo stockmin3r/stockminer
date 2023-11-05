@@ -495,7 +495,6 @@ void candle_scan(struct stock *stock, struct mag *mag)
 	int beginIndex, endIndex, x, y = 0, candle_day, days_left, bull_flags_len, bear_flags_len, nr_candles, nr_candlesticks;
 	double prior_close, delta, next_close;
 
-
 	if (!CANDLES_LOADED)
 		return;
 

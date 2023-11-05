@@ -2,6 +2,7 @@
 #define __STOCKS_H
 
 #include <conf.h>
+#include <apc.h>
 #include <stocks/api.h>
 #include <stocks/algo.h>
 #include <stocks/ufo.h>
@@ -447,32 +448,49 @@ struct tradetime {
 	char time_9AM;
 };
 
-__MODULE_INIT init_stocks_module    (struct server  *server);
-__MODULE_HOOK stocks_session_init   (struct session *session);
-__MODULE_HOOK stocks_main_pre_loop  (struct server  *server);
-__MODULE_HOOK stocks_main_post_loop (struct server  *server);
-struct stock  *search_stocks        (char *name);
-struct stock  *search_stocks_XLS    (struct XLS *XLS, char *ticker);
-struct XLS    *load_stocks          (int data_source, int data_format);
-void           stock_loop           (struct server *config);
-void           verify_stocks        (struct XLS *XLS);
-void           cmd_delisted         (void);
-void           load_fundamentals    (struct stock *stock);
-void          *stock_thread         (void *args);
-int            stocks_get_indexes   (char *ibuf);
-void           http_stock_api       (struct connection *connection, char *ticker, char *api, char **opt);
-int            is_index             (char *ticker);
-int            is_fund              (char *ticker);
-void           set_index            (struct stock *stock);
-unsigned short stock_id             (char *ticker);
-void           load_WSJ             (struct XLS *XLS);
-char          *json_board           (struct board *board, int *json_len);
-void           generate_monster_db  (struct XLS *XLS);
-void update_quicklook      (struct XLS *XLS);
-void update_peakwatch      (struct XLS *XLS);
-void init_monster          (struct XLS *XLS, int do_forks);
-void store_monster_db      (struct monster *monster);
-void http_send_monster     (struct connection *connection);
+/* stocks.c */
+__MODULE_INIT    init_stocks_module       (struct server  *server);
+__MODULE_HOOK    stocks_session_init      (struct session *session);
+__MODULE_HOOK    stocks_main_pre_loop     (struct server  *server);
+__MODULE_HOOK    stocks_main_post_loop    (struct server  *server);
+struct stock     *search_stocks           (char *name);
+struct stock     *search_stocks_XLS       (struct XLS *XLS, char *ticker);
+struct XLS       *load_stocks             (int data_source, int data_format);
+void              apc_update_EOD          (struct connection *connection, char **argv);
+void              stock_loop              (struct server *config);
+void              verify_stocks           (struct XLS *XLS);
+void              cmd_delisted            (void);
+void              load_fundamentals       (struct stock *stock);
+void             *stock_thread            (void *args);
+int               stocks_get_indexes      (char *ibuf);
+void              http_stock_api          (struct connection *connection, char *ticker, char *api, char **opt);
+int               is_index                (char *ticker);
+int               is_fund                 (char *ticker);
+void              set_index               (struct stock *stock);
+unsigned short    stock_id                (char *ticker);
+void              load_WSJ                (struct XLS *XLS);
+char             *json_board              (struct board *board, int *json_len);
+void              generate_monster_db     (struct XLS *XLS);
+void              update_quicklook        (struct XLS *XLS);
+void              update_peakwatch        (struct XLS *XLS);
+void              init_monster            (struct XLS *XLS, int do_forks);
+void              store_monster_db        (struct monster *monster);
+void              http_send_monster       (struct connection *connection);
+
+/* price.c */
+void              apc_update_WSJ          (struct connection *connection, char **argv);
+void              wsj_update_stock        (char *ticker);
+void              wsj_get_EOD             (struct stock *stock, char *page);
+int               wsj_query               (struct stock *stock, char *url, int url_size, char *page, void (*query)(struct stock *stock, char *page));
+void              update_current_price    (struct stock *stock);
+int               update_allday_price     (struct XLS *XLS, struct stock *stock);
+int               load_ohlc               (struct stock *stock);
+double            price_by_date           (struct stock *stock, char *date);
+void              argv_wsj_allday         (char *ticker);
+void              init_ip                 (void);
+
+/* volume.c */
+char             *volume                  (uint64_t vol, char *buf);
 
 /* ufo.c */
 void ufo_scan             (struct XLS *XLS);
@@ -493,10 +511,15 @@ void ufo_reload_charts    (struct session *session, char *packet, char *id, int 
 int  ufo_search_table     (char *table, char *packet);
 int  ufo_table_json       (char *table, char *packet);
 
-/* volume.c */
-void             *premarket_volume_thread (void *args);
-void              init_premarket          (void);
-char             *volume(uint64_t vol, char *buf);
+/* apc_stocks.c */
+void          apc_ebuild_stocks (struct connection *connection, char **argv);
+void          apc_yahoo_fetch   (struct connection *connection, char **argv);
+void          apc_ohlc          (struct connection *connection, char **argv);
+void          apc_stock_debug   (struct connection *connection, char **argv);
+void          apc_live          (struct connection *connection, char **argv);
+void          apc_signals       (struct connection *connection, char **argv);
+void          apc_print_stock   (struct connection *connection, char **argv);
+void          apc_candle        (struct connection *connection, char **argv);
 
 /* fund.c */
 void update_fundb           (char *ticker, struct XLS *XLS);
@@ -509,13 +532,13 @@ void candle_scan            (struct stock *stock, struct mag *mag);
 void marubozu_scan          (struct stock *stock, struct mag *mag, struct candle *candle, int start_entry, int nr_days, int *candles, int cdx);
 
 /* forks.c */
-void update_forks_EOD     (void);
-void store_forkdb         (char *forkpath, struct forkmem *FORKMEM, int NR_FORKS);
-int  load_forkdb          (struct XLS *XLS);
-void load_forks           (struct XLS *XLS);
-void init_forks           (struct XLS *XLS);
-void init_signals         (struct XLS *XLS);
-void build_flight_info    (struct monster *monster);
+void          apc_update_FORKS     (struct connection *connection, char **argv);
+void          store_forkdb         (char *forkpath, struct forkmem *FORKMEM, int NR_FORKS);
+int           load_forkdb          (struct XLS *XLS);
+void          load_forks           (struct XLS *XLS);
+void          init_forks           (struct XLS *XLS);
+void          init_signals         (struct XLS *XLS);
+void          build_flight_info    (struct monster *monster);
 
 static __inline__ double get_stock_price(struct stock *stock, int entry, int nr_entries)
 {
