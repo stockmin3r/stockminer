@@ -143,17 +143,27 @@ out:
 
 void db_engine_file(db_task_t *db_task)
 {
+	int rc;
+
 	switch (db_task->database) {
 		case DATABASE_USERS:
-			struct user *user = (struct user *)db_task->value;
-			user->uid         = ATOMIC_INC(&NR_USERS);
-			if (db_task->op == DB_APPEND)
-				fs_appendfile(USERS_PATH, (char *)db_task->value, sizeof(struct user));
-			else if (db_task->op == DB_OVERWRITE)
+			struct user *user = (struct user *)db_task->value;			
+			if (db_task->op == DB_APPEND) {
+				if (!search_user(user->uname)) {
+					user->uid       = ATOMIC_INC(&NR_USERS);
+					user->logged_in = 1;
+					rc              = SUCCESS;
+					fs_appendfile(USERS_PATH, (char *)db_task->value, sizeof(struct user));
+				} else {
+					rc = FAILURE;
+				}
+			} else if (db_task->op == DB_OVERWRITE) {
 				db_user_update_cb(user);
+				rc = SUCCESS;
+			}
 			printf("db_engine_file: NR_USERS: %d user->uid: %d logged_in: %d" RESET "\n", NR_USERS, user->uid, user->logged_in);
 			if (db_task->callback)
-				db_task->callback(db_task->connection, 1);
+				db_task->callback(db_task->connection, rc);
 			break;
 		case DATABASE_QUADVERSE:
 			break;
@@ -164,7 +174,8 @@ void db_engine_lmdb(db_task_t *db_task)
 {
 	switch (db_task->database) {
 		case DATABASE_USERS: {
-			struct user *user = (struct user *)db_task->value; uint64_t rc;
+			struct user *user = (struct user *)db_task->value;
+			uint64_t     rc;
 
 			ATOMIC_INC(&NR_USERS);
 			lmdb_set(DATABASE_USERS, user->uname, strlen(user->uname), user, sizeof(user));

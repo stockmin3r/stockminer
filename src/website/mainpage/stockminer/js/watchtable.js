@@ -130,137 +130,94 @@ function newtable(id,ord,col,o){
 	return T[id];
 }
 
-function ufoload(){
-	var wlist = $("#ufo-select option:selected").text(),
-	wsx  = document.getElementById(window.event.target.parentNode.parentNode.id),
-	QGID = W.current_quadspace+"q0ws0",
-	ufo  = $("#ufo").detach();
-	console.log("ufoload!@");
-	while (wsx.firstChild)
-		wsx.removeChild(wsx.firstChild);
-	if (wlist === "Highcaps") {
-		if ($(QGID)[0].UFO_TYPE == UFO_PRICE) {
-			T['R15'].destroy(1);
-			T['R5'].destroy(1);
-			T['R1'].destroy(1);
-			T['R15mL'].destroy(1);
-			T['R5mL'].destroy(1);
-			T['R1mL'].destroy(1);
-			console.log("doing ufo init");
-			ufoinit(MTAB, QGID.substr(1));
-			$(QGID).append(ufo);
-			WS.send("ufoinit PH1 15 "+W.current_quadspace+"q0ws0")
-		}
+// Load the Screener's right section with the columns associated with this Column Preset dict */
+function wdict_load(screener, dict)
+{
+	var wdst = $(".wdst ul", screener),
+		wsrc = $(".wsrc ul li", screener);
+	$("li", wdst).remove();
+	for (var x = 1; x<dict.length; x++) {
+		var column_id = dict[x].data, li; // v=900, v=901
+		$(wsrc).each(function(){
+			if ($(this).attr('v') == column_id) {
+				li = $(this).clone();
+				return false;
+			}
+		});
+		$(wdst).append(li);
 	}
 }
 
-function ufoinit(tab, id){ // id comes from addUFO() this['wsX'].id (QGID) via LoadQuadverse()
-	var t  = 'class="GTAB MTAB cell-border dataTable"><caption onclick=ufocharts("'+id+'",', t2 = '</caption><thead><tr>', R;
-
-	for (var x = 0; x<tab.length; x++)
-		t2 += "<th>" + WCOL[Object.values(tab[x])[0]] + "</th>";
-	t2 += "</tr></thead></table>";
-
-	R    = document.createElement("div");
-	R.id = "R15box";
-	R.innerHTML = '<table id=R15 ' + t + '15,1)>' + '15m Gainers' + t2 + '<table id=R15mL ' + t + '15,2)>' + '15m Losers' + t2;
-	$("#"+id).append(R);
-
-	R    = document.createElement("div");
-	R.id = "R5box";
-	R.innerHTML  = '<table id=R5 ' + t + '5,1)>'  + '5m Gainers'  + t2 + '<table id=R5mL '  + t + '5,2)>'  + '5m Losers'  + t2;
-	$("#"+id).append(R);
-
-	R    = document.createElement("div");
-	R.id = "R1box";
-	R.innerHTML  = '<table id=R1 ' + t + '1,1)>'  + '1m Gainers'  + t2 + '<table id=R1mL '  + t + '1,2)>'  + '1m Losers'  + t2;	
-	$("#"+id).append(R);
-
-	newtable("R15",   "desc", tab, 2,3);
-	newtable("R5",    "desc", tab, 2,3);
-	newtable("R1",    "desc", tab, 2,3);
-	newtable("R15mL", "asc",  tab, 2,3);
-	newtable("R5mL",  "asc",  tab, 2,3);
-	newtable("R1mL",  "asc",  tab, 2,3);
-
-	$('#R15 tbody').on  ('click', 'tr', function(){ufochart(T['R15'].row  (this).data()['900'],id)});
-	$('#R5 tbody').on   ('click', 'tr', function(){ufochart(T['R5'].row   (this).data()['900'],id)});
-	$('#R1 tbody').on   ('click', 'tr', function(){ufochart(T['R1'].row   (this).data()['900'],id)});
-	$('#R15mL tbody').on('click', 'tr', function(){ufochart(T['R15mL'].row(this).data()['900'],id)});
-	$('#R5mL tbody').on ('click', 'tr', function(){ufochart(T['R5mL'].row (this).data()['900'],id)});
-	$('#R1mL tbody').on ('click', 'tr', function(){ufochart(T['R1mL'].row (this).data()['900'],id)});
-	$("#"+id)[0].UFO_TYPE = UFO_PRICE;
+/*
+ * Loop through each of the <li> elements of the Screener's left box
+ */
+function init_stock_screener(){
+	$(".watchmgr .wsrc li").each(function(){
+		var c    = $(this).attr('n');
+		console.log("column: " + c);
+		this.setAttribute("onclick", "boxtick()");
+		WCOL[c]  = $(this).text();
+		WCOL2[c] = $(this).text().split(" ")[0]
+	});
+	$(".showtime .wsrc li").each(function(){this.setAttribute("onclick", "boxtick()")});
+	$(".watchmgr .links").hover(function(){$(".links-menu").css("display","block")})
 }
 
-function ufocharts(ws,i,t){
-	$("#" + ws + " .megabox").remove();
-	$("#" + ws + " .minibox").remove();
-	$("#" + ws + " .minibox").css("height", 250);
-	WS.send("ufoinit PL" + t + " " + i + " " + ws);
-	document.getElementById(ws).className = "grid13";
-}
-function ufochart(t,id){
-	$("#" + id + " .minibox").remove();
-	$("#" + id + " .megabox").remove();
-	document.getElementById(id).className = "gridUFO";
-	WS.send("ufomega " + t + " " + W.current_quadspace+"q0ws0");
-}
-function exmini(chart, div){
-	var ws = W.current_quadspace+"q0ws0",
-	d = $(div).detach();
-	$(ws + " .minibox").remove();
-	d.appendTo(ws);
-	if (!div.classList.contains("split"))
-		$(ws + " .split").remove();
-	$(ws)[0].className = "gridUFO";
-	chart.setSize(d.width(), 805);
-	$(div).css("height", 865)
-	WS.send("MDEL " + chart.title.textStr);
-}
-
-function vfoinit(tab,id){ // id comes from addVFO() this['wsX'].id via LoadQuadverse()
-	var V, t = 'class="GTAB MTAB cell-border dataTable"><caption onclick=ufocharts("'+id+'",', t2 = '</caption><thead><tr><th>Ticker</th><th>Price</th><th class=ct>%CHG</th><th class=vsp>VSpike</th><th>Volume</th></tr></thead></table>',
-
-	V    = document.createElement("div");
-	V.id = "V15box";
-	V.innerHTML = '<table id=V15 ' + t + '15,1)>' + '15m Volume Spike (Lowcaps)' + t2 + '<table id=V15H ' + t + '15,2)>' + '15m Volume Spike (Highcaps)' + t2;
-	$("#"+id).append(V);
-
-	V    = document.createElement("div");
-	V.id = "V5box";
-	V.innerHTML = '<table id=V5 ' + t + '5,1)>'   + '5m Volume Spike (Lowcaps)' + t2 + '<table id=V5H ' + t + '5,2)>' + '5m Volume Spike (Highcaps)' + t2;
-	$("#"+id).append(V);
-
-	V    = document.createElement("div");
-	V.id = "V1box";
-	V.innerHTML = '<table id=V1 ' + t + '1,1)>'   + '15m Volume Spike (Lowcaps)' + t2 + '<table id=V1H ' + t + '1,2)>' + '1m Volume Spike (Highcaps)' + t2;
-	$("#"+id).append(V);
-
-	newtable("V15", "desc",tab,2,3);
-	newtable("V5",  "desc",tab,2,3);
-	newtable("V1",  "desc",tab,2,3);
-	newtable("V15H","asc", tab,2,3);
-	newtable("V5H", "asc", tab,2,3);
-	newtable("V1H", "asc", tab,2,3);
-	
-	$('#V15 tbody').on ('click', 'tr', function(){ufochart(T['V15'].row (this).data()['900'],id)});
-	$('#V5 tbody').on  ('click', 'tr', function(){ufochart(T['V5'].row  (this).data()['900'],id)});
-	$('#V1 tbody').on  ('click', 'tr', function(){ufochart(T['V1'].row  (this).data()['900'],id)});
-	$('#V15H tbody').on('click', 'tr', function(){ufochart(T['V15H'].row(this).data()['900'],id)});
-	$('#V5H tbody').on ('click', 'tr', function(){ufochart(T['V5H'].row (this).data()['900'],id)});
-	$('#V1H tbody').on ('click', 'tr', function(){ufochart(T['V1H'].row (this).data()['900'],id)});
-	$("#"+id)[0].UFO_TYPE = UFO_PRICE;
-}
-
-function colmap(c)
+/*
+ * Return a JSON array of dicts
+ *  - constructs an array of "data":"Column Name" dicts
+ */var THIS;
+function screener_to_json(screener)
 {
-	var columns = Object.values(WCOL2);
-	for (var x = 0; x<columns.length; x++)
-		if (columns[x] == c)
-			return Object.keys(WCOL2)[x];
+	var d = '[{"data":null,"orderable":false,"defaultContent":""},';
+	$(".wdst li", screener).each(function(){THIS=this;d += '{"data":"'+$(this).attr('n') + '"},';});
+	d  = d.slice(0, -1);
+	d += "]";
+	return d;
 }
 
-	/* Change Category of columns */
+/*
+ * 1) Add columns to New^Preset, Remove columns from New^Preset (no change to selectbox)
+ * 2) Save a New Preset (set selectbox to new preset) (name is passed: New^Name)
+ * 3) Select Box onchange() to a different preset - Set .wmname
+ * 4) Menu -> Load Preset - Set .wnewname
+ * 5) Clear a Preset
+ * 6) Delete a preset
+ */
+function wtabselect(screener)
+{
+	var dict, P, preset_name, watchtable_id;
+
+	if (!screener)
+		screener = window.event.target.parentNode.parentNode.parentNode.screener;
+
+	if (screener.type == 'stocks')
+		P = TP;
+	else if (screener.type == 'options')
+		P = OP;
+
+	preset_name = $(".screener-select option:selected",screener).text();
+	if (preset_name == "New Preset") {
+		$(".wnewname", screener)[0].placeholder = preset_name;
+		$(".wsave",    screener)[0].style.color="grey";
+		$(".wnewname", screener).val("");
+	} else
+		$(".wnewname", screener)[0].value = preset_name;
+	if (P[preset_name] == undefined)
+		dict = STAB;
+	else
+		dict = JSON.parse(P[preset_name]);
+
+	for (var x=0; x<screener.curobj.length; x++) {
+		watchtable_id      = screener.curobj[x].id;
+		screener.curobj[x] = realloc_watchtable(watchtable_id, dict, screener);
+		wdict_load(screener, dict);
+		WS.send("TPLoad " + preset_name.replaceAll(" ", "^") + " " + watchtable_id);
+		console.log("checkin watchtable: " + watchtable_id);
+	}
+}
+
+/* Change Category of columns */
 function wcat(x,y){
 	if (x == -1)
 		$(".wsrc li").css("display", "block");
@@ -273,163 +230,252 @@ function wcat(x,y){
 		});
 }
 
-function getTableCell(tab,row,cname)
+function realloc_watchtable(watchtable_id, columns, screener)
 {
-	var found = 0, column = 1; // column Index
-
-	$(tab + " thead th").each(function(){
-		if (this.innerText == cname) {
-			found = 1;
-			return false;
-		}
-		column++;
-	});
-	if (!found)
-		return 0;
-	return $(tab + " tbody td:nth-child(" + column + ")")[row].innerText
+	var watchtable = $("#"+watchtable_id)[0], obj = watchtable.obj, QGID = "#"+watchtable.parentNode.id;
+	T[watchtable_id].destroy(1);
+	watchtable.remove();
+	watchtable     = Watchtable({type:'watchlist',dict:columns,QGID:QGID,TID:watchtable_id,menu:1,order:1});
+	watchtable.obj = obj;
+	obj.screener   = screener;
+	$("#" + watchtable_id + " caption").text(obj.watchlist);
+	return watchtable;
 }
 
-function pract()
-{
-	var on = check(),
-		tr = window.event.target.parentNode;
-	while (tr.tagName != "TR")
-		tr = tr.parentNode;
-	row    = tr.rowIndex-1;
-	var ws = $(tr).find(".prselect")[0].value;
-	console.log("row: " + row + " ws: " + ws);
-	PSET[row].ws = ws;
-	PSET[row].on = on;
-	WS.send("pset " + row + " " + ws + " " + on);
-	event.stopPropagation();
-}
+/* CALLERS:
+ *  - TPLoad()       - WatchTable Preset Loader   - watchtable.js
+ *  - loadScreener() - init of default #morphtab  - quadspace.js - XXX: must remove the static morphtab
+ *      + (add column onclick button callback)
+ *      + (del column onclick button callback)
+ *      + .sort .sortable()
+ *      + .wsave onclick when saving a Preset
+ *  - wtrash()       - Trashcan icon click to reset #morphtab
+ *  - sh_call_colmod - Scripting
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * screener:      Column Screener
+ * watchtable_id: Watchtable linked to Column Screener
+ * preset_name:   Column Preset Name
+ * d:             dict of watchtable's Columns
+ * save:          should the table preset be saved (RPC call)
+ * --------------------------------------------------------
+ */
+function colmod(screener, watchtable_id, preset_name, d, save) {
 
-function loadpresets(menu)
-{
-	var l = PR.length;
-	if (!l)
-		return;
-
-	var tbl = $(menu).find(".prelist table tbody");
-	for (var x = 0; x<l; x++) {
-		var preset = PR[x].split(" "),
-		ac         = preset[1].split("^"),pr,
-		active     = ac[ac.length-1];
-		console.log("preset: " + preset + " " + "active: " + active);
-		if (active=='1')
-			pr = prON;
-		else
-			pr = prOFF;
-		row        = '<tr><td>' + pr + '</td><td>'+preset[0]+'</td><td>'+preset[1].replaceAll("^", " ").split(" ").slice(0, -2).join(" ") + '</td><td>'+PMS[x]+'</td><td class=wc title=Remove>&times;</td></tr>';
-		$(tbl).append(row);
-	}
-}
-
-function showEnabled(chart)
-{
-	var mm  = $(".mm", chart.menu),
-	id      = $(mm).find("select option:selected")[0].text,
-	s       = chart.get(id),
-	tab     = $("tbody", mm);
-
-	tab.html("");
-	if (!s.ilist)
-		s.ilist = [];
-	for (var x=0; x<s.ilist.length; x++)
-		$(tab).append('<tr><td>' + s.ilist[x] + '</td><td i='+x+' class=ic2>✖</td></tr>');
-	$(".ic2", tab).click(function(){
-		var i = $(this).attr("i"), indi = s.ilist[i];
-		console.log("idx: " + i + " " + indi);
-		s.ilist.slice(i, 1);
-		$(this.parentNode).remove();
-		chart.get(id+'-'+indi).remove(1);
-		ryx(chart);
-	});
-
-	$(".imenu", chart.menu).css("display", "none");
-	$(mm).css("display", "block");
-	$(chart.menu).css("display", "block");
-}
-
-function check(p){
-	var on, n = window.event.target;
-	if (p==1)
-		n = window.event.target.firstChild;
-	if ($(n).hasClass("tick")) {
-		$(n).removeClass("tick");
-		$(n).addClass("untick");
-		on = 0;
-	} else {
-		$(n).removeClass("untick");
-		$(n).addClass("tick");
-		on = 1;
-	}
-	event.stopPropagation();
-	return on;
-}
-
-
-function preset(name, chart, id)
-{
-	if (chart == null)
-		chart = $("#"+id).highcharts();
-	console.log("PRESET CALLED: " + name);
-	var menu  = chart.menu,
-	indi      = PMD[name].split("^");
-	if (!menu) {
-		iopen(chart,chart.title.textStr, id);
-		menu = chart.menu;
-	}
-	for (var x=0; x<indi.length-2; x++) {
-		menu.indi = indi[x];
-		console.log("ADDING INDICATOR: " + indi[x]);
-		iadd(chart);
-	}
-	$(menu).css("display", "none");
-}
-
-function prselect()
-{
-	var op = window.event.target,
-	sel    = opt.parentNode, tr = sel;
-	while (tr.tagName != "TR")
-		tr = tr.parentNode;
-
-	console.log("prselect: " + (tr.rowIndex-1) + " " + opt.value + " 2");
-	PMS[row] = window.event.target.parentNode.innerHTML;
-	WS.send("pset " + tr.rowIndex-1 + " " + opt.value + " 2");
-}
-
-function rpc_indicator(av)
-{
-	var name = av[1], indicators = av[2];
-	console.log("SETPRE: " + name + " INDI: " + indicators);
-	PR.push(name + " " + indicators);
-	PMD[name] = indicators;
-	var ar    = indicators.split("^"),
-	ws        = ar[ar.length-2],
-	on        = ar[ar.length-1];
-	PSET.push({ws:ws,on:on,n:name});
-	PMenu['Preset'+(PMenu.length+1)] = {"name":name, callback:function(itemKey,opt,e){preset(name,null,$(this).closest(".chart").attr("id"))}};
-	var s = "<select class=prselect onchange=prselect()>";
-	if (ws == '0')
-		s += "<option value=0>All Charts</option>";
-	else {
-		s += "<option value=" + ws + ">" + WName[ws-1] + "</option>";
-		s += "<option value=0>All Charts</option>";
-	}
-	for (var x = 0; x<WName.length; x++) {
-		if (x-1 == ws)
+	for (var x=0; x<screener.curobj.length; x++) {
+		var watchtable = screener.curobj[x];
+		if (watchtable_id && watchtable.id != watchtable_id)
 			continue;
-		s += "<option value="+(x+1)+">" + WName[x] + "</option>";
+
+		if (!d)
+			d = screener_to_json(screener);
+		if (preset_name == "" || preset_name == undefined)
+			preset_name = $(".screener-select option:selected", screener).text().replaceAll(" ", "^");
+		else {
+			/* Called by .wsave click handler, onchange(), TPLoad() */
+			SetSelect($(".screener-select", screener), preset_name);
+			$(".wnewname",screener)[0].style.color = "";
+		}
+		// set new preset for this watchtable
+		screener.curobj[x] = realloc_watchtable(watchtable.id, JSON.parse(d), screener);
+		if (save == NO_RPC)
+			return;
+
+		wsave = $(".wsave", screener)[0];
+		if (save==1 || save==2) {
+			WS.send("watchtable " + d + " " + preset_name + " " + $(".wdst li", screener).length);
+			wsave.style.color = save==1 ? "limegreen" : "green";
+			wsave.innerText   = save==1 ? "Save"      : "Saved";
+			if (save==2) {
+				var obj = {preset:preset_name};
+				MODCALL("XLS", 'reload', screener.quadspace, ['any', obj], obj);
+			}
+		} else {
+			wsave.style.color = "grey";
+			wsave.innerText   = "Save";
+		}
 	}
-	s += "</select>";
-	PMS.push(s);
 }
 
-/* *************
- * WATCHTABLES *
- **************/
+function CUROBJ(screener, watchtable)
+{
+	for (x=0; x<screener.curobj.length; x++)
+		if (screener.curobj[x] == watchtable)
+			return 1;
+	return 0;
+}
+
+function TPLoad(preset_name) {
+	var watchtable_id = $(window.event.target).closest(".context-menu-root")[0].classList[1].split("-")[1], watchtable = $("#"+watchtable_id)[0], obj = watchtable.obj, screener;
+
+	screener   = watchtable.obj.screener;
+	if (obj.controller) {
+		/* controller */
+		obj.preset = preset_name;
+		switch (obj.type) {
+			case 'XLS':
+				XLS_reload(obj);
+				break;
+		}
+	} else if (!screener || !CUROBJ(screener,watchtable)) {
+		realloc_watchtable(watchtable_id, JSON.parse(TP[preset_name]), 0);
+		console.log("no screener");
+	} else {
+		console.log("got TPload");
+		colmod(screener,watchtable_id,preset_name,TP[preset_name],0);
+	}
+
+	WS.send("TPLoad " + name.replaceAll(" ", "^") + " " + watchtable_id);
+	if (screener) {
+		$(".wnewname",screener)[0].value = preset_name;
+		wdict_load(screener, JSON.parse(TP[preset_name]))
+	}
+}
+
+/* Called by:
+ *  - [1] .XLS-select      A Screener's Preset Name <select> (has controller) (ALTER WATCHTABLE)
+ *  - [2] addXLS()         blankspace XLS image onclick      (has controller) (CREATE NEW||EMPTY WATCHTABLE)
+ *  - [3] <span .XLS-load> XLS-controller's button           (no controller)  (ALTER WATCHTABLE)
+ *  - [4] QuadMenu                                           (no controller)  (CREATE NEW|EMPTY)
+ */
+function loadXLS(controller,obj,QVID,QSID,QID,WSID) {
+	var controller,ticker,preset,rows,quad,QGID,columns,XLS,t,title,fromQuadMenu=0;
+	if (!obj || !obj.preset) {
+		if (!obj)
+			obj = {};
+		/* [3] we were called by XLS-controller's Load XLS button onclick code which means a table has already been created previously */
+		/* [4] QuadMenu */
+		if (!obj.QGID) {
+			if (QVID!=undefined) {
+				/* [4] QuadMenu */
+				WSID = 'ws'+WSID;
+				quad = Q[QVID].quadspace[QSID].quad[QID];
+				obj  = quad.workspace[WSID].obj;
+				QGID = "#P"+QVID+"Q"+QSID+"q"+QID+WSID;
+				controller = get_WS_OBJ('XLS-controller', obj);
+				if (!controller)
+					controller = quad.addXLS_controller(QGID, WSID, {});
+				fromQuadMenu = 1;
+			} else {
+				/* [3] onclick() Load XLS button */
+				controller = window.event.target.parentNode;
+				QGID = "#"+controller.parentNode.parentNode.id;
+			}
+		} else
+			QGID = obj.QGID;
+
+		console.log("QGID: " + obj.QGID + " ticker: " + obj.ticker);
+		if (!obj.ticker) {
+			t = $(".XLS-ticker", controller)[0].value;
+			if (t != "")
+				ticker = t;
+		} else
+			ticker = obj.ticker;
+
+		// GUI extract preset/ticker/row from XLS-controller
+		preset = $(".XLS-presets option:selected", controller).text();
+		if (!preset)
+			preset = 'New^Preset';
+		console.log("PresetName: " + preset + " QGID: " + obj.QGID);
+		rows = $(".XLS-rows-input", controller).val();
+		if (rows == '')
+			rows = 16;
+	} else {
+		preset = obj.preset;
+		rows   = obj.rows;
+		ticker = obj.ticker;
+		QGID   = obj.QGID;
+	}
+
+	// Create a new XLS table
+	if (!controller.curobj.length || fromQuadMenu) {
+		if (preset == 'New^Preset') // XXX: STATIC
+			columns = STAB;
+		else
+			columns = JSON.parse(TP[preset]);
+		if (ticker != undefined)
+			title = ticker+" "+preset;
+		else
+			title = preset;
+		obj  = {type:"XLS",ticker:ticker,preset:preset,rows:rows,QGID:QGID,title:title,controller:controller};
+		XLS  = Watchtable({type:"XLS",dict:columns,QGID:QGID,TID:0,menu:1,order:1});
+		controller.curobj.push(XLS);
+		$("#"+XLS.id)[0].classList.replace("MTAB", "XLS");
+		$("#"+XLS.id + " caption").text(obj.title.replaceAll("^", " "));
+		obj.ref = XLS;
+		obj.TID = XLS.id;
+		XLS.obj = obj;
+		quad    = $(QGID)[0].w;
+		quad.workspace['ws'+quad.current_workspace].obj.push(obj);
+		XLS.onclick = function(){selobj($(XLS)[0])};
+		return
+	}
+
+	for (var x = 0; x<controller.curobj.length; x++) {
+		var xobj = controller.curobj[x].obj;
+		if (xobj.preset == preset && xobj.rows == rows && xobj.ticker == ticker && xobj.QGID == QGID)
+			continue;
+		if (preset != "*")
+			xobj.preset = preset;
+		if (rows != "*")
+			xobj.rows   = rows;
+		if (ticker != "*")
+			xobj.ticker = ticker;
+		xobj.QGID   = QGID;
+		XLS_CALLBACKS['reload'](xobj)
+	}
+}
+
+function XLS_reload(obj)
+{
+	var preset_name = obj.preset, XLS, p, left = "*", top = "*";
+	if (obj.ref) {
+		p = obj.ref;
+		left = p.style.left;
+		top  = p.style.top;
+		p.remove();
+	}
+	XLS       = Watchtable({type:"XLS",dict:JSON.parse(TP[preset_name]),QGID:obj.QGID,TID:obj.TID,menu:1,order:1,left:left,top:top});
+	obj.ref   = XLS;
+	XLS.obj   = obj;
+	obj.TID   = XLS.id;
+	if (!obj.ticker)
+		obj.title = obj.preset;
+	else
+		obj.title = obj.ticker + ": " + obj.preset;
+
+	$("#"+obj.TID)[0].classList.replace("MTAB", "XLS");
+	$("#"+obj.TID + " caption").text(obj.title);
+
+	if (obj.ticker)
+		WS.send("XLS " + obj.ticker + " ws " + obj.rows + " " + preset_name + " " + obj.QGID + " " + obj.TID)
+}
+
+function XLS_loadTicker_onclick()
+{
+	var xload = $("#XLS-load-ticker")[0], obj = xload.obj;
+	xload.style.display='none';
+	obj.ticker = $("input", xload).val();
+	XLS_CALLBACKS['reload'](xload.obj);
+}
+
+function XLS_loadTicker(watchtable,QGID)
+{
+	var xload = $("#XLS-load-ticker").detach();
+	xload.css("display","block");
+	xload[0].obj = $("#"+watchtable)[0].obj;
+	$('body').append(xload);
+	$(xload).attr("style", 'position:absolute;top:'+window.event.clientY+'px;left:'+window.event.clientX+'px;');
+}
+
+/* Short Column Name -> Long Column Name */
+function colmap(c)
+{
+	var columns = Object.values(WCOL2);
+	for (var x = 0; x<columns.length; x++)
+		if (columns[x] == c)
+			return Object.keys(WCOL2)[x];
+}
+
 function wtrash()
 {
 	var screener = window.event.target.parentNode.parentNode.screener;
@@ -515,73 +561,6 @@ function rpc_TPset(av)
 	$(".screener-select").append(opt);
 	TPMenu['Load'+(Object.keys(TPMenu).length+1)] = {"name":name, callback:function(){TPLoad(name)}};
 //	TPMenu['Load'+(Object.keys(TPMenu).length+1)] = {"name":name, callback:function(i){TPLoad(TP[i.substr(4)-1])}};
-}
-
-// Load the Screener's right section with the columns associated with this Column Preset dict */
-function wdict_load(screener, dict)
-{
-	var wdst = $(".wdst ul", screener),
-		wsrc = $(".wsrc ul li", screener);
-	$("li", wdst).remove();
-	for (var x = 1; x<dict.length; x++) {
-		var tattr = dict[x].data, li; // v=900, v=901
-		$(wsrc).each(function(){
-			if ($(this).attr('v') == tattr) {
-				li = $(this).clone();
-				return false;
-			}
-		});
-		$(wdst).append(li);
-	}
-}
-
-function wdict(screener){
-	var d = '[{"data":null,"orderable":false,"defaultContent":""},';
-	$(".wdst li", screener).each(function(){d += '{"data":"'+$(this).attr("v") + '"},';});
-	d  = d.slice(0, -1);
-	d += "]";
-	return d;
-}
-
-/*
- * 1) Add columns to New^Preset, Remove columns from New^Preset (no change to selectbox)
- * 2) Save a New Preset (set selectbox to new preset) (name is passed: New^Name)
- * 3) Select Box onchange() to a different preset - Set .wmname
- * 4) Menu -> Load Preset - Set .wnewname
- * 5) Clear a Preset
- * 6) Delete a preset
- */
-function wtabselect(screener)
-{
-	var dict, P, preset_name, watchtable_id;
-
-	if (!screener)
-		screener = window.event.target.parentNode.parentNode.parentNode.screener;
-
-	if (screener.type == 'stocks')
-		P = TP;
-	else if (screener.type == 'options')
-		P = OP;
-
-	preset_name = $(".screener-select option:selected",screener).text();
-	if (preset_name == "New Preset") {
-		$(".wnewname", screener)[0].placeholder = preset_name;
-		$(".wsave",    screener)[0].style.color="grey";
-		$(".wnewname", screener).val("");
-	} else
-		$(".wnewname", screener)[0].value = preset_name;
-	if (P[preset_name] == undefined)
-		dict = STAB;
-	else
-		dict = JSON.parse(P[preset_name]);
-
-	for (var x=0; x<screener.curobj.length; x++) {
-		watchtable_id      = screener.curobj[x].id;
-		screener.curobj[x] = realloc_watchtable(watchtable_id, dict, screener);
-		wdict_load(screener, dict);
-		WS.send("TPLoad " + preset_name.replaceAll(" ", "^") + " " + watchtable_id);
-		console.log("checkin watchtable: " + watchtable_id);
-	}
 }
 
 /* wget url watchtable_id, QGID */
@@ -721,242 +700,6 @@ function table_export(TID,output)
 	}
 }
 
-function realloc_watchtable(watchtable_id, columns, screener)
-{
-	var watchtable = $("#"+watchtable_id)[0], obj = watchtable.obj, QGID = "#"+watchtable.parentNode.id;
-	T[watchtable_id].destroy(1);
-	watchtable.remove();
-	watchtable = Watchtable({type:'watchlist',dict:columns,QGID:QGID,TID:watchtable_id,menu:1,order:1});
-	watchtable.obj = obj;
-	$("#" + watchtable_id + " caption").text(obj.watchlist);
-	obj.screener = screener;
-	return watchtable;
-}
-
-/* CALLERS:
- *  - TPLoad()       - WatchTable Preset Loader   - watchtable.js
- *  - loadScreener() - init of default #morphtab  - quadspace.js - XXX: must remove the static morphtab
- *      + (add column onclick button callback)
- *      + (del column onclick button callback)
- *      + .sort .sortable()
- *      + .wsave onclick when saving a Preset
- *  - wtrash()       - Trashcan icon click to reset #morphtab
- *  - sh_call_colmod - Scripting
- * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * screener:      Column Screener
- * watchtable_id: Watchtable linked to Column Screener
- * preset_name:   Column Preset Name
- * d:             dict of watchtable's Columns
- * save:          should the table preset be saved (RPC call)
- * --------------------------------------------------------
- */
-function colmod(screener, watchtable_id, preset_name, d, save) {
-
-	for (var x=0; x<screener.curobj.length; x++) {
-		var watchtable = screener.curobj[x];
-		if (watchtable_id && watchtable.id != watchtable_id)
-			continue;
-
-		if (!d)
-			d = wdict(screener);
-		if (preset_name == "" || preset_name == undefined)
-			preset_name = $(".screener-select option:selected", screener).text().replaceAll(" ", "^");
-		else {
-			/* Called by .wsave click handler, onchange(), TPLoad() */
-			SetSelect($(".screener-select", screener), preset_name);
-			$(".wnewname",screener)[0].style.color = "";
-		}
-		// set new preset for this watchtable
-		screener.curobj[x] = realloc_watchtable(watchtable.id, JSON.parse(d), screener);
-		if (save == NO_RPC)
-			return;
-		wsave  = $(".wsave", screener)[0];
-		if (save==1 || save==2) {
-			WS.send("wtab " + d + " " + preset_name + " " + $(".wdst li", screener).length);
-			wsave.style.color = save==1 ? "limegreen" : "green";
-			wsave.innerText   = save==1 ? "Save"      : "Saved";
-			if (save==2) {
-				var obj = {preset:preset_name};
-				MODCALL("XLS", 'reload', screener.quadspace, ['any', obj], obj);
-			}
-		} else {
-			wsave.style.color = "grey";
-			wsave.innerText   = "Save";
-		}
-	}
-}
-
-function CUROBJ(screener, watchtable)
-{
-	for (x=0; x<screener.curobj.length; x++)
-		if (screener.curobj[x] == watchtable)
-			return 1;
-	return 0;
-}
-
-function TPLoad(preset_name) {
-	var watchtable_id = $(window.event.target).closest(".context-menu-root")[0].classList[1].split("-")[1], watchtable = $("#"+watchtable_id)[0], obj = watchtable.obj, screener;
-
-	screener   = watchtable.obj.screener;
-	if (obj.controller) {
-		/* controller */
-		obj.preset = preset_name;
-		switch (obj.type) {
-			case 'XLS':
-				XLS_reload(obj);
-				break;
-		}
-	} else if (!screener || !CUROBJ(screener,watchtable)) {
-		realloc_watchtable(watchtable_id, JSON.parse(TP[preset_name]), 0);
-		console.log("no screener");
-	} else {
-		console.log("got TPload");
-		colmod(screener,watchtable_id,preset_name,TP[preset_name],0);
-	}
-
-	WS.send("TPLoad " + name.replaceAll(" ", "^") + " " + watchtable_id);
-	if (screener) {
-		$(".wnewname",screener)[0].value = preset_name;
-		wdict_load(screener, JSON.parse(TP[preset_name]))
-	}
-}
-
-/* Called by:
- *  - [1] .XLS-select      A Screener's Preset Name <select> (has controller) (ALTER WATCHTABLE)
- *  - [2] addXLS()         blankspace XLS image onclick      (has controller) (CREATE NEW||EMPTY WATCHTABLE)
- *  - [3] <span .XLS-load> XLS-controller's button           (no controller)  (ALTER WATCHTABLE)
- *  - [4] QuadMenu                                           (no controller)  (CREATE NEW|EMPTY)
- */
-function loadXLS(controller,obj,QVID,QSID,QID,WSID) {
-	var controller,ticker,preset,rows,quad,QGID,columns,XLS,t,title,fromQuadMenu=0;
-	if (!obj || !obj.preset) {
-		if (!obj)
-			obj = {};
-		/* [3] we were called by XLS-controller's Load XLS button onclick code which means a table has already been created previously */
-		/* [4] QuadMenu */
-		if (!obj.QGID) {
-			if (QVID!=undefined) {
-				/* [4] QuadMenu */
-				WSID = 'ws'+WSID;
-				quad = Q[QVID].quadspace[QSID].quad[QID];
-				obj  = quad.workspace[WSID].obj;
-				QGID = "#P"+QVID+"Q"+QSID+"q"+QID+WSID;
-				controller = get_WS_OBJ('XLS-controller', obj);
-				if (!controller)
-					controller = quad.addXLS_controller(QGID, WSID, {});
-				fromQuadMenu = 1;
-			} else {
-				/* [3] onclick() Load XLS button */
-				controller = window.event.target.parentNode;
-				QGID = "#"+controller.parentNode.parentNode.id;
-			}
-		} else
-			QGID = obj.QGID;
-
-		console.log("QGID: " + obj.QGID + " ticker: " + obj.ticker);
-		if (!obj.ticker) {
-			t = $(".XLS-ticker", controller)[0].value;
-			if (t != "")
-				ticker = t;
-		} else
-			ticker = obj.ticker;
-
-		// GUI extract preset/ticker/row from XLS-controller
-		preset = $(".XLS-presets option:selected", controller).text();
-		if (!preset)
-			preset = 'New^Preset';
-		console.log("PresetName: " + preset + " QGID: " + obj.QGID);
-		rows = $(".XLS-rows-input", controller).val();
-		if (rows == '')
-			rows = 16;
-	} else {
-		preset = obj.preset;
-		rows   = obj.rows;
-		ticker = obj.ticker;
-		QGID   = obj.QGID;
-	}
-
-	// Create a new XLS table
-	if (!controller.curobj.length || fromQuadMenu) {
-		if (preset == 'New^Preset')
-			columns = STAB;
-		else
-			columns = JSON.parse(TP[preset]);
-		if (ticker != undefined)
-			title = ticker+" "+preset;
-		else
-			title = preset;
-		obj  = {type:"XLS",ticker:ticker,preset:preset,rows:rows,QGID:QGID,title:title,controller:controller};
-		XLS  = Watchtable({type:"XLS",dict:columns,QGID:QGID,TID:0,menu:1,order:1});
-		controller.curobj.push(XLS);
-		$("#"+XLS.id)[0].classList.replace("MTAB", "XLS");
-		$("#"+XLS.id + " caption").text(obj.title.replaceAll("^", " "));
-		obj.ref = XLS;
-		obj.TID = XLS.id;
-		XLS.obj = obj;
-		quad = $(QGID)[0].w;
-		quad.workspace['ws'+quad.current_workspace].obj.push(obj);
-		XLS.onclick = function(){selobj($(XLS)[0])};
-		return
-	}
-
-	for (var x = 0; x<controller.curobj.length; x++) {
-		var xobj = controller.curobj[x].obj;
-		if (xobj.preset == preset && xobj.rows == rows && xobj.ticker == ticker && xobj.QGID == QGID)
-			continue;
-		if (preset != "*")
-			xobj.preset = preset;
-		if (rows != "*")
-			xobj.rows   = rows;
-		if (ticker != "*")
-			xobj.ticker = ticker;
-		xobj.QGID   = QGID;
-		XLS_CALLBACKS['reload'](xobj)
-	}
-}
-
-function XLS_reload(obj)
-{
-	var preset_name = obj.preset, XLS, p, left = "*", top = "*";
-	if (obj.ref) {
-		p = obj.ref;
-		left = p.style.left;
-		top  = p.style.top;
-		p.remove();
-	}
-	XLS       = Watchtable({type:"XLS",dict:JSON.parse(TP[preset_name]),QGID:obj.QGID,TID:obj.TID,menu:1,order:1,left:left,top:top});
-	obj.ref   = XLS;
-	XLS.obj   = obj;
-	obj.TID   = XLS.id;
-	if (!obj.ticker)
-		obj.title = obj.preset;
-	else
-		obj.title = obj.ticker + ": " + obj.preset;
-
-	$("#"+obj.TID)[0].classList.replace("MTAB", "XLS");
-	$("#"+obj.TID + " caption").text(obj.title);
-
-	if (obj.ticker)
-		WS.send("XLS " + obj.ticker + " ws " + obj.rows + " " + preset_name + " " + obj.QGID + " " + obj.TID)
-}
-
-function XLS_loadTicker_onclick()
-{
-	var xload = $("#XLS-load-ticker")[0], obj = xload.obj;
-	xload.style.display='none';
-	obj.ticker = $("input", xload).val();
-	XLS_CALLBACKS['reload'](xload.obj);
-}
-
-function XLS_loadTicker(watchtable,QGID)
-{
-	var xload = $("#XLS-load-ticker").detach();
-	xload.css("display","block");
-	xload[0].obj = $("#"+watchtable)[0].obj;
-	$('body').append(xload);
-	$(xload).attr("style", 'position:absolute;top:'+window.event.clientY+'px;left:'+window.event.clientX+'px;');
-}
-
 function tabview(tab, i)
 {
 	var div = document.createElement("div"), t;
@@ -980,6 +723,134 @@ function col(i,c)
 		s     = c.get(c.title.textStr + "-price-" + i);
 	}
 }
+
+/*
+ * UFO Screener
+ */
+function ufoload(){
+	var wlist = $("#ufo-select option:selected").text(),
+	wsx  = document.getElementById(window.event.target.parentNode.parentNode.id),
+	QGID = W.current_quadspace+"q0ws0",
+	ufo  = $("#ufo").detach();
+	console.log("ufoload!@");
+	while (wsx.firstChild)
+		wsx.removeChild(wsx.firstChild);
+	if (wlist === "Highcaps") {
+		if ($(QGID)[0].UFO_TYPE == UFO_PRICE) {
+			T['R15'].destroy(1);
+			T['R5'].destroy(1);
+			T['R1'].destroy(1);
+			T['R15mL'].destroy(1);
+			T['R5mL'].destroy(1);
+			T['R1mL'].destroy(1);
+			console.log("doing ufo init");
+			ufoinit(MTAB, QGID.substr(1));
+			$(QGID).append(ufo);
+			WS.send("ufoinit PH1 15 "+W.current_quadspace+"q0ws0")
+		}
+	}
+}
+
+function ufoinit(tab, id){ // id comes from addUFO() this['wsX'].id (QGID) via LoadQuadverse()
+	var t  = 'class="GTAB MTAB cell-border dataTable"><caption onclick=ufocharts("'+id+'",', t2 = '</caption><thead><tr>', R;
+
+	for (var x = 0; x<tab.length; x++)
+		t2 += "<th>" + WCOL[Object.values(tab[x])[0]] + "</th>";
+	t2 += "</tr></thead></table>";
+
+	R    = document.createElement("div");
+	R.id = "R15box";
+	R.innerHTML = '<table id=R15 ' + t + '15,1)>' + '15m Gainers' + t2 + '<table id=R15mL ' + t + '15,2)>' + '15m Losers' + t2;
+	$("#"+id).append(R);
+
+	R    = document.createElement("div");
+	R.id = "R5box";
+	R.innerHTML  = '<table id=R5 ' + t + '5,1)>'  + '5m Gainers'  + t2 + '<table id=R5mL '  + t + '5,2)>'  + '5m Losers'  + t2;
+	$("#"+id).append(R);
+
+	R    = document.createElement("div");
+	R.id = "R1box";
+	R.innerHTML  = '<table id=R1 ' + t + '1,1)>'  + '1m Gainers'  + t2 + '<table id=R1mL '  + t + '1,2)>'  + '1m Losers'  + t2;	
+	$("#"+id).append(R);
+
+	newtable("R15",   "desc", tab, 2,3);
+	newtable("R5",    "desc", tab, 2,3);
+	newtable("R1",    "desc", tab, 2,3);
+	newtable("R15mL", "asc",  tab, 2,3);
+	newtable("R5mL",  "asc",  tab, 2,3);
+	newtable("R1mL",  "asc",  tab, 2,3);
+
+	$('#R15 tbody').on  ('click', 'tr', function(){ufochart(T['R15'].row  (this).data()['900'],id)});
+	$('#R5 tbody').on   ('click', 'tr', function(){ufochart(T['R5'].row   (this).data()['900'],id)});
+	$('#R1 tbody').on   ('click', 'tr', function(){ufochart(T['R1'].row   (this).data()['900'],id)});
+	$('#R15mL tbody').on('click', 'tr', function(){ufochart(T['R15mL'].row(this).data()['900'],id)});
+	$('#R5mL tbody').on ('click', 'tr', function(){ufochart(T['R5mL'].row (this).data()['900'],id)});
+	$('#R1mL tbody').on ('click', 'tr', function(){ufochart(T['R1mL'].row (this).data()['900'],id)});
+	$("#"+id)[0].UFO_TYPE = UFO_PRICE;
+}
+
+function ufocharts(ws,i,t){
+	$("#" + ws + " .megabox").remove();
+	$("#" + ws + " .minibox").remove();
+	$("#" + ws + " .minibox").css("height", 250);
+	WS.send("ufoinit PL" + t + " " + i + " " + ws);
+	document.getElementById(ws).className = "grid13";
+}
+function ufochart(t,id){
+	$("#" + id + " .minibox").remove();
+	$("#" + id + " .megabox").remove();
+	document.getElementById(id).className = "gridUFO";
+	WS.send("ufomega " + t + " " + W.current_quadspace+"q0ws0");
+}
+
+// ancient
+function exmini(chart, div){
+	var ws = W.current_quadspace+"q0ws0",
+	d = $(div).detach();
+	$(ws + " .minibox").remove();
+	d.appendTo(ws);
+	if (!div.classList.contains("split"))
+		$(ws + " .split").remove();
+	$(ws)[0].className = "gridUFO";
+	chart.setSize(d.width(), 805);
+	$(div).css("height", 865)
+	WS.send("MDEL " + chart.title.textStr);
+}
+
+function vfoinit(tab,id){ // id comes from addVFO() this['wsX'].id via LoadQuadverse()
+	var V, t = 'class="GTAB MTAB cell-border dataTable"><caption onclick=ufocharts("'+id+'",', t2 = '</caption><thead><tr><th>Ticker</th><th>Price</th><th class=ct>%CHG</th><th class=vsp>VSpike</th><th>Volume</th></tr></thead></table>',
+
+	V    = document.createElement("div");
+	V.id = "V15box";
+	V.innerHTML = '<table id=V15 ' + t + '15,1)>' + '15m Volume Spike (Lowcaps)' + t2 + '<table id=V15H ' + t + '15,2)>' + '15m Volume Spike (Highcaps)' + t2;
+	$("#"+id).append(V);
+
+	V    = document.createElement("div");
+	V.id = "V5box";
+	V.innerHTML = '<table id=V5 ' + t + '5,1)>'   + '5m Volume Spike (Lowcaps)' + t2 + '<table id=V5H ' + t + '5,2)>' + '5m Volume Spike (Highcaps)' + t2;
+	$("#"+id).append(V);
+
+	V    = document.createElement("div");
+	V.id = "V1box";
+	V.innerHTML = '<table id=V1 ' + t + '1,1)>'   + '15m Volume Spike (Lowcaps)' + t2 + '<table id=V1H ' + t + '1,2)>' + '1m Volume Spike (Highcaps)' + t2;
+	$("#"+id).append(V);
+
+	newtable("V15", "desc",tab,2,3);
+	newtable("V5",  "desc",tab,2,3);
+	newtable("V1",  "desc",tab,2,3);
+	newtable("V15H","asc", tab,2,3);
+	newtable("V5H", "asc", tab,2,3);
+	newtable("V1H", "asc", tab,2,3);
+	
+	$('#V15 tbody').on ('click', 'tr', function(){ufochart(T['V15'].row (this).data()['900'],id)});
+	$('#V5 tbody').on  ('click', 'tr', function(){ufochart(T['V5'].row  (this).data()['900'],id)});
+	$('#V1 tbody').on  ('click', 'tr', function(){ufochart(T['V1'].row  (this).data()['900'],id)});
+	$('#V15H tbody').on('click', 'tr', function(){ufochart(T['V15H'].row(this).data()['900'],id)});
+	$('#V5H tbody').on ('click', 'tr', function(){ufochart(T['V5H'].row (this).data()['900'],id)});
+	$('#V1H tbody').on ('click', 'tr', function(){ufochart(T['V1H'].row (this).data()['900'],id)});
+	$("#"+id)[0].UFO_TYPE = UFO_PRICE;
+}
+
 function qhide()
 {
 	var id = window.event.target.parentNode.parentNode.parentNode.id.replace(/[^0-9]/g, '').split(''),qdiv, QID;

@@ -275,12 +275,29 @@
 		loadXLS(XLS_controller, {QGID:QGID});
 	}
 
+	addWatchtools(quad, QGID, WSID, watchtable_id) {
+		var watchtools = $('body > .watchtable-tools').clone()[0];
+		bshide(QGID);
+		quad[WSID].appendChild(watchtools);
+		$(watchtools).css("display", "block");
+		$(".watchtable-input", watchtools).keyup(function(event) {
+			if (event.keyCode === 13) {
+				watchlist_addstock(watchtable_id);
+				this.value = '';
+			}
+		});
+		quad.workspace[WSID].obj.push({type:"watchtools", OBJ_ID:"watchtools", ref:watchtools});
+		watchtools.curtab = $("#"+watchtable_id)[0];
+		return watchtools;
+	}
+
 	/* CALLED BY 5 paths:
 	 *   - QuadMenu({send_rpc:1}):                click to add watchtable to a Quad's currently selected Workspace (Quad Context)
 	 *   - ModLoad({QSID:x,QID:y}):               Blankspace module onclicks
 	 *   - quadspace_load({QGID,TID,send_rpc:0}): called when loading a QuadSpace (no context) (TID:OBJ_ID)
 	 *   - qupdate({QGID,TID,send_rpc:0}):        called by RPC when another user adds a watchtable to a Quad's Workspace (no context)
-	 *   - watchtable_workspace()
+	 *   - watchtable_workspace()                 called when parsing Website.json in init.js::LoadQuadverse()
+	 *
 	 *   + screener.curobj:                       list of tables linked with this screener
 	 *   + watchtable.obj.screener:               pointer to the screener linked to this table
 	 */
@@ -319,23 +336,9 @@
 
 		// only QuadMenu
 		if (args.send_rpc != 0) {
-			console.log("sending rpc");WS.send(QUPDATE_ADD_WSTAB + QVID + " " + QSID + " " + QID + " " + WSID + " " + watchtable_id);}
-	}
-
-	addWatchtools(quad, QGID, WSID, watchtable_id) {
-		var watchtools = $('body > .watchtable-tools').clone()[0];
-		bshide(QGID);
-		quad[WSID].appendChild(watchtools);
-		$(watchtools).css("display", "block");
-		$(".watchtable-input", watchtools).keyup(function(event) {
-			if (event.keyCode === 13) {
-				watchlist_addstock(watchtable_id);
-				this.value = '';
-			}
-		});
-		quad.workspace[WSID].obj.push({type:"watchtools", OBJ_ID:"watchtools", ref:watchtools});
-		watchtools.curtab = $("#"+watchtable_id)[0];
-		return watchtools;
+			console.log("sending rpc");
+			WS.send(QUPDATE_ADD_WSTAB + QVID + " " + QSID + " " + QID + " " + WSID + " " + watchtable_id);
+		}
 	}
 
 	/* ********************************
@@ -818,18 +821,20 @@
 			return;
 
 		if (tab.QSID) {
+			// rpc qswitch 2 -> workspace::quadspace_switch()
 			this.current_quadspace = tab.QSID;
 			this.current_workspace = tab.QSID.substr(4);
 			$(".quadspace").css("display", "none");
 			$(tab.QSID).css("display", "grid");
 			if (WINIT && rpc != -1)
-				WS.send("page " + tab.QSID);
+				WS.send("qswitch q " + tab.QSID.substr(1));
 		} else {
+			// rpc qswitch 3 -> workspace::workspace_switch()
 			this.current_workspace = tab.WSID;
 			this.workspace.find(".ws").css("display", "none");
 			this['ws'+tab.WSID].style.display = "grid";
 			if (WINIT && rpc != -1)
-				WS.send("page " + tab.QID + " " + tab.WSID);
+				WS.send("qswitch w " + tab.QID + " " + tab.WSID);
 		}
 	}
 
@@ -984,7 +989,8 @@ function QUADVERSE_SWITCH(name,c,QVID)
 	$("#quadverse"+W.PID).css("display", "block");
 	// If the website is fully loaded and we switch to a new quadverse: if it has an init() registered then we call it
 	if (WINIT) {
-		WS.send("page P" + W.PID);
+		// rpc qswitch 1 -> workspace::quadverse_switch()
+		WS.send("qswitch Q " + W.PID);
 		if (W.qinit)
 			W.qinit(0);
 	}
@@ -1018,7 +1024,7 @@ function loadScreener(screener,watchtable_id){
 			$('.wnewname',screener)[0].style.color="red";
 			return;
 		}
-		dict = wdict(screener);
+		dict = screener_to_json(screener);
 		TP[preset_name] = dict;
 		var set  = $(".watchmgr-screener option:selected", screener).text();
 		if (set !== preset_name) {
@@ -1063,7 +1069,7 @@ function quadspace_load(QVID,QSID,quads) {
 			quadspace.quad[QID].addBlankspace(QVID, QSID, QID);
 			continue;
 		}
-//			console.log("quadspace_load QSID: " + QSID + " QID: " + QID + " workspace len: " + workspace.length + " workspace: " + workspace);
+//		console.log("quadspace_load QSID: " + QSID + " QID: " + QID + " workspace len: " + workspace.length + " workspace: " + workspace);
 		for (var ws=0; ws<workspace.length; ws++) {
 			if (workspace[ws] == "-1")
 				continue;
@@ -1072,7 +1078,7 @@ function quadspace_load(QVID,QSID,quads) {
 			if (obj) {
 				objsize = obj.length;
 				QGID    = "P"+QVID+"Q"+QSID+"q"+QID+"ws"+ws;
-//					console.log("quadspace_load: QGID: " + QGID + " objLEN: " + obj.length + " workspaceTitle: " + workspace[ws].title);
+//				console.log("quadspace_load: QGID: " + QGID + " objLEN: " + obj.length + " workspaceTitle: " + workspace[ws].title);
 				if (!objsize) {
 					quadspace.quad[QID].addBlankspace(QVID, QSID, QID);
 					continue;

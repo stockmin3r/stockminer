@@ -85,4 +85,7 @@
 #define __MODULE_HOOK void
 #define __MODULE_INIT void
 
+#define SUCCESS true
+#define FAILURE false
+
 #endif

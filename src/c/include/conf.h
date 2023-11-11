@@ -406,7 +406,7 @@ void              rpc_mini_charts         (struct rpc *rpc); // workspace.c
 void              rpc_stockpage           (struct rpc *rpc); // workspace.c
 void              rpc_quadverse_export    (struct rpc *rpc); // workspace.c
 void              rpc_quadverse_update    (struct rpc *rpc); // workspace.c
-void              rpc_set_quadverse       (struct rpc *rpc); // workspace.c
+void              rpc_qswitch             (struct rpc *rpc); // workspace.c
 void              rpc_session_finish      (struct rpc *rpc); // www.c
 void              rpc_wget_table          (struct rpc *rpc); // www.c
 void              rpc_stockpage_earnings  (struct rpc *rpc); // earnings.c
@@ -598,6 +598,10 @@ int           www_new_websocket      (struct session *session, struct connection
 void         *init_www               (void *args);
 void          www_load_website       (struct server *server);
 void          apc_reload_website     (struct connection *connection, char **argv);
+
+/* auth.c */
+void          admin_client_auth      (char *username, char *password);
+
 
 /* profile.c */
 void              session_load_profile      (struct session *session);
@@ -834,6 +838,7 @@ bool   base64_validate           (unsigned char *src, size_t len);
 /* apc.c */
 void   admin_client_loop         (void);
 void   apc_send_command          (const char *command);
+void   apc_connect_command       (const char *command);
 void   apc_send_result           (struct connection *connnection, char *result);
 void   apc_exec                  (char *command);
 

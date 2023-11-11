@@ -348,7 +348,6 @@ website_gzip_mainpage(struct page *mainpage)
 	strcpy(mainpage_response_gz, HTTP_MAINPAGE);
 	zbytes = zip_compress(mainpage->file, mainpage_response_gz+SIZEOF_MAINPAGE, mainpage->filesize);
 	md5_string(md5_checksum(mainpage_response_gz+SIZEOF_MAINPAGE, ebuf, zbytes), ETag);
-	printf("setting new ETag: %s old: %.8s\n", ETag, (char *)&mainpage->etag);
 	mainpage->etag = *(uint64_t *)ETag;
 	*(uint64_t  *)(strstr(mainpage_response_gz, "ETag:")   +7) = *(uint64_t *)ETag;
 	cstring_itoa ((strstr(mainpage_response_gz, "Length: ")+8), zbytes);

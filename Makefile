@@ -72,7 +72,7 @@ endif
 
 all:$(OBJ) $(EXE)
 
-$(OBJ):$(INCS) | libhydrogen lmdb queues certs
+$(OBJ):$(INCS) | libhydrogen lmdb queues certs wasm
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

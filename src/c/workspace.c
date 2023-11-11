@@ -120,107 +120,6 @@ int pack_mini(struct stock *stock, char *packet, struct chart *chart, struct wsi
 	return (packet_len);
 }
 
-#define MAX_BOOTPARAM_OBJECTS 4
-
-/*
- * GET /ws/action/objtype/filetype/filesize/filename/arg1/arg2
- * GET /ws/ACTION_BOOT/bootstring
- * GET /ws/ACTION_RELOAD
- */
-bool rpc_boot(char *request, struct connection *connection)
-{
-	struct session *session = connection->session;
-	char           *packet  = connection->packet+connection->packet_size;
-	struct stock   *stock;
-	struct XLS     *XLS = CURRENT_XLS;
-	char           *argv  [MAX_BOOT_OBJECTS];
-	char           *pargv [MAX_WORKSPACE_OBJECTS];
-	char           *params[MAX_BOOTPARAM_OBJECTS];
-	char           *p = request, *p2;
-	struct rpc      rpc;
-	uint64_t        action, argc, packet_size = 0;
-
-	action = strtoul(request, NULL, 10);
-	if (action >= MAX_WEBSOCKET_ACTIONS)
-		return false;
-
-	while (*p != '/') {
-		p++;
-		if (*p == '\0')
-			return false;
-	}
-	p++;
-	p2 = p;
-	while (*p2 != '\r') {
-		p2++;
-		if (*p2 == '\0')
-			return false;
-	}
-	*p2 = 0;
-
-	argc = cstring_split(p, argv, MAX_BOOT_OBJECTS, '/');
-	if (!argc)
-		return false;
-
-	for (int x = 0; x<argc; x++) {
-		int nr_params  = cstring_split(argv[x],   params, MAX_BOOTPARAM_OBJECTS, ':');
-		int nr_objects = cstring_split(params[1], pargv,  MAX_WORKSPACE_OBJECTS, ',');
-		char *obj_id   = params[1]; // one or more objects of type: chart/table/etc
-		char *QGID     = params[2];
-
-
-		if (!nr_params || !nr_objects)
-			return false;
-		//printf("nr_objects: %d\n", nr_objects);
-
-		if (!strncmp(params[0], "addTable", 8)) {
-			/****************
-			 *     Tables
-			 ***************/
-			for (int y = 0; y<nr_objects; y++)
-				packet_size += ufo_table_json(pargv[y], packet+packet_size);
-			/***********************************************************/
-		} else if (!strncmp(params[0], "addChart", 8)) {
-			/****************
-			 *     Charts
-			 ***************/
-			char *cargv[6] = {0};
-
-			if (nr_params != 4)
-				continue;
-
-			if (*obj_id == '?')
-				stock = XLS->boards[LOWCAP_GAINER_BOARD]->stocks[0];
-			else
-				stock = search_stocks(obj_id);
-
-			if (!stock)
-				continue;
-
-			cargv[1]       = QGID;
-			cargv[2]       = stock->sym;
-			cargv[5]       = params[3]; // class name of an existing <div> where the chart will reside (meaning it was created already rather than by the rpc_chart() js handler
-			rpc.session    = session;
-			rpc.connection = connection;
-			rpc.packet     = packet+packet_size;
-			rpc.argv       = cargv;
-			rpc.internal   = true;
-			/*
-			 * rpc_chart() is called internally to pack chart config JSON(s) into connection->packet
-			 * it will also create quadspaces/workspaces necessary to hold those charts
-			 */
-			rpc_chart(&rpc);
-
-			packet_size   += rpc.packet_size;
-			*(packet+packet_size++) = '@';
-//			printf("params: %s packet_size: %lld\n", params[3], packet_size);
-		}
-//		printf("argv: %s params: %d\n", argv[x], nr_params);
-	}
-	connection->packet_size = packet_size;
-	return true;
-}
-
 void rpc_chart(struct rpc *rpc)
 {
 	struct session     *session    = rpc->session;
@@ -295,7 +194,7 @@ void rpc_chart(struct rpc *rpc)
 	chart->stock = stock;
 	chart->type  = CHART_TYPE_OHLC;
 	if (!packet_len || rpc->internal) {
-	printf(BOLDGREEN "%s" RESET "\n", chart->div);
+		printf(BOLDGREEN "rpc_chart: %s" RESET "\n", chart->div);
 		rpc->packet_size = packet_len;
 		goto out;
 	}
@@ -685,91 +584,6 @@ void rpc_stockpage(struct rpc *rpc)
 	websockets_sendall_except(session, connection, packet, packet_len);
 }
 
-void session_load_quadverse(struct session *session)
-{
-	struct quadverse *quadverse;
-	struct quadspace *quadspace;
-	struct quad      *quad;
-	struct workspace *workspace;
-
-	session->nr_quadverses     = 6;
-	/* QVID 0: STOCKS QUADVERSE */
-	memset(&session->quadverse[0],      0, sizeof(struct quadverse *) * MAX_QUADVERSES);
-	memset(&session->current_quadverse, 0, sizeof(char)*MAX_WEBSOCKETS);
-	session->quadverse[0]      = quadverse = new_quadverse();
-	quadverse->nr_quadspaces   = 4;
-	quadverse->quadspace[0]    = quadspace = new_quadspace(); // Stocks
-	quadverse->quadspace[1]    = new_quadspace();             // Screener
-	quadverse->quadspace[2]    = new_quadspace();             // Price Action
-	quadverse->quadspace[3]    = new_quadspace();             // Volume
-	quadverse->quadspace[4]    = new_quadspace();             // Candles
-
-	/* QVID 0: Gainer Tables */
-	quadspace->quad[0]         = quad = new_quad();           // Gainer Tables
-	quad->workspace[0]         = workspace = new_workspace(); // Lowcaps
-	workspace->watchtables     = lowcap_tables;
-	quad->nr_workspaces        = 2;
-	workspace->nr_watchtables  = 2;
-	quad->workspace[1]         = workspace = new_workspace(); // Highcaps
-	workspace->watchtables     = highcap_tables;
-	workspace->nr_watchtables  = 2;
-
-	/* QVID 0: Main Chart */
-	quadspace->quad[1]         = quad      = new_quad();      // Main Chart
-	quadspace->nr_quads        = 2;
-	quad->workspace[0]         = workspace = new_workspace();
-	quad->nr_workspaces        = 1;
-//	workspace->nr_charts       = 1;
-//	session->main_chart        = workspace->charts[0] = (struct chart *)zmalloc(sizeof(struct chart));
-//	session->main_chart->nr_updates = 0;
-//	session->main_chart->nr_ohlc    = 0;
-
-	/* QVID 0: QSID 1 */
-	quadverse->quadspace[1]->quad[2] = quad = new_quad();            // morphtab
-	quad->workspace[0]               = workspace = new_workspace();  // morphtab
-	workspace->watchlists[0]         = session->morphtab;
-	workspace->nr_watchtables        = 1;
-
-
-	/* QVID 1: OPTIONS QUADVERSE */
-	session->quadverse[1]      = quadverse = new_quadverse();
-	quadverse->nr_quadspaces   = 2;
-	quadverse->quadspace[0]    = quadspace = new_quadspace(); // Options
-	quadverse->quadspace[1]    = new_quadspace();             // Screener
-
-	/* QVID 2: CRYPTO QUADVERSE */
-	session->quadverse[2]      = quadverse = new_quadverse();
-	quadverse->quadspace[0]    = quadspace = new_quadspace(); // Crypto
-	quadverse->nr_quadspaces   = 1;
-
-	/* QVID 3: CHARTSPACE QUADVERSE */
-	session->quadverse[3]      = quadverse = new_quadverse();
-	quadverse->nr_quadspaces   = 1;
-	quadspace->quad[0]         = quad = new_quad();
-	quad->workspace[0]         = workspace = new_workspace();
-	quad->nr_workspaces        = 1;
-
-	/* QVID 4: PROFILE QUADVERSE */
-	session->quadverse[4]      = quadverse = new_quadverse();
-	quadverse->flags          |= QUADVERSE_PROFILE;
-	quadverse->nr_quadspaces   = 1;
-
-	/* QVID 5: MONSTER */
-	session->quadverse[5]      = quadverse = new_quadverse();
-	quadverse->quadspace[0]    = quadspace = new_quadspace();
-	quadspace->quad[0]         = quad      = new_quad();
-	quad->workspace[0]         = new_workspace();
-	quad->workspace[1]         = workspace = new_workspace();
-	quad->workspace[2]         = new_workspace();
-	quad->workspace[3]         = new_workspace();
-	quad->workspace[4]         = new_workspace();
-	quad->workspace[5]         = new_workspace();
-	quad->workspace[6]         = new_workspace();
-	workspace->watchtables     = peakwatch_tables;
-	workspace->workarea        = (struct peakwatch_workarea *)zmalloc(sizeof(struct peakwatch_workarea));
-
-}
-
 int qpage_load_qcache(struct qpage *qpage)
 {
 	yyjson_doc *doc;
@@ -802,7 +616,7 @@ void load_quadverse_pages()
 	struct qpage     *qpage, *qpage_file;
 	char              qbuf[sizeof(struct qpage) * MAX_QPAGES];
 	char              path[256];
-	int               qsize, nr_qpages, x;
+	int               qsize, nr_qpages;
 
 	session_list = get_session_list();
 	DLIST_FOR_EACH_ENTRY(session, session_list, list) {
@@ -814,21 +628,21 @@ void load_quadverse_pages()
 		qsize = fs_readfile(path, qbuf, sizeof(qbuf));
 		printf("qpage path: %s qsize: %d\n", path, qsize);
 		if (!qsize) {
-			new_profile_qpage(session);
+//			new_profile_qpage(session);
 			continue;
 		}
 		nr_qpages          = qsize/sizeof(struct qpage);
 		qpage_file         = (struct qpage *)qbuf;
 		session->nr_qpages = nr_qpages;
 		session->qpages    = (struct qpage **)malloc(sizeof(struct qpage *) * (MAX(32, nr_qpages)));
-		for (x=0; x<nr_qpages; x++) {
+		for (int x=0; x<nr_qpages; x++) {
 			qpage              = (struct qpage *)malloc(sizeof(*qpage));
 			quadverse_pages[x] = qpage;
 			session->qpages[x] = qpage;
 			memcpy(qpage, qpage_file, sizeof(*qpage_file));
 			memset(&qpage->qpage_lock, 0, sizeof(qpage->qpage_lock));
 			qpage->subscribers = (struct subscriber **)zmalloc(sizeof(struct subscriber *) * MAX_SUBSCRIBERS);
-			if (qpage->flags &= QUADVERSE_PROFILE) {
+			if (qpage->flags  &= QUADVERSE_PROFILE) {
 				qpage->quadverse        = session->quadverse[QUADVERSE_PROFILE];
 				qpage->quadverse->qpage = qpage;
 				strcpy(qpage->url, session->user->uname);
@@ -840,8 +654,8 @@ void load_quadverse_pages()
 			nr_quadverse_pages++;
 			qpage_file++;
 		}
-		if (!session->quadverse[QUADVERSE_PROFILE]->qpage)
-			new_profile_qpage(session);
+//		if (!session->quadverse[QUADVERSE_PROFILE]->qpage)
+//			new_profile_qpage(session);
 	}
 }
 
@@ -960,16 +774,18 @@ void workspace_set_watchtable(struct session *session, struct watchlist *watchta
 	printf(BOLDBLUE "adding table: watchtable->name: %s watchlist_id: %s watchtable: %p workspace: %p qbuf: %s" RESET "\n", watchtable->name, (char *)&watchtable->watchlist_id, watchtable, workspace, wstab);
 }
 
-
+/*
+ * Update all dynamic charts & tables in a single Workspace
+ */
 int process_workspace(struct session *session, char *packet, struct workspace *workspace, int PID, int QSID, int QID, int WSID)
 {
-	struct stock     *stock;
-	struct chart     *chart;
-	struct ohlc      *ohlc;
-	int               x, nbytes, packet_len = 0;
+	struct stock *stock;
+	struct chart *chart;
+	struct ohlc  *ohlc;
+	int           nbytes, packet_len = 0;
 
 	/* 1) Update Charts */
-	for (x=0; x<workspace->nr_charts; x++) {
+	for (int x=0; x<workspace->nr_charts; x++) {
 		if (!(chart=workspace->charts[x]))
 			continue;
 		stock = chart->stock;
@@ -981,11 +797,11 @@ int process_workspace(struct session *session, char *packet, struct workspace *w
 		ohlc = &stock->ohlc[stock->nr_ohlc-1];
 		if (chart->type == CHART_TYPE_OHLC) {
 			nbytes = sprintf(packet+packet_len, "update %s [%.3f,%.3f,%.2f,%.2f,%llu]@", chart->div, ohlc->open, ohlc->high, ohlc->low, ohlc->close, ohlc->volume);
-			printf(BOLDGREEN "process_workspace(): %s" RESET "\n", packet+packet_len);
+			printf(BOLDGREEN "CHART_TYPE_OHLC: %s" RESET "\n", packet+packet_len);
 		} else if (chart->type == CHART_TYPE_MINI) {
 			nbytes = sprintf(packet+packet_len, "upmini %s %s %s %.2f %.2f@",
 			stock->sym, chart->div, stock->current_tick->current_mini, stock->current_price, stock->pr_percent);
-			printf(BOLDMAGENTA "process_workspace(): %s" RESET "\n", packet+packet_len);
+			printf(BOLDMAGENTA "CHART_TYPE_MINI: %s" RESET "\n", packet+packet_len);
 		} else
 			continue;
 		packet_len += nbytes;
@@ -999,7 +815,7 @@ int process_workspace(struct session *session, char *packet, struct workspace *w
 
 	/* 3) Generic WatchTables */
 //	printf(BOLDYELLOW "updating watchtables? QSID: %d QID: %d WSID: %d nr_watchtables: %d" RESET "\n", QSID, QID, WSID, workspace->nr_watchtables);
-	for (x=0; x<workspace->nr_watchtables; x++) {
+	for (int x=0; x<workspace->nr_watchtables; x++) {
 		if (workspace->watchlists[x]) {
 			int size = watchtable_packet(session, workspace->watchlists[x], packet+packet_len);
 			if (size > 0) {
@@ -1011,6 +827,11 @@ int process_workspace(struct session *session, char *packet, struct workspace *w
 	return (packet_len);
 }
 
+/*
+ * Update the dynamic charts & tables belonging to the current QuadSpace
+ *   - For each Quad in a QuadSpace:
+ *     - Calls process_workspace() for each Quad's Workspace
+ */
 void update_page(struct session *session, struct connection *connection, char *packet)
 {
 	struct quadspace *quadspace;
@@ -1187,10 +1008,7 @@ out:
 /*
  * qupdate QSP_NAME 
  * qupdate QSP_DEL
- *
- *
  */
-
 int quadverse_update_packet(struct session *session, struct qpage *qpage, char *packet, int operation, int JQVID, int QVID, int QSID, int QID, int WSID, char *args)
 {
 	char QGID[64];
@@ -1577,81 +1395,357 @@ struct workspace *session_new_workspace(struct session *session, struct connecti
 	return workspace;
 }
 
-void rpc_set_quadverse(struct rpc *rpc)
+static void quadverse_switch(struct session *session, struct connection *connection, char *QVID)
 {
-	struct session    *session    = rpc->session;
-	struct connection *connection = rpc->connection;
-	char              *QGID       = rpc->argv[1];
+	struct quadverse *quadverse;
+	uint16_t          current_quadverse;
+	uint16_t          websocket_id = connection->websocket_id;
+
+	current_quadverse = strtoul(QVID, NULL, 10);
+	printf("current quadverse: %d\n", current_quadverse);
+	if (current_quadverse >= MAX_QUADVERSES)
+		return;
+	if (!(quadverse=session->quadverse[current_quadverse])) {
+		session->quadverse[current_quadverse]  = quadverse = new_quadverse();
+		session->nr_quadverses++;
+	}
+	session->current_quadverse[websocket_id]   = current_quadverse;
+//	if (!session->qcache && current_quadverse != QUADVERSE_ALGO)
+	if (!session->qcache)
+		session->qcache = qcache_create(session, current_quadverse, 0, NULL, 0);
+}
+
+static void quadspace_switch(struct session *session, struct connection *connection, char *QGID)
+{
+	struct quadverse *quadverse;
+	uint16_t          current_quadverse, current_quadspace;
+	uint16_t          websocket_id = connection->websocket_id;
+
+	printf("quadverse_switch QGID: %s\n", QGID);
+	if ((current_quadverse = strtoul(QGID+1, NULL, 10)) >= MAX_QUADVERSES)
+		return;
+
+	if (!(quadverse=session->quadverse[current_quadverse])) {
+		session->quadverse[current_quadverse] = quadverse = new_quadverse();
+		session->nr_quadverses++;
+	}
+
+	char *p = QGID+2;
+	while (*p != 'Q') {
+		p++;
+		if (*p == '\0')
+			return;
+	}
+	current_quadspace = strtoul(p+1, NULL, 10);
+	if (current_quadspace >= MAX_QUADSPACES)
+		return;
+	if (!quadverse->quadspace[current_quadspace])
+		session_new_quadspace(session, connection, quadverse->qpage, current_quadspace); // creates session->qcache if empty
+	quadverse->current_quadspace[websocket_id] = current_quadspace;
+	session->current_quadverse[websocket_id]   = current_quadverse;
+}
+
+static void workspace_switch(struct session *session, struct connection *connection, char *QGID)
+{
 	struct quadverse  *quadverse;
 	struct quadspace  *quadspace;
 	struct workspace  *workspace;
 	struct quad       *quad;
+	uint16_t           current_quadverse, current_quadspace, current_workspace;
+	uint16_t           QID, websocket_id = connection->websocket_id;
+
+	// set workspace
+	printf("workspace_switch: QGID: %s\n", QGID);
+	current_quadverse = session->current_quadverse[websocket_id];
+	if (!(quadverse=session->quadverse[current_quadverse]))
+		return;
+	current_quadspace = quadverse->current_quadspace[websocket_id];
+	if (current_quadspace >= MAX_QUADSPACES)
+		return;
+	if (!(quadspace=quadverse->quadspace[current_quadspace]))
+		return;
+	QID = strtoul(QGID, NULL, 10);
+	if (QID >= MAX_QUADS)
+		return;
+	quad = quadspace->quad[QID];
+	if (!quad)
+		return;
+	if (*(QGID+1) != ' ')
+		QGID++;
+	current_workspace = strtoul(QGID+2, NULL, 10);
+
+	if (current_workspace >= MAX_WORKSPACES)
+		return;
+//	if (current_workspace >= MAX_WORKSPACES || current_quadverse == QUADVERSE_ALGO)
+//		return;
+	if (!(workspace=quad->workspace[current_workspace])) {
+		printf("calling session_new workspace: websocket_id: %d\n", websocket_id);
+		workspace = session_new_workspace(session, connection, quadverse->qpage, quad, current_quadverse, current_quadspace, QID, current_workspace);
+		if (!workspace)
+			return;
+	}
+	printf("[set workspace]: current_workspace: %d websocket_id: %d\n", current_workspace, websocket_id);
+	quad->current_workspace[websocket_id] = current_workspace;
+	process_workspace(session, connection->packet, workspace, current_quadverse, current_quadspace, QID, current_workspace);
+}
+
+/*
+ * Tripple use RPC for handling onclick events for switching between:
+ *   - QuadVerses (from the drop down menu)
+ *   - QuadSpaces (by clicking on a Quadspace ChromeTab)
+ *   - WorkSpaces (by clicking on a Workspace ChromeTab)
+ */
+void rpc_qswitch(struct rpc *rpc)
+{
+	struct session    *session    =  rpc->session;
+	struct connection *connection =  rpc->connection;
+	char               qswitch    = *rpc->argv[1];
+	char              *QGID       =  rpc->argv[2];
 	char              *p;
 	int                current_quadverse, current_quadspace, QID, current_workspace, websocket_id = connection->websocket_id;
 
 	// set quadverse
-	if (*QGID == 'P') {
-		current_quadverse = atoi(QGID+1);
-		if (current_quadverse < 0 || current_quadverse >= MAX_QUADVERSES)
-			return;
-		if (!(quadverse=session->quadverse[current_quadverse]))
-			session->quadverse[current_quadverse] = quadverse = new_quadverse();
-		session->current_quadverse[websocket_id]  = current_quadverse;
-		if (!session->qcache && current_quadverse != QUADVERSE_ALGO)
-			session->qcache = qcache_create(session, current_quadverse, 0, NULL, 0);
-	} else if (*QGID == '#') {
-		// set quadspace; eg: "#P0Q2"
-		current_quadverse = atoi(QGID+2);
-		if (current_quadverse < 0 || current_quadverse >= MAX_QUADVERSES)
-			return;
-		if (!(quadverse=session->quadverse[current_quadverse]))
-			session->quadverse[current_quadverse] = quadverse = new_quadverse();
-		p = QGID+3;
-		while (*p != 'Q') {
-			p++;
-			if (*p == '\0')
-				return;
-		}
-		current_quadspace = atoi(p+1);
-		if (current_quadspace < 0 || current_quadspace >= MAX_QUADSPACES)
-			return;
-		if (!quadverse->quadspace[current_quadspace])
-			session_new_quadspace(session, connection, quadverse->qpage, current_quadspace); // creates session->qcache if empty
-		quadverse->current_quadspace[websocket_id] = current_quadspace;
-		session->current_quadverse[websocket_id]   = current_quadverse;
-		printf("#set_quadverse websocket_id: %d current_quadverse: %d\n", websocket_id, current_quadverse);
-	} else {
-		// set workspace
-		current_quadverse = session->current_quadverse[websocket_id];
-		quadverse = session->quadverse[current_quadverse];
-		if (!quadverse)
-			return;
-		current_quadspace = quadverse->current_quadspace[websocket_id];
-		if (current_quadspace < 0 || current_quadspace >= MAX_QUADSPACES)
-			return;
-		quadspace = quadverse->quadspace[current_quadspace];
-		if (!quadspace)
-			return;
-		QID = atoi(QGID);
-		if (QID < 0 || QID >= MAX_QUADS)
-			return;
-		quad = quadspace->quad[QID];
-		if (!quad)
-			return;
-		if (*(QGID+1) != ' ')
-			QGID++;
-		current_workspace = atoi(QGID+2);
-		if (current_workspace < 0 || current_workspace >= MAX_WORKSPACES || current_quadverse == QUADVERSE_ALGO)
-			return;
-		if (!(workspace=quad->workspace[current_workspace])) {
-			printf("calling session_new workspace: websocket_id: %d\n", websocket_id);
-			workspace = session_new_workspace(session, connection, quadverse->qpage, quad, current_quadverse, current_quadspace, QID, current_workspace);
-			if (!workspace)
-				return;
-		}
-		printf("[set workspace]: current_workspace: %d websocket_id: %d\n", current_workspace, websocket_id);
-		quad->current_workspace[websocket_id] = current_workspace;
-		process_workspace(session, rpc->packet, workspace, current_quadverse, current_quadspace, QID, current_workspace);
+	switch (qswitch) {
+		case RPC_QUADVERSE_SWITCH:
+			printf("set_quadverse qswitch: %s\n", QGID);
+			quadverse_switch(session, connection, QGID);
+			break;
+		case RPC_QUADSPACE_SWITCH:
+			quadspace_switch(session, connection, QGID);
+			break;
+		case RPC_WORKSPACE_SWITCH:
+			workspace_switch(session, connection, QGID);
+			break;
 	}
 }
 
+#define MAX_BOOTPARAM_OBJECTS 4
+
+/*
+ * GET /ws/action/objtype/filetype/filesize/filename/arg1/arg2
+ * GET /ws/ACTION_BOOT/bootstring
+ * GET /ws/ACTION_RELOAD
+ */
+bool rpc_boot(char *request, struct connection *connection)
+{
+	struct session   *session = connection->session;
+	char             *packet  = connection->packet+connection->packet_size;
+	struct XLS       *XLS     = CURRENT_XLS;
+	struct stock     *stock;
+	struct quadverse *quadverse;
+	struct quadspace *quadspace;
+	struct quad      *quad;
+	struct workspace *workspace;
+	char             *argv  [MAX_BOOT_OBJECTS];
+	char             *pargv [MAX_WORKSPACE_OBJECTS];
+	char             *params[MAX_BOOTPARAM_OBJECTS];
+	char             *p = request, *p2;
+	struct rpc        rpc;
+	uint64_t          action, argc, packet_size = 0;
+	uint16_t          quadverse_profile_index;
+
+	action = strtoul(request, NULL, 10);
+	if (action >= MAX_WEBSOCKET_ACTIONS)
+		return false;
+
+	while (*p != '/') {
+		p++;
+		if (*p == '\0')
+			return false;
+	}
+	p++;
+	p2 = p;
+	while (*p2 != '\r') {
+		p2++;
+		if (*p2 == '\0')
+			return false;
+	}
+	*p2 = 0;
+
+	argc = cstring_split(p, argv, MAX_BOOT_OBJECTS, '/');
+	if (!argc)
+		return false;
+
+	if (!(quadverse=session->quadverse[0])) {
+		session->quadverse[0] = quadverse = new_quadverse();
+		session->nr_quadverses++;
+	}
+
+	for (int x = 0; x<argc; x++) {
+		int      nr_params  = cstring_split(argv[x],   params, MAX_BOOTPARAM_OBJECTS, ':');
+		int      nr_objects = cstring_split(params[1], pargv,  MAX_WORKSPACE_OBJECTS, ',');
+		char    *obj_id     = params[1]; // one or more objects of type: chart/table/etc
+		char    *QGID       = params[2];
+		uint16_t QID, WSID; // Quad ID & Workspace ID (QVID & QSID are always 0 on boot)
+
+		if (!(p=strchr(QGID+1, 'q')))
+			return false;
+		QID = strtoul(p+1, NULL, 10);
+		if (!(p=strchr(p+1, 'w')))
+			return false;
+		WSID = strtoul(p+2, NULL, 10);
+
+		if (QID >= MAX_QUADS || WSID >= MAX_WORKSPACES)
+			return false;
+
+		if (!(quadspace=quadverse->quadspace[0])) {
+			quadverse->quadspace[0] = quadspace = new_quadspace();
+			quadverse->nr_quadspaces++;
+		}
+
+		if (!(quad=quadspace->quad[QID])) {
+			quadspace->quad[QID] = quad = new_quad();
+			quadspace->nr_quads++;
+		}
+
+		if (!(workspace=quad->workspace[WSID])) {
+			quad->workspace[WSID] = workspace = new_workspace();
+			quad->nr_workspaces++;
+		}
+
+		if (!nr_params || !nr_objects)
+			return false;
+
+		if (!strncmp(params[0], "addTable", 8)) {
+			/****************
+			 *     Tables
+			 ***************/
+			for (int y = 0; y<nr_objects; y++)
+				packet_size += ufo_table_json(pargv[y], packet+packet_size);
+			/***********************************************************/
+		} else if (!strncmp(params[0], "addChart", 8)) {
+			/****************
+			 *     Charts
+			 ***************/
+			char *cargv[6] = {0};
+
+			if (nr_params != 4)
+				continue;
+
+			// pick a "random" stock if a '?' is supplied instead of the ticker
+			if (*obj_id == '?')
+				stock = XLS->boards[LOWCAP_GAINER_BOARD]->stocks[0];
+			else
+				stock = search_stocks(obj_id);
+
+			if (!stock)
+				continue;
+
+			cargv[1]       = QGID;
+			cargv[2]       = stock->sym;
+			cargv[5]       = params[3]; // class name of an existing <div> where the chart will reside (meaning it was created already rather than by the rpc_chart() js handler
+			rpc.session    = session;
+			rpc.connection = connection;
+			rpc.packet     = packet+packet_size;
+			rpc.argv       = cargv;
+			rpc.internal   = true;
+			/*
+			 * rpc_chart() is called internally to pack chart config JSON(s) into connection->packet
+			 * it will also create quadspaces/workspaces necessary to hold those charts
+			 */
+			rpc_chart(&rpc);
+
+			packet_size += rpc.packet_size;
+			*(packet+packet_size++) = '@';
+//			printf("params: %s packet_size: %lld\n", params[3], packet_size);
+		} else if (!strncmp(params[0], "addProfile", 10)) {
+			if (!params[1])
+				return false;
+			quadverse_profile_index = strtoul(params[1], NULL, 10);
+			if (quadverse_profile_index >= MAX_QUADVERSES)
+				return false;
+			if (!(quadverse=session->quadverse[quadverse_profile_index]))
+				quadverse     = new_quadverse();
+			quadverse->flags |= QUADVERSE_PROFILE;
+			quadverse->nr_quadspaces = 1;
+			session->nr_quadverses++;
+		}
+//		printf("argv: %s params: %d\n", argv[x], nr_params);
+	}
+	connection->packet_size = packet_size;
+	return true;
+}
+
+
+
+void session_load_quadverse(struct session *session)
+{
+	struct quadverse *quadverse;
+	struct quadspace *quadspace;
+	struct quad      *quad;
+	struct workspace *workspace;
+
+//	session->nr_quadverses     = 6;
+	/* QVID 0: STOCKS QUADVERSE */
+//	memset(&session->quadverse[0],      0, sizeof(struct quadverse *) * MAX_QUADVERSES);
+//	memset(&session->current_quadverse, 0, sizeof(char)*MAX_WEBSOCKETS);
+
+//	session->quadverse[0]      = quadverse = new_quadverse();
+/*	quadverse->nr_quadspaces   = 4;
+	quadverse->quadspace[0]    = quadspace = new_quadspace(); // Stocks
+	quadverse->quadspace[1]    = new_quadspace();             // Screener
+	quadverse->quadspace[2]    = new_quadspace();             // Price Action
+	quadverse->quadspace[3]    = new_quadspace();             // Volume
+	quadverse->quadspace[4]    = new_quadspace();             // Candles
+
+	// QVID 0: Gainer Tables
+	quadspace->quad[0]         = quad = new_quad();           // Gainer Tables
+	quad->workspace[0]         = workspace = new_workspace(); // Lowcaps
+	workspace->watchtables     = lowcap_tables;
+	quad->nr_workspaces        = 2;
+	workspace->nr_watchtables  = 2;
+	quad->workspace[1]         = workspace = new_workspace(); // Highcaps
+	workspace->watchtables     = highcap_tables;
+	workspace->nr_watchtables  = 2;*/
+
+	// QVID 0: Main Chart
+/*	quadspace->quad[1]         = quad      = new_quad();      // Main Chart
+	quadspace->nr_quads        = 2;
+	quad->workspace[0]         = workspace = new_workspace();
+	quad->nr_workspaces        = 1;
+//	workspace->nr_charts       = 1;
+
+	// QVID 0: QSID 1
+	quadverse->quadspace[1]->quad[2] = quad = new_quad();            // morphtab
+	quad->workspace[0]               = workspace = new_workspace();  // morphtab
+	workspace->watchlists[0]         = session->morphtab;
+	workspace->nr_watchtables        = 1;
+
+	// QVID 1: OPTIONS QUADVERSE
+/*	session->quadverse[1]      = quadverse = new_quadverse();
+	quadverse->nr_quadspaces   = 2;
+	quadverse->quadspace[0]    = quadspace = new_quadspace(); // Options
+	quadverse->quadspace[1]    = new_quadspace();             // Screener
+
+	// QVID 2: CRYPTO QUADVERSE
+	session->quadverse[2]      = quadverse = new_quadverse();
+	quadverse->quadspace[0]    = quadspace = new_quadspace(); // Crypto
+	quadverse->nr_quadspaces   = 1;*/
+
+	// QVID 3: CHARTSPACE QUADVERSE
+/*	session->quadverse[3]      = quadverse = new_quadverse();
+	quadverse->nr_quadspaces   = 1;
+	quadspace->quad[0]         = quad = new_quad();
+	quad->workspace[0]         = workspace = new_workspace();
+	quad->nr_workspaces        = 1;*/
+
+	// QVID 4: PROFILE QUADVERSE
+/*	session->quadverse[4]      = quadverse = new_quadverse();
+	quadverse->flags          |= QUADVERSE_PROFILE;
+	quadverse->nr_quadspaces   = 1;
+
+	// QVID 5: MONSTER
+	session->quadverse[5]      = quadverse = new_quadverse();
+	quadverse->quadspace[0]    = quadspace = new_quadspace();
+	quadspace->quad[0]         = quad      = new_quad();
+	quad->workspace[0]         = new_workspace();
+	quad->workspace[1]         = workspace = new_workspace();
+	quad->workspace[2]         = new_workspace();
+	quad->workspace[3]         = new_workspace();
+	quad->workspace[4]         = new_workspace();
+	quad->workspace[5]         = new_workspace();
+	quad->workspace[6]         = new_workspace();
+	workspace->watchtables     = peakwatch_tables;
+	workspace->workarea        = (struct peakwatch_workarea *)zmalloc(sizeof(struct peakwatch_workarea));*/
+
+}

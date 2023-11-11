@@ -231,6 +231,8 @@ void rpc_watchtable_addstocks(struct rpc *rpc)
 		argc = cstring_split(tickers, ticker_argv, nr_stocks, ',');
 		if (!argc)
 			return;
+	} else {
+		ticker_argv[0] = tickers;
 	}
 
 //	if (watchtable->origin)

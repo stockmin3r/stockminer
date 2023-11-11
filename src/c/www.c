@@ -28,7 +28,7 @@ struct request rpc_requests[] = {
 	{ "indi_preset_edit",    rpc_indicator_edit,         2, 2, ARGS_TYPE_ARGV},
 
 	/* QuadVerse */
-	{ "page",                rpc_set_quadverse,          2, 3, ARGS_TYPE_ARGV},
+	{ "qswitch",             rpc_qswitch,                3, 4, ARGS_TYPE_ARGV},
 	{ "qupdate",             rpc_quadverse_update,       6, 6, ARGS_TYPE_ARGV},
 	{ "qexport",             rpc_quadverse_export,       6, 6, ARGS_TYPE_ARGV},
 	{ "stage",               rpc_webscript,              3, 3, ARGS_TYPE_ARGV},
@@ -80,15 +80,15 @@ struct request rpc_requests[] = {
 	{ "alerts_del",          rpc_remove_alert,           2, 2, ARGS_TYPE_ARGV},
 
 	/* Tables, Styles */
-	{ "watchtable",          rpc_watchtable_columns,     2, 2, ARGS_TYPE_ARGV},
+	{ "watchtable",          rpc_watchtable_columns,     4, 4, ARGS_TYPE_ARGV},
 	{ "css",                 rpc_css,                    2, 2, ARGS_TYPE_JSON},
 	{ "deftab",              rpc_define_table,           2, 2, ARGS_TYPE_JSON},
 	{ "wget",                rpc_wget_table,             3, 3, ARGS_TYPE_ARGV},
 
 	/* CandleSticks */
 	{ "candle",              rpc_candle_stock,           2, 2, ARGS_TYPE_ARGV},
-	{ "csp",                 rpc_csp,                    2, 2, ARGS_TYPE_ARGV},
-	{ "csr",                 rpc_csr,                    2, 2, ARGS_TYPE_ARGV},
+	{ "csp",                 rpc_csp,                    3, 3, ARGS_TYPE_ARGV},
+	{ "csr",                 rpc_csr,                    3, 3, ARGS_TYPE_ARGV},
 	{ "czoom",               rpc_candle_zoom,            3, 3, ARGS_TYPE_ARGV},
 
 	/* Options */
@@ -269,6 +269,7 @@ void www_load_website(struct server *server)
 void apc_reload_website(struct connection *connection, char **argv)
 {
 	www_load_website(&Server);
+	printf(BOLDGREEN "reloaded website" RESET "\n");
 }
 
 static void
@@ -318,7 +319,7 @@ static __inline__ int get_profile_QVID(struct session *session, char *username)
 {
 	int free_QVID = 0;
 
-	for (int x=6; x<MAX_QUADVERSES; x++) {
+	for (int x=0; x<MAX_QUADVERSES; x++) {
 		struct quadverse *quadverse = session->quadverse[x];
 		if (!quadverse) {
 			if (!free_QVID)
@@ -355,7 +356,7 @@ www_route_user(struct connection *connection, struct url *url)
 
 	// GET /user
 	if (url->nr_segments == 1) {
-		/* init profile qpage_json, profile_username QVID profile_json (profile_json: empty profile JSON)*/
+		/* init profile qpage_json, profile_username QVID profile_json (profile_json: empty profile JSON) */
 		strcpy(packet, "init profile [[null]] ");
 		packet_size = 22;
 
@@ -640,6 +641,7 @@ int www_websocket_sync(char *req, struct connection *connection)
 					rpc.packet       = packet;
 					rpc.argc         = argc = cstring_split(msg, argv, request->argc_max, ' ');
 					rpc.argv         = argv;
+					rpc.internal     = 0;
 					printf("argc: %d min: %d max: %d\n", argc, request->argc_min, request->argc_max);
 					if (request->argc_min && (argc > request->argc_max || argc < request->argc_min)) {
 						printf(BOLDRED "command error: %s" RESET "\n", argv[0]);

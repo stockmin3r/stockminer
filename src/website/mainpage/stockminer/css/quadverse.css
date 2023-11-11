@@ -47,6 +47,8 @@ iframe                   {min-height:80vh}
 #LOGIN   {position:absolute;font-size:13.5px;font-weight:bold;cursor:pointer;margin-right:1.3vw;margin-top:5px;color:#821eda;top:0;right:0}
 #version {position:absolute;font-size:13px;font-weight:bold;color:orange;cursor:pointer;margin-right:25rem;margin-top:10px;top:0;right:0}
 #bell    {position:absolute;top:0;right:0;width:20px;z-index:100;margin-right:33rem;cursor:pointer;color:transparent;text-shadow:0 0 0 grey;margin-top:12px}
+#github  {position:absolute;top:0;right:0;width:24px;z-index:100;margin-right:11.2rem;cursor:pointer;color:transparent;text-shadow:0 0 0 grey;margin-top:10px}
+#discord {position:absolute;top:0;right:0;width:32px;z-index:100;margin-right:13rem;cursor:pointer;color:transparent;text-shadow:0 0 0 grey;margin-top:5px;height:32px}
 #help    {position:absolute;font-size:20px;cursor:pointer;margin-top:5px;top:0;right:0}
 #PCustom img {border:2px solid #821eda}
 
@@ -311,7 +313,7 @@ iframe                   {min-height:80vh}
 .wnew             {float:right;margin-right:-72px}
 .wnew input       {line-height:1.5;display:block;width:60%;margin-top:5%;margin-right:20px}
 .on               {font-weight:bold;color:white!important}
-.wsave            {position:absolute;color:grey;margin-top:3px;margin-left:110px;font-weight:bold;cursor:pointer}
+.wsave            {position:absolute;color:grey;margin-top:3px;margin-left:97px;font-weight:bold;cursor:pointer}
 .wstrash          {position:absolute;color:grey;margin-top:1%; margin-left:20%;font-weight:bold;font-size:24px;cursor:pointer}
 .wsbomb           {position:absolute;color:black;margin-top:1%;margin-left:24%;font-weight:bold;font-size:24px;cursor:pointer}
 .GEAR:before      {content:'\1F6E0';color:black;margin-left:-20px;margin-top:-15px;position:absolute;font-size:21px}

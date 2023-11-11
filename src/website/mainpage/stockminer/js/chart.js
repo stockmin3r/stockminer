@@ -729,6 +729,143 @@ function indi_save_preset()
 	$(chart.menu).find(".PRE").css("display", "block");
 }
 
+function pract()
+{
+	var on = check(),
+		tr = window.event.target.parentNode;
+	while (tr.tagName != "TR")
+		tr = tr.parentNode;
+	row    = tr.rowIndex-1;
+	var ws = $(tr).find(".prselect")[0].value;
+	console.log("row: " + row + " ws: " + ws);
+	PSET[row].ws = ws;
+	PSET[row].on = on;
+	WS.send("pset " + row + " " + ws + " " + on);
+	event.stopPropagation();
+}
+
+function loadpresets(menu)
+{
+	var l = PR.length;
+	if (!l)
+		return;
+
+	var tbl = $(menu).find(".prelist table tbody");
+	for (var x = 0; x<l; x++) {
+		var preset = PR[x].split(" "),
+		ac         = preset[1].split("^"),pr,
+		active     = ac[ac.length-1];
+		console.log("preset: " + preset + " " + "active: " + active);
+		if (active=='1')
+			pr = prON;
+		else
+			pr = prOFF;
+		row        = '<tr><td>' + pr + '</td><td>'+preset[0]+'</td><td>'+preset[1].replaceAll("^", " ").split(" ").slice(0, -2).join(" ") + '</td><td>'+PMS[x]+'</td><td class=wc title=Remove>&times;</td></tr>';
+		$(tbl).append(row);
+	}
+}
+
+function check(p){
+	var on, n = window.event.target;
+	if (p==1)
+		n = window.event.target.firstChild;
+	if ($(n).hasClass("tick")) {
+		$(n).removeClass("tick");
+		$(n).addClass("untick");
+		on = 0;
+	} else {
+		$(n).removeClass("untick");
+		$(n).addClass("tick");
+		on = 1;
+	}
+	event.stopPropagation();
+	return on;
+}
+
+function preset(name, chart, id)
+{
+	if (chart == null)
+		chart = $("#"+id).highcharts();
+	console.log("PRESET CALLED: " + name);
+	var menu  = chart.menu,
+	indi      = PMD[name].split("^");
+	if (!menu) {
+		iopen(chart,chart.title.textStr, id);
+		menu = chart.menu;
+	}
+	for (var x=0; x<indi.length-2; x++) {
+		menu.indi = indi[x];
+		console.log("ADDING INDICATOR: " + indi[x]);
+		iadd(chart);
+	}
+	$(menu).css("display", "none");
+}
+
+function prselect()
+{
+	var op = window.event.target,
+	sel    = opt.parentNode, tr = sel;
+	while (tr.tagName != "TR")
+		tr = tr.parentNode;
+
+	console.log("prselect: " + (tr.rowIndex-1) + " " + opt.value + " 2");
+	PMS[row] = window.event.target.parentNode.innerHTML;
+	WS.send("pset " + tr.rowIndex-1 + " " + opt.value + " 2");
+}
+
+function rpc_indicator(av)
+{
+	var name = av[1], indicators = av[2];
+	console.log("SETPRE: " + name + " INDI: " + indicators);
+	PR.push(name + " " + indicators);
+	PMD[name] = indicators;
+	var ar    = indicators.split("^"),
+	ws        = ar[ar.length-2],
+	on        = ar[ar.length-1];
+	PSET.push({ws:ws,on:on,n:name});
+	PMenu['Preset'+(PMenu.length+1)] = {"name":name, callback:function(itemKey,opt,e){preset(name,null,$(this).closest(".chart").attr("id"))}};
+	var s = "<select class=prselect onchange=prselect()>";
+	if (ws == '0')
+		s += "<option value=0>All Charts</option>";
+	else {
+		s += "<option value=" + ws + ">" + WName[ws-1] + "</option>";
+		s += "<option value=0>All Charts</option>";
+	}
+	for (var x = 0; x<WName.length; x++) {
+		if (x-1 == ws)
+			continue;
+		s += "<option value="+(x+1)+">" + WName[x] + "</option>";
+	}
+	s += "</select>";
+	PMS.push(s);
+}
+
+function showEnabled(chart)
+{
+	var mm  = $(".mm", chart.menu),
+	id      = $(mm).find("select option:selected")[0].text,
+	s       = chart.get(id),
+	tab     = $("tbody", mm);
+
+	tab.html("");
+	if (!s.ilist)
+		s.ilist = [];
+	for (var x=0; x<s.ilist.length; x++)
+		$(tab).append('<tr><td>' + s.ilist[x] + '</td><td i='+x+' class=ic2>✖</td></tr>');
+	$(".ic2", tab).click(function(){
+		var i = $(this).attr("i"), indi = s.ilist[i];
+		console.log("idx: " + i + " " + indi);
+		s.ilist.slice(i, 1);
+		$(this.parentNode).remove();
+		chart.get(id+'-'+indi).remove(1);
+		ryx(chart);
+	});
+
+	$(".imenu", chart.menu).css("display", "none");
+	$(mm).css("display", "block");
+	$(chart.menu).css("display", "block");
+}
+
 function rsz(box,div)
 {
 	var h = -box.offsetHeight+10;
@@ -739,7 +876,7 @@ function hideY(chart,name) {
     $(chart.yAxis).each(function(i, item) {
         if (item.userOptions.id == name)
             chart.yAxis[i].update({visible: false});
-  }); 
+  });
 }
 
 var LINE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='16' stroke='%23000' stroke-width='1.5'  stroke-linecap='round' stroke-linejoin='round' fill='black' fill-rule='evenodd'%3E%3Cdefs%3E%3ClinearGradient id='A' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='purple'/%3E%3Cstop offset='100%25' stop-color='%23672965'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M.5 14.5L10 5l5 5.5L23.5 1' stroke='url(%23A)' fill='none'/%3E%3C/svg%3E";
@@ -829,6 +966,7 @@ function ryx(chart) {
 	positions.forEach(function (position, index) {yAxes[index].update({height:position.height + '%',top:position.top + '%',resize:resizers[index]}, false);});
 }
 
+// ancient
 function Chart_addTicker(chart, ticker)
 {
 	$.ajax({url:"/1mOHLC/"+ticker, async:"true", complete:function(result){

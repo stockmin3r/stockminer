@@ -70,6 +70,7 @@ __MODULE_HOOK stocks_session_alloc(struct session *session)
 	/* morphtab New^Preset */
 	wtab = (struct wtab *)zmalloc(sizeof(*wtab));
 	wtab->colmap[0]  = 900; wtab->colmap[1]  = 901;
+	wtab->colmap[2]  = 903; wtab->colmap[3]  = 904;
 	wtab->table_type = WATCHTABLE_ROOT;
 	session->nr_watchtable_presets = 1;
 	session->watchtable_presets[0] = wtab;

@@ -12,6 +12,7 @@ https://people.csail.mit.edu/shanir/publications/Baskets%20Queue.pdf
 https://gist.github.com/glampert/c40f2584d2fbc72316e1c8a6ef1c0436 # atomic lockless linked list
 https://gist.github.com/jserv/c3823ea893e08607b432827a11ec4b69#file-free_later-c lockfree hashmap
 https://gist.github.com/larytet/c306d470f7b032c796efad15dcd609a9 # lockfree hashtable
+https://seastar.io/shared-nothing/ # thread per core architecture (used by scylladb)
 
 [queues]
 https://arxiv.org/pdf/2010.14189.pdf # Jiffy - Wait Free Queue
@@ -26,6 +27,12 @@ https://github.com/chaoran/fast-wait-free-queue/
 https://00f.net/2018/10/18/on-user-authentication/ # hydrogen client auth + terrarium link
 https://github.com/fastly/terrarium-templates/tree/master/105_access_control_example # OPRF WASM AUTH (typescript)
 https://tozny.com/blog/secure-authentication-libsodium/
+https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-14.html
+https://r.jordan.im/download/technology/jefferys2020-2.pdf # Session - fork of signal but with decentralization in mind
+https://datatracker.ietf.org/doc/rfc9420/ # ratchet trees for group messaging to solve closed group size limitations (a problem with Session), very recent
+https://signal.org/docs/specifications/doubleratchet/
+https://www.scottbrady91.com/jose/jwts-which-signing-algorithm-should-i-use
+https://www.encryptionconsulting.com/overview-of-rsassa-pss/
 https://eprint.iacr.org/2018/163 # OPAQUE - uses an OPRF
 https://build-your-own.org/blog/20230110_alt_ssh/
 https://stackoverflow.com/questions/65314524/openssl-generate-ed25519-keypair-c
@@ -88,6 +95,7 @@ https://github.com/yardenshafir/IoRing_Demos/blob/main/IoRingPerf/IoRingPerf/Sou
 https://yuukidach.github.io/p/makefile-for-projects-with-subdirectories/
 
 [ai]
+https://lightning.ai/blog/scaling-large-language-models-with-pytorch-lightning/ # Distributed Llama modelling
 https://analyticsindiamag.com/cosine-similarity-in-machine-learning/
 https://tivadardanka.com/blog/linear-algebra-in-machine-learning
 https://math.stackexchange.com/questions/317114/what-is-the-purpose-of-subtracting-the-mean-from-data-when-standardizing

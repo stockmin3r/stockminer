@@ -24,54 +24,55 @@
 			<button class=wbtn onclick="wcat(500,600)">Options</button>
 		</div>
 	</div>
+
+	<!-- The Left box of the screener - drag & drop column box source -->
 	<div id=WSRC class=wsrc>
 		<ul class="sort">
-		<li v=915>Date</li>
-		<li v=900>Ticker</li>
-		<li v=901>Price</li>
-		<li v=916>PT - Price Target</li>
-		<li v=902>Rank</li>
-		<li v=903>Delta</li>
-		<li v=904>Vol</li>
-		<li v=905>Open</li>
-		<li v=906>High</li>
-		<li v=907>Low</li>
-		<li v=908>PClose</li>
-		<li v=909>Open% - %Chg from previous close to Today's Open</li>
-		<li v=910>High% - %Chg from previous close to Today's High</li>
-		<li v=911>Low%  - %Chg from previous close to Today's Low</li>
-		<li v=912>Peak  - 52 Week High</li>
-		<li v=913>Peak% - % Chg from peak</li>
-		<li v=914>VS - Volume Spike	</li>
+		<!-- Standard Ticker Columns-->
+		<li n=Date v=915>Date</li>
+		<li n=T    v=900>Ticker</li>
+		<li n=P    v=901>Price</li>
+		<li n=R    v=902>Rank</li>
+		<li n=D    v=903>Delta</li>
+		<li n=V    v=904>Vol</li>
+		<li n=O    v=905>Open</li>
+		<li n=H    v=906>High</li>
+		<li n=L    v=907>Low</li>
+		<li n=PC   v=908>PClose</li>
+		<li n=OP   v=909>Open% - %Chg from previous close to Today's Open</li>
+		<li n=HP   v=910>High% - %Chg from previous close to Today's High</li>
+		<li n=LP   v=911>Low%  - %Chg from previous close to Today's Low</li>
+		<li n=PK   v=912>Peak  - 52 Week High</li>
+		<li n=PKP  v=913>Peak% - % Chg from peak</li>
 
 		<!-- Trend -->
-		<li v=400>D↑         - count of consecutive up days </li>
-		<li v=401>D↓         - count of consecutive down days</li>
-		<li v=402>W↑         - count of consecutive up weeks</li>
-		<li v=403>W↓         - count of consecutive down weeks</li>
-		<li v=404>%D↑        - percentage of up days in the year </li>
-		<li v=405>%D↓        - percentage of down days in the year </li>
-		<li v=406>BIX        - has to stock beaten the SPX? % delta from SPX</li>
-		<li v=418>Q1         - AnyDay % of days stock gained 5% within Q1 (63 days, 2021)</li>
-		<li v=419>Q2         - AnyDay % of days stock gained 5% within Q2 (126 days, 2021)</li>
-		<li v=420>Q1         - AnyDay % of days stock gained 5% within Q1 (63 days, 2020)</li>
-		<li v=421>Q2         - AnyDay % of days stock gained 5% within Q2 (126 days, 2020)</li>
-		<li v=422>Q1         - AnyDay % of days stock gained 5% within Q1 (63 days, 2019)</li>
-		<li v=423>Q2         - AnyDay % of days stock gained 5% within Q2 (126 days, 2019)</li>
-		<li v=424>Q1         - AnyDay % of days stock gained 10% within Q1 (63 days, 2021)</li>
-		<li v=425>Q2         - AnyDay % of days stock gained 10% within Q2 (126 days, 2021)</li>
-		<li v=426>Q1         - AnyDay % of days stock gained 10% within Q1 (63 days, 2020)</li>
-		<li v=427>Q2         - AnyDay % of days stock gained 10% within Q2 (126 days, 2020)</li>
-		<li v=428>Q1         - AnyDay % of days stock gained 10% within Q1 (63 days, 2019)</li>
-		<li v=429>Q2         - AnyDay % of days stock gained 10% within Q2 (126 days, 2019)</li>
-		<li v=430>'21        - AvgDays stock took to gain 5% (2021)</li>
-		<li v=431>'20        - AvgDays stock took to gain 5% (2020)</li>
-		<li v=432>'19        - AvgDays stock took to gain 5% (2019)</li>
-		<li v=433>'21        - AvgDays stock took to gain 10% (2021)</li>
-		<li v=434>'20        - AvgDays stock took to gain 10% (2020)</li>
-		<li v=435>'19        - AvgDays stock took to gain 10% (2019)</li>
+		<li n=NDUP v=400>D↑         - count of consecutive up days </li>
+		<li n=NDDW v=401>D↓         - count of consecutive down days</li>
+		<li n=NWUP v=402>W↑         - count of consecutive up weeks</li>
+		<li n=NWDW v=403>W↓         - count of consecutive down weeks</li>
+		<li n=PDUP v=404>%D↑        - percentage of up days in the year </li>
+		<li n=PDDW v=405>%D↓        - percentage of down days in the year </li>
+		<li n=BIX  v=406>BIX        - has to stock beaten the SPX? % delta from SPX</li>
+		<li n=5AD21Q1 v=418>Q1      - AnyDay % of days stock gained 5% within Q1 (63 days,  2023)</li>
+		<li n=5AD21Q2 v=419>Q2      - AnyDay % of days stock gained 5% within Q2 (126 days, 2023)</li>
+		<li n=5AD20Q1 v=420>Q1      - AnyDay % of days stock gained 5% within Q1 (63 days,  2022)</li>
+		<li n=5AD20Q2 v=421>Q2      - AnyDay % of days stock gained 5% within Q2 (126 days, 2022)</li>
+		<li n=5AD19Q1 v=422>Q1      - AnyDay % of days stock gained 5% within Q1 (63 days,  2021)</li>
+		<li n=5AD19Q2 v=423>Q2      - AnyDay % of days stock gained 5% within Q2 (126 days, 2021)</li>
+		<li n=10AD21Q1 v=424>Q1     - AnyDay % of days stock gained 10% within Q1 (63 days,  2023)</li>
+		<li n=10AD21Q2 v=425>Q2     - AnyDay % of days stock gained 10% within Q2 (126 days, 2023)</li>
+		<li n=10AD20Q1 v=426>Q1     - AnyDay % of days stock gained 10% within Q1 (63 days,  2022)</li>
+		<li n=10AD20Q2 v=427>Q2     - AnyDay % of days stock gained 10% within Q2 (126 days, 2022)</li>
+		<li n=10AD19Q1 v=428>Q1     - AnyDay % of days stock gained 10% within Q1 (63 days,  2021)</li>
+		<li n=10AD19Q2 v=429>Q2     - AnyDay % of days stock gained 10% within Q2 (126 days, 2021)</li>
+		<li n=5AD21 v=430>'23       - AvgDays stock took to gain 5% (2023)</li>
+		<li n=5AD20 v=431>'22       - AvgDays stock took to gain 5% (2022)</li>
+		<li n=5AD19 v=432>'21       - AvgDays stock took to gain 5% (2021)</li>
+		<li n=10AD21 v=433>'23      - AvgDays stock took to gain 10% (2023)</li>
+		<li n=10AD20 v=434>'22      - AvgDays stock took to gain 10% (2022)</li>
+		<li n=10AD19 v=435>'21      - AvgDays stock took to gain 10% (2021)</li>
 
-
+		<!-- Candlestick Patterns (broken) -->
 		<li v=800>Candle     - Candlestick Type</li>
 		<li v=851>D1         - 1 day after signal</li>
 		<li v=852>D2         - 2 days after signal</li>
@@ -185,122 +186,112 @@
 		<li v=188>DLR</li>
 		<li v=189>CR</li>
 
-
-		<li v=700>MACD</li>
-		<li v=701>RSI</li>
-		<li v=702>Aroon</li>
-		<li v=703>Stoch</li>
-		<li v=704>BB</li>
-		<li v=705>CCI</li>
-		<li v=706>Keltner</li>
-
 		<!-- Fundamentals -->
-		<li v=300>Earnings - Earnings Date</li>
-		<li v=313>ED - Days to/from Earnings Date</li>
-		<li v=301>Sector</li>
-		<li v=302>Dividend Yield</li>
-		<li v=303>Div</li>
-		<li v=304>Xdate</li>
-		<li v=305>Annual Revenue</li>
-		<li v=306>EPS</li>
-		<li v=307>Value at Risk (VaR)</li>
-		<li v=308>Market Cap</li>
-		<li v=309>PEG Ratio</li>
-		<li v=310>Price to Book ratio (PBR)</li>
-		<li v=311>Profit Margin %</li>
-		<li v=312>ROA</li>
+		<li n=fED    v=300>Earnings - Earnings Date</li>
+		<li n=fEDOFF v=313>ED - Days to/from Earnings Date</li>
+		<li n=fSEC   v=301>Sector</li>
+		<li n=fDY    v=302>Dividend Yield</li>
+		<li n=fDIV   v=303>Div</li>
+		<li n=fXD    v=304>Xdate</li>
+		<li n=fAR    v=305>Annual Revenue</li>
+		<li n=fEPS   v=306>EPS</li>
+		<li n=fVAR   v=307>Value at Risk (VaR)</li>
+		<li n=fMCP   v=308>Market Cap</li>
+		<li n=fPEG   v=309>PEG Ratio</li>
+		<li n=fPBR   v=310>Price to Book ratio (PBR)</li>
+		<li n=fPM    v=311>Profit Margin %</li>
+		<li n=fROA   v=312>ROA</li>
 
-		<!-- Algorithmic -->
+		<!-- Algorithmic (colgen.py/mag2) -->
+		<li v=286>Sig - Signal</li>
+		<li v=285>⟑ - peak or not</li>
+		<li v=278>1YPPR - One Year Peak Price</li>
+		<li v=279>P10LIMIT - Limit Price level</li>
+		<li v=280>P10DELTA - % Away from being a P10 buy</li>
+		<li v=281>peak%P₁ₒ - 10th percentile %Peak</li>
+		<li v=282>peak%P₅ - 5th percentile %Peak</li>
+		<li v=283>last_peak - last peak date</li>
+		<li v=284>P₁ₒOrP₅ - 10th or 5th percentile</li>
+		<li v=226>RTD - Return to Date</li>
+		<li v=227>Streak</li>
+		<li v=228>DIR - Streak Direction (up or down)</li>
+		<li v=229>Buy - Buy Price level</li>
+		<li v=230>BuyDelta - % Away from being a buy</li>
+		<li v=231>Sell - Sell Price level</li>
+		<li v=232>SellDelta - % Away from being a sell</li>
+		<li v=233>FIB</li>
+		<li v=234>FIBDIR - direction (up or down)</li>
+		<li v=235>BuyFIB - Buy Price Level</li>
+		<li v=236>BuyDeltaFIB - % Away from being a buy</li>
+		<li v=237>SellFIB - Sell Price Level</li>
+		<li v=238>SellDeltaFIB - % Away from being a sell</li>
+		<li v=239>Mean - associated average</li>
+		<li v=240>STD - Standard Deviation</li>
+		<li v=212>A1ESP - Action 1 ESP</li>
+		<li v=213>A1 - Action 1</li>
+		<li v=214>A1Same</li>
+		<li v=215>A1Result</li>
+		<li v=216>A4ESP - Action 4 ESP</li>
+		<li v=217>A4 - Action 4</li>
+		<li v=241>Var90 - Parametric Value at Risk 90%</li>
+		<li v=242>Var95 - Parametric Value at Risk 95%</li>
+		<li v=243>Var99 - Parametric Value at Risk 99%</li>
+		<li v=244>Var99Pot - Potential on Parametric Value at Risk 99%</li>
+		<li v=245>1YA - One Year Ago</li>
+		<li v=246>1YP - One Year pk %</li>
+		<li v=247>YTD - Year to Date</li>
+		<li v=218>1d - 1 Day Return</li>
+		<li v=219>3d - 3 Day Return</li>
+		<li v=220>5d - 5 day Return</li>
+		<li v=221>8d - 8 day Return</li>
+		<li v=222>13d - 13 day Return</li>
+		<li v=223>21d - 21 day Return</li>
+		<li v=224>42d - 42 day Return</li>
+		<li v=225>63d - 63 day Return</li>
+		<li v=200>#days5% - # Days to reach 5%</li>
+		<li v=201>#days10% - # Days to reach 10%</li>
+		<li v=202>#days15% - # Days to reach 15%</li>
+		<li v=203>#days20% - # Days to reach 20%</li>
+		<li v=204>return5% - associated return >= 5 %</li>
+		<li v=205>return10% - associated return >= 10 %</li>
+		<li v=206>return15% - associated return >= 15 %</li>
+		<li v=207>return20% - associated return >= 20 %</li>
+		<li v=208>Max5% - max days elapsed towards 5%</li>
+		<li v=209>Max10% - max days elapsed towards 10%</li>
+		<li v=210>Max15% - max days elapsed towards 15%</li>
+		<li v=211>Max20% - max days elapsed towards 20%</li>
+		<li v=248>#Sig21A1 - number of A1 signals (offset 21)</li>
+		<li v=249>#Sig42A1 - number of A1 signals (offset 42)</li>
+		<li v=250>#Sig63A1 - number of A1 signals (offset 63)</li>
+		<li v=251>MX5%21A1 - max days to return 5% (offset 21)</li>
+		<li v=252>MX5%42A1 - max days to return 5% (offset 42)</li>
+		<li v=253>MX5%63A1 - max days to return 5% (offset 63)</li>
+		<li v=254>SX5%21A1 - success rate to return 5% (offset 21)</li>
+		<li v=255>SX5%42A1 - success rate to return 5% (offset 42)</li>
+		<li v=256>SX5%63A1 - success rate to return 5% (offset 63)</li>
+		<li v=257>MX10%21A1 - max days to return 10% (offset 21)</li>
+		<li v=258>MX10%42A1 - max days to return 10% (offset 42)</li>
+		<li v=259>MX10%63A1 - max days to return 10% (offset 63)</li>
+		<li v=260>SX10%21A1 - success rate to return 10% (offset 21)</li>
+		<li v=261>SX10%42A1 - success rate to return 10% (offset 42)</li>
+		<li v=262>SX10%63A1 - success rate to return 10% (offset 63)</li>
+		<li v=263>#Sig21A4 - number of A4 signals (offset 21)</li>
+		<li v=264>#Sig42A4 - number of A4 signals (offset 42)</li>
+		<li v=265>#Sig63A4 - number of A4 signals (offset 63)</li>
+		<li v=266>MX5%21A4 - max days to return 5% (offset 21)</li>
+		<li v=267>MX5%63A4 - max days to return 5% (offset 42)</li>
+		<li v=268>MX5%42A4 - max days to return 5% (offset 63)</li>
+		<li v=269>SX5%21A4 - success rate to return 5% (offset 21)</li>
+		<li v=270>SX5%42A4 - success rate to return 5% (offset 42)</li>
+		<li v=271>SX5%63A4 - success rate to return 5% (offset 63)</li>
+		<li v=272>MX10%21A4 - max days to return 10% (offset 21)</li>
+		<li v=273>MX10%42A4 - max days to return 10% (offset 42)</li>
+		<li v=274>MX10%63A4 - max days to return 10% (offset 63)</li>
+		<li v=275>SX10%21A4 - success rate to return 10% (offset 21)</li>
+		<li v=276>SX10%42A4 - success rate to return 10% (offset 42)</li>
+		<li v=277>SX10%63A4 - success rate to return 10% (offset 63)</li>
 
-<li v=286>Sig - Signal</li>
-<li v=285>⟑ - peak or not</li>
-<li v=278>1YPPR - One Year Peak Price</li>
-<li v=279>P10LIMIT - Limit Price level</li>
-<li v=280>P10DELTA - % Away from being a P10 buy</li>
-<li v=281>peak%P₁ₒ - 10th percentile %Peak</li>
-<li v=282>peak%P₅ - 5th percentile %Peak</li>
-<li v=283>last_peak - last peak date</li>
-<li v=284>P₁ₒOrP₅ - 10th or 5th percentile</li>
-<li v=226>RTD - Return to Date</li>
-<li v=227>Streak</li>
-<li v=228>DIR - Streak Direction (up or down)</li>
-<li v=229>Buy - Buy Price level</li>
-<li v=230>BuyDelta - % Away from being a buy</li>
-<li v=231>Sell - Sell Price level</li>
-<li v=232>SellDelta - % Away from being a sell</li>
-<li v=233>FIB</li>
-<li v=234>FIBDIR - direction (up or down)</li>
-<li v=235>BuyFIB - Buy Price Level</li>
-<li v=236>BuyDeltaFIB - % Away from being a buy</li>
-<li v=237>SellFIB - Sell Price Level</li>
-<li v=238>SellDeltaFIB - % Away from being a sell</li>
-<li v=239>Mean - associated average</li>
-<li v=240>STD - Standard Deviation</li>
-<li v=212>A1ESP - Action 1 ESP</li>
-<li v=213>A1 - Action 1</li>
-<li v=214>A1Same</li>
-<li v=215>A1Result</li>
-<li v=216>A4ESP - Action 4 ESP</li>
-<li v=217>A4 - Action 4</li>
-<li v=241>Var90 - Parametric Value at Risk 90%</li>
-<li v=242>Var95 - Parametric Value at Risk 95%</li>
-<li v=243>Var99 - Parametric Value at Risk 99%</li>
-<li v=244>Var99Pot - Potential on Parametric Value at Risk 99%</li>
-<li v=245>1YA - One Year Ago</li>
-<li v=246>1YP - One Year pk %</li>
-<li v=247>YTD - Year to Date</li>
-<li v=218>1d - 1 Day Return</li>
-<li v=219>3d - 3 Day Return</li>
-<li v=220>5d - 5 day Return</li>
-<li v=221>8d - 8 day Return</li>
-<li v=222>13d - 13 day Return</li>
-<li v=223>21d - 21 day Return</li>
-<li v=224>42d - 42 day Return</li>
-<li v=225>63d - 63 day Return</li>
-<li v=200>#days5% - # Days to reach 5%</li>
-<li v=201>#days10% - # Days to reach 10%</li>
-<li v=202>#days15% - # Days to reach 15%</li>
-<li v=203>#days20% - # Days to reach 20%</li>
-<li v=204>return5% - associated return >= 5 %</li>
-<li v=205>return10% - associated return >= 10 %</li>
-<li v=206>return15% - associated return >= 15 %</li>
-<li v=207>return20% - associated return >= 20 %</li>
-<li v=208>Max5% - max days elapsed towards 5%</li>
-<li v=209>Max10% - max days elapsed towards 10%</li>
-<li v=210>Max15% - max days elapsed towards 15%</li>
-<li v=211>Max20% - max days elapsed towards 20%</li>
-<li v=248>#Sig21A1 - number of A1 signals (offset 21)</li>
-<li v=249>#Sig42A1 - number of A1 signals (offset 42)</li>
-<li v=250>#Sig63A1 - number of A1 signals (offset 63)</li>
-<li v=251>MX5%21A1 - max days to return 5% (offset 21)</li>
-<li v=252>MX5%42A1 - max days to return 5% (offset 42)</li>
-<li v=253>MX5%63A1 - max days to return 5% (offset 63)</li>
-<li v=254>SX5%21A1 - success rate to return 5% (offset 21)</li>
-<li v=255>SX5%42A1 - success rate to return 5% (offset 42)</li>
-<li v=256>SX5%63A1 - success rate to return 5% (offset 63)</li>
-<li v=257>MX10%21A1 - max days to return 10% (offset 21)</li>
-<li v=258>MX10%42A1 - max days to return 10% (offset 42)</li>
-<li v=259>MX10%63A1 - max days to return 10% (offset 63)</li>
-<li v=260>SX10%21A1 - success rate to return 10% (offset 21)</li>
-<li v=261>SX10%42A1 - success rate to return 10% (offset 42)</li>
-<li v=262>SX10%63A1 - success rate to return 10% (offset 63)</li>
-<li v=263>#Sig21A4 - number of A4 signals (offset 21)</li>
-<li v=264>#Sig42A4 - number of A4 signals (offset 42)</li>
-<li v=265>#Sig63A4 - number of A4 signals (offset 63)</li>
-<li v=266>MX5%21A4 - max days to return 5% (offset 21)</li>
-<li v=267>MX5%63A4 - max days to return 5% (offset 42)</li>
-<li v=268>MX5%42A4 - max days to return 5% (offset 63)</li>
-<li v=269>SX5%21A4 - success rate to return 5% (offset 21)</li>
-<li v=270>SX5%42A4 - success rate to return 5% (offset 42)</li>
-<li v=271>SX5%63A4 - success rate to return 5% (offset 63)</li>
-<li v=272>MX10%21A4 - max days to return 10% (offset 21)</li>
-<li v=273>MX10%42A4 - max days to return 10% (offset 42)</li>
-<li v=274>MX10%63A4 - max days to return 10% (offset 63)</li>
-<li v=275>SX10%21A4 - success rate to return 10% (offset 21)</li>
-<li v=276>SX10%42A4 - success rate to return 10% (offset 42)</li>
-<li v=277>SX10%63A4 - success rate to return 10% (offset 63)</li>
-
-
+		<!-- Option Screener columns, why are they here? Was there not a separate Screener for Options? -->
 		<li v=500>Contract Name</li>
 		<li v=501>Price</li>
 		<li v=515>Delta</li>
@@ -317,19 +308,33 @@
 		<li v=512>%OTM</li>
 		<li v=513>ND (Net Debit)</li>
 		<li v=514>NDP (Net Debit Percent)</li>
+
+		<!-- mag4?
+		<li v=700>MACD</li>
+		<li v=701>RSI</li>
+		<li v=702>Aroon</li>
+		<li v=703>Stoch</li>
+		<li v=704>BB</li>
+		<li v=705>CCI</li>
+		<li v=706>Keltner</li>-->
+
 		</ul>
 	</div>
+
+	<!-- The Middle space between the right & left column boxes -->
 	<div class=wmid>
 		<button class=wmadd>Add</button>
 		<button class=wmrem>Remove</button>
 		<button class=wmcol onclick=tableColors_onclick()>Colors</button>
 	</div>
+
+	<!-- The Right box of the screener - drag & drop column box destination -->
 	<div class=wdst>
 		<ul id=WDST class="sort">
-			<li t=T v=900>Ticker</li>
-			<li t=P v=901>Price</li>
-			<li t=D v=903>Delta</li>
-			<li t=V v=904>Vol</li>
+			<li n=T v=900>Ticker</li>
+			<li n=P v=901>Price</li>
+			<li n=D v=903>Delta</li>
+			<li n=V v=904>Vol</li>
 		</ul>
 	</div>
 </div>
@@ -403,7 +408,7 @@
 	<img   class=watchtable-del   onclick=watchlist_delstock() title="Delete Stock from Watchlist" src=/img/close.png>-->
 	<span  class=watchtable-save  onclick=watchlist_save()     title="Save Watchlist">💾</span>
 	<!--<span  class=watchtable-theme onclick=CSSEditor()          title="Create your own Table Style"></span>-->
-	<input class=watchtable-input type=text placeholder=Ticker>
+	<input class=watchtable-input title="Hit the ENTER key to add a ticker" type=text placeholder=Ticker>
 </div>
 
 <div class=opmorph style="display:none">

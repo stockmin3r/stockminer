@@ -15,6 +15,7 @@ db/
 
 www/*.pem
 www/key.pem
+!README.md
 !www/video/*
 !www/img/*
 !www/nginx.conf

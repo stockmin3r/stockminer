@@ -152,6 +152,22 @@ function edit_alert(){
 	edit_alert_update(oldPT,watchlist,ticker,td,row);
 }
 
+function getTableCell(tab,row,cname)
+{
+	var found = 0, column = 1; // column Index
+
+	$(tab + " thead th").each(function(){
+		if (this.innerText == cname) {
+			found = 1;
+			return false;
+		}
+		column++;
+	});
+	if (!found)
+		return 0;
+	return $(tab + " tbody td:nth-child(" + column + ")")[row].innerText
+}
+
 function edit_alert_update(oldPT,watchlist,ticker,td,row)
 {
 	var input,newPT,aIdx,a;

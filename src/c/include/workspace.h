@@ -16,6 +16,10 @@
 #define MAX_WEBSOCKETS           8
 #define MAX_OBJ_SIZE             32*1024*1024
 
+#define RPC_QUADVERSE_SWITCH    'Q'
+#define RPC_QUADSPACE_SWITCH    'q'
+#define RPC_WORKSPACE_SWITCH    'w'
+
 #define QUPDATE_GRID            0
 #define QUPDATE_QSP_DEL         1
 #define QUPDATE_WS_DEL          2
@@ -96,7 +100,6 @@
 #define QPAGE_BACKGROUND_SHARK   '5' /* shark   SVG */
 #define QPAGE_BACKGROUND_UNICORN '6' /* unicorn SVG */
 
-#define QUADVERSE_STOCKS          0
 #define QUADVERSE_PROFILE         4
 #define QUADVERSE_ALGO            5
 

@@ -150,7 +150,7 @@
 			"click":"quadspace_load",
 			"noload":"1",
 			"quads":[{
-				"workspace":[{"title": "Tech", "grid":"grid2x2", "obj":[{"chart":"AAPL"},{"chart":"AMZN"},{"chart":"GOOG"},{"chart":"MSFT"}]}]
+				"workspace":[{"title": "Tech", "grid":"grid2x2", "obj":[{"chart":"NVDA"},{"chart":"GOOG"},{"chart":"AAPL"},{"chart":"MSFT"}]}]
 			}]
 		}]
 	},{

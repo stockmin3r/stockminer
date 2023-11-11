@@ -13,9 +13,9 @@ typedef void      (*apc_handler)(struct connection *connection, char **argv);
  * Admin Procedure Calls (APCs)
  */
 struct apc {
-		int         type;        /* APC || LPC */
-        char       *name;        /* name of APC command to type in the terminal shell */
-		apc_handler handler;     /* apc function handler (used by both server and client) */
+	int         type;        /* APC || LPC */
+	char       *name;        /* name of APC command to type in the terminal shell */
+	apc_handler handler;     /* apc function handler (used by both server and client) */
 };
 
 enum {

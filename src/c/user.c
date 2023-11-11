@@ -5,8 +5,6 @@ mutex_t         user_lock;
 struct uhash   *USER_HASHTABLE;
 int             NR_USERS;
 
-static const char *verify_username(char *username, int username_len);
-
 /*
  * Called by db.c::db_thread()::db_engine_file() when a user is created
  * Currently this is a FILE type "database" (db/users.db)
@@ -34,7 +32,6 @@ void db_user_register_cb(struct connection *connection, int result)
 	uhash->session = connection->session;
 	strcpy(uhash->username, connection->session->user->uname);
 	HASH_ADD_STR(USER_HASHTABLE, username, uhash);
-	connection->session->user->logged_in = 1;
 	websocket_send(connection, "regok", 5);
 }
 
@@ -75,11 +72,16 @@ void rpc_user_register(struct rpc *rpc)
 	int                pwdlen     = pwd ? strlen(pwd) : 0;
 	int                usrlen     = usr ? strlen(usr) : 0;
 	struct user       *user;
-	char               pwhash[crypto_pwhash_STRBYTES];
+	char               pwhash[crypto_pwhash_STRBYTES], *p = usr;
 	const char        *error;
 
-	if (unlikely(!usr || !pwd || !pwdlen || !usrlen) || (error=verify_username(usr, usrlen)))
+	if (unlikely(!usr || !pwd || !pwdlen || !usrlen || usrlen >= MAX_USERNAME_SIZE))
 		goto out_error;
+
+	for (int x=0; x<usrlen; x++) {
+		if (!isalnum(*p++))
+			goto out_error;
+	}
 
 	user = session->user;
 	strcpy(user->uname, usr);
@@ -88,6 +90,8 @@ void rpc_user_register(struct rpc *rpc)
 		error = SYSTEM_ERROR;
 		goto out_error;
 	}
+	memset(pwd, 0, pwdlen);
+	user->logged_in = 1;
 	memcpy(user->pwhash, pwhash, crypto_pwhash_STRBYTES);
 
 	// enqueue db task for the db deathloop to add the user
@@ -95,7 +99,7 @@ void rpc_user_register(struct rpc *rpc)
 	return;
 out_error:
 	if (connection)
-		websocket_send(connection, (char *)error, 12);
+		websocket_send(connection, ILLEGAL_USERNAME, 12);
 
 }
 
@@ -145,24 +149,16 @@ unsigned int uid_by_username(char *username)
 	return (user->uid);
 }
 
-static const char *
-verify_username(char *username, int username_len)
+/* user_lock will be locked by caller in db.c */
+bool user_exists(char *username)
 {
-	char *p;
+	struct uhash *uhash = NULL;
+	int rc = true;
 
-	if (username_len > MAX_USERNAME_SIZE)
-		return ILLEGAL_USERNAME;
-
-	if (search_user(username))
-		return USERNAME_EXISTS;
-
-	p = username;
-	for (int x=0; x<username_len; x++) {
-		if (!isalnum(*p))
-			return ILLEGAL_USERNAME;
-		p++;
-	}
-	return NULL;
+	HASH_FIND_STR(USER_HASHTABLE, username, uhash);
+	if (!uhash)
+		rc = false;
+	return (rc);
 }
 
 struct user *search_user(char *username)

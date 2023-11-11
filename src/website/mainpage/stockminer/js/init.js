@@ -35,12 +35,15 @@ function init_websocket(action) {
 
 	if (action != ACTION_RELOAD) {
 		action = ACTION_BOOT;
-		// we're loading the standard mainpage from this server
-		if (path == "/")
+		if (path == "/") {
+			// we're loading the standard mainpage from this server
 			rpc    = quadspace_to_rpc(WEBSITE.QuadVerse[0].QuadSpace);
-		else {
+			// let the server know the QVID of the Profile QuadVerse
+			rpc   += quadverse_profile(WEBSITE.QuadVerse);
+		} else {
+			// we're loading either a builtin QPAGE or a user's QPAGE, eg: stockminer.org/stocks (builtin) OR stockminer.org/myQuadverse (user's QPAGE)
 			action = ACTION_QPAGE;
-			rpc    = path+"/"; // we're loading either a builtin QPAGE or a user's QPAGE, eg: stockminer.org/stocks (builtin) OR stockminer.org/myQuadverse (user's QPAGE)
+			rpc    = path+"/";
 		}
 	} else {
 		// page reload doesn't require any extra information - this is a mess
@@ -109,6 +112,17 @@ function quadspace_to_rpc(quadspace)
 		}
 	}
 	return rpc;
+}
+
+function quadverse_profile(quadverse_array)
+{
+	var quadverse_index = 0;
+	for (quadverse in quadverse_array) {
+		if (quadverse.profile)
+			return "addProfile:" + quadverse_index + "/";
+		quadverse_index++;
+	}
+	return "";
 }
 
 // used by init() and LoadQuadverse(), ancient, a mess
@@ -276,18 +290,6 @@ function init_menu()
 		SIGMON = 1;
 	}
 }
-
-function init_stock_screener(){
-	$(".watchmgr .wsrc li").each(function(){
-		var c    = $(this).attr('v');
-		this.setAttribute("onclick", "boxtick()");
-		WCOL[c]  = $(this).text();
-		WCOL2[c] = $(this).text().split(" ")[0]
-	});
-	$(".showtime .wsrc li").each(function(){this.setAttribute("onclick", "boxtick()")});
-	$(".watchmgr .links").hover(function(){$(".links-menu").css("display","block")})
-}
-
 
 function loadprofile(p,title)
 {

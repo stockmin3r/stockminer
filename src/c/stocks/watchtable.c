@@ -192,21 +192,21 @@ int watchtable_packet(struct session *session, struct watchlist *watchlist, char
 	struct watchstock *watchstock;
 	struct wtab       *wtab;
 	struct stock      *stock;
-	int                nstocks, x, packet_len;
+	int                nstocks, packet_len;
 
-	if (!watchlist->nr_stocks)
+	if (!watchlist->nr_stocks) 
 		return 0;
-	packet_len = sprintf(packet, "table %s [", watchlist->basetable);  // a watchlist is inside a basetable, use the ID of the table which is in T[table_name]
+	packet_len = snprintf(packet, 32, "table %s [", watchlist->basetable);  // a watchlist is inside a basetable, use the ID of the table which is in T[table_name]
 	wtab       = watchlist->wtab;
 	/* Assign default watchtable preset */
 	if (!wtab) {
 		printf(BOLDRED "watchtable packet NULL for watchlist: %s" RESET "\n\n\n\n\n\n", watchlist->name);
 		watchlist->wtab = wtab = default_watchtable_preset();
 	}
-	nstocks     = watchlist->nr_stocks;
+	nstocks = watchlist->nr_stocks;
 	if (verbose)
 		printf("watchtable_packet(): wtab->name: %s watchlist->name %s nstocks: %d wtab->nr_columns: %d\n", wtab->name, watchlist->name, nstocks, wtab->nr_columns);
-	for (x=0; x<nstocks; x++) {
+	for (int x=0; x<nstocks; x++) {
 		watchstock = &watchlist->stocks[x];
 		stock      = watchstock->stock;
 		if (!stock || !stock->mag)
@@ -277,8 +277,7 @@ void rpc_watchtable_columns(struct rpc *rpc)
 	wtab = search_watchtable_preset(session, preset_name, &position);
 	if (!wtab) {
 		new_preset = 1;
-		wtab       = (struct wtab *)malloc(sizeof(*wtab)); // can't be New^Preset
-		memset(wtab, 0, sizeof(*wtab));
+		wtab       = (struct wtab *)zmalloc(sizeof(*wtab)); // can't be New^Preset
 		printf("name: %s not found, allocating new\n", preset_name);
 	} else {
 		if (origin)
@@ -684,7 +683,7 @@ int websocket_watchtable_presets(struct session *session, char *packet)
 		wtab = session->watchtable_presets[x];
 		if (!wtab || wtab->table_type == WATCHTABLE_ROOT)
 			continue;
-		nbytes = sprintf(packet+packet_len, "TPset %s-%s@", wtab->name, wtab->dict);
+		nbytes = snprintf(packet+packet_len, 64, "TPset %s-%s@", wtab->name, wtab->dict);
 		packet_len += nbytes;
 	}
 out:
@@ -812,7 +811,7 @@ void session_load_css(struct session *session)
 
 	if (!session->user || !session->user->logged_in)
 		return;
-	pathlen = sprintf(path, "db/uid/%d/css/", session->user->uid);
+	pathlen = snprintf(path, sizeof(path)-1, "db/uid/%d/css/", session->user->uid);
 	if (!fs_opendir(path, &dirmap))
 		return;
 

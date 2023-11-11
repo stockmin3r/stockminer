@@ -57,7 +57,7 @@ function rpc_set_cookie(av)
 }
 
 function login() {
-	if (USER == localStorage.user) {
+	if (USER && USER == localStorage.user) {
 		QUADVERSE_SWITCH("Profile");
 		return;
 	}
