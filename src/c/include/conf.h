@@ -764,7 +764,7 @@ void           DOUBLE_SORT_HILO        (double array[], int n);
 /* openssl.c */
 void               openssl_init               (void);
 struct ssl_server *openssl_server             (const char *cert, const char *key);
-void               openssl_server_sync        (www_callback_t callback, port_t port, bool create_thread);
+void               openssl_server_sync        (www_callback_t callback, in_addr_t ipaddr, port_t port, bool create_thread);
 bool               openssl_connect_sync       (struct connection *connection, unsigned int ipaddr, unsigned short port);
 packet_size_t      openssl_read_sync          (struct connection *connection, char *buf, packet_size_t packet_size);
 packet_size_t      openssl_read_sync2         (struct connection *connection, char *buf, packet_size_t max_packet_size);

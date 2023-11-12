@@ -104,6 +104,9 @@ void init_config(struct server *server)
 	if (config_get("domain", CONF_TYPE_STR, &domain, NULL))
 		strncpy(server->domain, domain, sizeof(server->domain)-1);
 
+	config_get("http_port",  CONF_TYPE_INT, server->http_port,  NULL);
+	config_get("https_port", CONF_TYPE_INT, server->https_port, NULL);
+
 	return;
 out_error:
 	printf(BOLDRED "config param: (%s:%s) failure", key, val);

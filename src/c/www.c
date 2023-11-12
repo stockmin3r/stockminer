@@ -827,7 +827,11 @@ void *www_http_server_sync(void *args)
  */
 void *www_https_server_sync(void *args)
 {
-	openssl_server_sync(www_process_sync, 443, 1);
+	in_addr_t ipaddr = LOCALHOST;
+
+	if (Server.production)
+		ipaddr = INADDR_ANY;
+	openssl_server_sync(www_process_sync, ipaddr, 443, 1);
 }
 
 /*

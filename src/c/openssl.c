@@ -324,7 +324,7 @@ struct ssl_server *openssl_server(const char *cert, const char *key)
 	return (ssl_server);
 }
 
-void openssl_server_sync(www_callback_t callback, port_t port, bool create_thread)
+void openssl_server_sync(www_callback_t callback, in_addr_t ipaddr, port_t port, bool create_thread)
 {
 	struct sockaddr_in  srv, cli;
 	struct connection  *connection = NULL;
@@ -336,7 +336,7 @@ void openssl_server_sync(www_callback_t callback, port_t port, bool create_threa
 	if (!ssl_server)
 		return;
 
-	server_fd = net_tcp_bind(LOCALHOST, port);
+	server_fd = net_tcp_bind(ipaddr, port);
 	if (server_fd == -1) {
 		printf(BOLDRED "[-] openssl_server_sync(): Failed to bind to port (%d)" RESET "\n", port);
 		return;

@@ -145,7 +145,7 @@ out:
 
 void *netctl_thread(void *args)
 {
-	openssl_server_sync(admin_server_loop, ADMIN_PORT, 1);
+	openssl_server_sync(admin_server_loop, LOCALHOST, ADMIN_PORT, 1);
 	return NULL;
 }
 
