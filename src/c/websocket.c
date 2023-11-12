@@ -192,7 +192,6 @@ void websockets_sendall(struct session *session, char *packet, int packet_len)
 {
 	int x;
 
-	return;
 	for (x=0; x<session->nr_websockets; x++) {
 		struct connection *connection = session->websockets[x];
 		if (!connection || connection->fd == -1)
@@ -209,7 +208,6 @@ void websockets_sendall_except(struct session *session, struct connection *this_
 {
 	int x;
 
-	return;
 	for (x=0; x<session->nr_websockets; x++) {
 		struct connection *connection = session->websockets[x];
 		if (!connection || connection->fd == -1)

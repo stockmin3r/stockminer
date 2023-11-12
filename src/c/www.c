@@ -2,6 +2,8 @@
 #include <extern.h>
 #include <stocks/stocks.h>
 
+#define INIT 0x74696e69
+
 struct website    *WEBSITE;
 struct ssl_server *WWW_SERVER;
 char              *auth_wasm_header;
@@ -10,7 +12,9 @@ uint64_t           stock_data_size;
 int                auth_wasm_size;
 struct rhash      *RPC_HASHTABLE;
 
-static __inline__ int www_reload(struct connection *connection);
+static __inline__ int www_reload   (struct connection *connection);
+static void           www_set_route(struct connection *connection, struct url *url);
+static bool           www_get_route(char *request, struct url *url);
 
 /****************************
 *struct request {
@@ -336,6 +340,63 @@ static __inline__ int get_profile_QVID(struct session *session, char *username)
 	return -1;
 }
 
+
+/* 1) User has no Cookie and has NOT logged in
+ * 2) User has Cookie but has NOT logged in
+ * 3) User has no cookie and has logged in      (must login and get configuration + backpage)
+ * 4) User has Cookie and has logged in         (load the user's default backpage upon websocket creation)
+ */
+int www_websocket_async(char *request, struct connection *connection)
+{
+	struct session *session;
+	struct url      url = {0};
+
+	printf(BOLDWHITE "www_websocket: %.60s" RESET "\n", request);
+
+	/* extract the cookie (if any) and get its session or malloc a new session */
+	if (!(session=session_get(connection, request)))
+		return 0;
+
+	/* Allocate new websocket in a bounded circular array buffer of type socket_t (int) */
+	connection->websocket_id = www_new_websocket(session, connection);
+
+	/* extract the URL segments */
+	if (!www_get_route(request+8, &url))
+		return 0;
+
+	/* Send websocket handshake response */
+	if (!websocket_handshake(connection, request))
+		return 0;
+
+	/* Website Reload */
+	if (url.action == ACTION_RELOAD)
+		return www_reload(connection);
+
+	/* User is uploading an object */
+	if (url.action >= ACTION_UPLOAD_MIN && url.action <= ACTION_UPLOAD_MAX)
+		return websocket_upload_object(session, connection, request+8);
+
+	/* The mainpage's website.json boot RPC */
+	if (url.action == ACTION_BOOT)
+		if (!rpc_boot(request+8, connection))
+			return 0;
+
+	/* pack the user's saved website customization confs into connection->packet */
+	session_set_config(connection);
+
+	/* QPAGE || mainpage */
+	if (url.action == ACTION_QPAGE) {
+		www_set_route(connection, &url); // init qpage (builtin route (eg: /stocks), a user profile or a user quadverse, etc)
+	} else {
+		*(unsigned int *)(connection->packet+connection->packet_size) = INIT; // the string "init" in hex (4 bytes)
+		connection->packet_size += 4;
+	}
+
+	// Send Initial Packet with user settings & init command
+	if (connection->packet_size)
+		websocket_send(connection, connection->packet, connection->packet_size);
+}
+
 /* HTTP GET /user           [profile endpoint] */
 /* HTTP GET /user/quadverse [qpage endpoint]   */
 static bool
@@ -413,8 +474,6 @@ www_route_user(struct connection *connection, struct url *url)
 	return (false);
 }
 
-#define INIT 0x74696e69
-
 static void
 www_set_route(struct connection *connection, struct url *url)
 {
@@ -477,14 +536,14 @@ www_get_route(char *request, struct url *url)
 		*p++ = 0;
 		if (*p == '\0')
 			break;
-		url->segment[x] = p;
+		url->segment[x] = strdup(p);
 		url->nr_segments++;
 	}
 
 	if (url->segment[1]) {
 		if (!strncasecmp(url->segment[1], "stocks/", 6))
 			url->route = URL_ROUTE_STOCKS;
-		if (!strncasecmp(url->segment[1], "options/", 8))
+		else if (!strncasecmp(url->segment[1], "options/", 8))
 			url->route = URL_ROUTE_OPTIONS;
 		else
 			url->route = URL_ROUTE_USER;
@@ -492,62 +551,6 @@ www_get_route(char *request, struct url *url)
 		url->route = URL_ROUTE_ROOT;
 	}
 	return true;
-}
-
-/* 1) User has no Cookie and has NOT logged in
- * 2) User has Cookie but has NOT logged in
- * 3) User has no cookie and has logged in      (must login and get configuration + backpage)
- * 4) User has Cookie and has logged in         (load the user's default backpage upon websocket creation)
- */
-int www_websocket_async(char *request, struct connection *connection)
-{
-	struct session *session;
-	struct url      url = {0};
-
-	printf(BOLDWHITE "www_websocket: %.60s" RESET "\n", request);
-
-	/* extract the cookie (if any) and get its session or malloc a new session */
-	if (!(session=session_get(connection, request)))
-		return 0;
-
-	/* Allocate new websocket in a bounded circular array buffer of type socket_t (int) */
-	connection->websocket_id = www_new_websocket(session, connection);
-
-	/* extract the URL segments */
-	if (!www_get_route(request+8, &url))
-		return 0;
-
-	/* Send websocket handshake response */
-	if (!websocket_handshake(connection, request))
-		return 0;
-
-	/* Website Reload */
-	if (url.action == ACTION_RELOAD)
-		return www_reload(connection);
-
-	/* User is uploading an object */
-	if (url.action >= ACTION_UPLOAD_MIN && url.action <= ACTION_UPLOAD_MAX)
-		return websocket_upload_object(session, connection, request+8);
-
-	/* The mainpage's website.json boot RPC */
-	if (url.action == ACTION_BOOT)
-		if (!rpc_boot(request+8, connection))
-			return 0;
-
-	/* pack the user's saved website customization confs into connection->packet */
-	session_set_config(connection);
-
-	/* QPAGE || mainpage */
-	if (url.action == ACTION_QPAGE) {
-		www_set_route(connection, &url); // init qpage (builtin route (eg: /stocks), a user profile or a user quadverse, etc)
-	} else {
-		*(unsigned int *)(connection->packet+connection->packet_size) = INIT; // the string "init" in hex (4 bytes)
-		connection->packet_size += 4;
-	}
-
-	// Send Initial Packet with user settings & init command
-	if (connection->packet_size)
-		websocket_send(connection, connection->packet, connection->packet_size);
 }
 
 int www_websocket_sync(char *req, struct connection *connection)
@@ -575,7 +578,7 @@ int www_websocket_sync(char *req, struct connection *connection)
 	/* extract the URL segments */
 	if (!www_get_route(req+8, &url))
 		return 0;
-
+	printf("url seg: %s url2: %s\n", url.segment[0], url.segment[1]);
 	/* Send websocket handshake response */
 	if (!websocket_handshake(connection, req))
 		return 0;
@@ -613,6 +616,7 @@ int www_websocket_sync(char *req, struct connection *connection)
 		websocket_send(connection, connection->packet, connection->packet_size);
 	}
 	packet = connection->packet;
+//	printf(BOLDCYAN "%s" RESET "\n", packet);
 	net_socket_nonblock(http_fd);
 	while (1) {
 		FD_ZERO(&rdset);
