@@ -4,10 +4,11 @@
 #define WEBSITE_MAINPAGE 0
 #define WEBSITE_BACKPAGE 1
 
-static bool website_load_pages    (struct page **pages, int nr_pages, int PAGE_CONTAINER_INDEX);
-static void gzip_mainpage         (struct page *mainpage);
-static void website_gzip_mainpage (struct page *mainpage);
-static void free_pages            (struct page *page);
+static bool  website_load_pages    (struct page **pages, int nr_pages, int PAGE_CONTAINER_INDEX);
+static void  gzip_mainpage         (struct page *mainpage);
+static void  website_gzip_mainpage (struct page *mainpage);
+static char *website_set_domain    (char *website, char *domain);
+static void  free_pages            (struct page *page);
 
 #define DEFER               1
 #define JS                  0
@@ -137,7 +138,7 @@ char *build_mainpage(struct server *server)
 			if (script->defer)
 				defer_js[nr_defer_js++] = strdup(buf);
 			else
-				head_js[nr_head_js++]   =  strdup(buf);
+				head_js[nr_head_js++]   = strdup(buf);
 		}
 	}
 
@@ -245,6 +246,8 @@ struct website *build_website(struct server *server)
 		page->json     = fs_mallocfile_str(path, NULL);
 		snprintf(mainpage_json, sizeof(mainpage_json)-1,  "@MAINPAGE_%s", page->filename);
 		mainpage_html  = cstring_inject(mainpage_html, page->json, mainpage_json, NULL);
+		if (server->production)
+			mainpage_html = website_set_domain(mainpage_html, server->domain);
 		page->file     = mainpage_html;
 		page->filesize = strlen(mainpage_html);
 		website_gzip_mainpage(page); // sets HTTP_MAINPAGE header + gzipped content of page->file
@@ -272,6 +275,16 @@ struct website *build_website(struct server *server)
 		page->filesize = strlen(backpage_html);
 		free_pages(page);
 	}
+	return (website);
+}
+
+static char *website_set_domain(char *website, char *domain)
+{
+	char *p;
+
+	while ((p=cstring_inject(website, domain, "localhost", NULL)))
+		website = p;
+
 	return (website);
 }
 

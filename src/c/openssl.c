@@ -173,7 +173,7 @@ EVP_PKEY *openssl_gen_key(int type)
 	return (pkey);
 }
 
-// not working
+// obsolete
 X509 *openssl_gen_cert(EVP_PKEY *pkey)
 {
 	X509 *x509 = X509_new();

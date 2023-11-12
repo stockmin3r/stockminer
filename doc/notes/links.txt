@@ -100,4 +100,4 @@ https://analyticsindiamag.com/cosine-similarity-in-machine-learning/
 https://tivadardanka.com/blog/linear-algebra-in-machine-learning
 https://math.stackexchange.com/questions/317114/what-is-the-purpose-of-subtracting-the-mean-from-data-when-standardizing
 https://machinelearningmastery.com/learning-curves-for-diagnosing-machine-learning-model-performance/
-
+https://www.wwwinsights.com/ai/openai-text-embedding/

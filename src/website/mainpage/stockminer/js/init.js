@@ -49,7 +49,7 @@ function init_websocket(action) {
 		// page reload doesn't require any extra information - this is a mess
 		rpc = "";
 	}
-	url = 'wss://localhost:443/ws/' + action + "/" + rpc + "c=" + (localStorage.cookie?localStorage.cookie:"");
+	url = 'wss://localhost:443/ws/' + action + rpc + "c=" + (localStorage.cookie?localStorage.cookie:"");
 	console.log('init_websocket(): ' + url);
 	WS           = new WebSocket(url);
 	WS.onerror   = function() {WS.close()};
@@ -95,7 +95,7 @@ function init_websocket(action) {
  */
 function quadspace_to_rpc(quadspace)
 {
-	var quads = quadspace[0].quads, rpc = "";
+	var quads = quadspace[0].quads, rpc = "/";
 	for (var QID = 0; QID<quads.length; QID++) {
 		quad = quads[QID];
 		for (var WSID = 0; WSID<quad.workspace.length; WSID++) {

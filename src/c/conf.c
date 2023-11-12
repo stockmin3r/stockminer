@@ -60,6 +60,7 @@ void init_config(struct server *server)
 	char          *config_file_str = alloc_config_file();
 	char          *config_argv[MAX_CONF];
 	char          *key, *val;
+	char          *domain;
 	int            argc, x;
 	int64_t        nr_lines;
 
@@ -99,6 +100,9 @@ void init_config(struct server *server)
 
 	if (config_enabled("async"))
 		server->async = true;
+
+	if (config_get("domain", CONF_TYPE_STR, &domain, NULL))
+		strncpy(server->domain, domain, sizeof(server->domain)-1);
 
 	return;
 out_error:

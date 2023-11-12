@@ -271,6 +271,7 @@ struct server {
 	struct XLS          *XLS;
 	struct watchlist    *Watchlists[256];
 	char                *css_themes[256];
+	char                 domain[256];
 	mutex_t              watchlist_lock;
 	mutex_t              stock_lock;
 	unsigned short       stock_boot;

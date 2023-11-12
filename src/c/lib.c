@@ -532,15 +532,6 @@ char *cstring_inject(char *target, char *payload, char *pattern, int *output_siz
 	return output;
 }
 
-void cstring_strchr_replace(char *str, char replace_char, char to_char)
-{
-	char *p;
-	while ((p=strchr(str, replace_char))) {
-		*p++ = to_char;
-		str  = p;
-	}
-}
-
 void cstring_strstr_replace(char *str, char *pattern)
 {
 	char *p, *endp;
@@ -553,6 +544,15 @@ void cstring_strstr_replace(char *str, char *pattern)
 		str         = p + 1;
 		endp       -= pattern_len;
 		string_len -= pattern_len;
+	}
+}
+
+void cstring_strchr_replace(char *str, char replace_char, char to_char)
+{
+	char *p;
+	while ((p=strchr(str, replace_char))) {
+		*p++ = to_char;
+		str  = p;
 	}
 }
 
