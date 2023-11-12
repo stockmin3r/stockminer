@@ -120,7 +120,7 @@ struct module {
 #define TLS_CLIENT    2
 #define TLS_WEBSOCKET 4
 
-#define URL_ROUTE_INDEX          0  /* / root mainpage */
+#define URL_ROUTE_ROOT           0  /* / root mainpage */
 #define URL_ROUTE_STOCKS         1  /* /stocks/ticker  - loads the stockpage for a ticker */
 #define URL_ROUTE_OPTIONS        2  /* /options/ticker - loads the options QuadVerse */
 #define URL_ROUTE_USER           3  /* a User route eg: /bob (bob's squeak feed) or /bob/crypto (bob's crypto QuadVerse) */

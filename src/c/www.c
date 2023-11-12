@@ -480,14 +480,17 @@ www_get_route(char *request, struct url *url)
 		url->segment[x] = p;
 		url->nr_segments++;
 	}
-	url->route = 0;
 
-	if (!strcasecmp(request, "stocks"))
-		url->route = URL_ROUTE_STOCKS;
-	else if (!strcasecmp(request, "options"))
-		url->route = URL_ROUTE_OPTIONS;
-	else
-		url->route = URL_ROUTE_USER;
+	if (url->segment[1]) {
+		if (!strncasecmp(url->segment[1], "stocks/", 6))
+			url->route = URL_ROUTE_STOCKS;
+		if (!strncasecmp(url->segment[1], "options/", 8))
+			url->route = URL_ROUTE_OPTIONS;
+		else
+			url->route = URL_ROUTE_USER;
+	} else {
+		url->route = URL_ROUTE_ROOT;
+	}
 	return true;
 }
 
@@ -722,7 +725,7 @@ void *www_process_sync(void *args)
 		memset(req, 0, sizeof(req));
 		if (!openssl_read_sync2(connection, req, 1024))
 			goto out;
-		printf(BOLDYELLOW "%.14s" RESET "\n", req);
+		printf(BOLDYELLOW "%.25s" RESET "\n", req);
 		r0 = *(uint64_t *)req;
 		r1 = *(uint32_t *)req;
 		r2 = *(uint32_t *)(req+4);
