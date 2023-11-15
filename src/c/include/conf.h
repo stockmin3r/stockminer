@@ -165,6 +165,7 @@ struct user {
 	char                 cookies[MAX_WEBSOCKETS][COOKIE_SIZE];
 	char                 uname[MAX_USERNAME_SIZE+1];
 	char                 pwhash[crypto_pwhash_STRBYTES];
+	char                 pubkey[44];
 	unsigned int         logged_in;
 	uid_t                uid;
 	uint64_t             config;
@@ -246,6 +247,7 @@ struct rhash {
 struct column_hash {
 	struct column       *column;
 	char                *key_column_str;
+	int                  column_id;
 	UT_hash_handle       hh;
 };
 
@@ -601,8 +603,9 @@ void          www_load_website       (struct server *server);
 void          apc_reload_website     (struct connection *connection, char **argv);
 
 /* auth.c */
-void          admin_client_auth      (char *username, char *password);
-
+void          admin_client_auth      (char *command);
+void          apc_server_auth        (struct connection *connection, char **argv);
+void          lpc_adduser            (struct connection *connection, char **argv);
 
 /* profile.c */
 void              session_load_profile      (struct session *session);

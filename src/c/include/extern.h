@@ -10,6 +10,7 @@ extern struct XLS        *CURRENT_XLS;      // this should be called MARKET or M
 extern struct ihash      *UID_HASHTABLE;
 extern struct chash      *COOKIE_HASHTABLE;
 extern struct www        *WWW_HASHTABLE;
+extern struct connection  apc_connection;
 extern int                NR_USERS;
 
 extern char *test_scripts;

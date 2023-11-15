@@ -71,7 +71,7 @@ int fs_readline(char *s, int fd)
 	int  n, len = 0;
 	char c      = 0;
 
-    while (1) {
+	while (1) {
 		n = read(fd, &c, 1);
 		if (n <= 0)
 			return -1;

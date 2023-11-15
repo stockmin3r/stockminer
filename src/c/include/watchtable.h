@@ -25,6 +25,7 @@ struct column {
 	char           *column_name_str;
 	char           *column_fmt_str;
 	int             column_class;
+	int             column_id;
 	column_cb       cb;
 	UT_hash_handle  hh;
 };

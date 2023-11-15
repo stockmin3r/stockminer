@@ -65,6 +65,7 @@ struct request rpc_requests[] = {
 	{ "ufomega",             rpc_ufo_megachart,          2, 2, ARGS_TYPE_ARGV},
 
 	/* Watchlists & Watchtables */
+	{ "watchtable",          rpc_watchtable_columns,     5, 5, ARGS_TYPE_ARGV},
 	{ "watchlist_addstocks", rpc_watchtable_addstocks,   2, 3, ARGS_TYPE_ARGV},
 	{ "watchlist_save",      rpc_watchlist_save,         2, 2, ARGS_TYPE_ARGV},
 	{ "watchlist_delstock",  rpc_watchlist_delstock,     2, 2, ARGS_TYPE_ARGV},
@@ -84,7 +85,6 @@ struct request rpc_requests[] = {
 	{ "alerts_del",          rpc_remove_alert,           2, 2, ARGS_TYPE_ARGV},
 
 	/* Tables, Styles */
-	{ "watchtable",          rpc_watchtable_columns,     4, 4, ARGS_TYPE_ARGV},
 	{ "css",                 rpc_css,                    2, 2, ARGS_TYPE_JSON},
 	{ "deftab",              rpc_define_table,           2, 2, ARGS_TYPE_JSON},
 	{ "wget",                rpc_wget_table,             3, 3, ARGS_TYPE_ARGV},

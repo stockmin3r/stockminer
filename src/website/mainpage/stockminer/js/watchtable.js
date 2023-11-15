@@ -282,7 +282,7 @@ function colmod(screener, watchtable_id, preset_name, d, save) {
 
 		wsave = $(".wsave", screener)[0];
 		if (save==1 || save==2) {
-			WS.send("watchtable " + d + " " + preset_name + " " + $(".wdst li", screener).length);
+			WS.send("watchtable " + watchtable_id + " " + d + " " + preset_name + " " + $(".wdst li", screener).length);
 			wsave.style.color = save==1 ? "limegreen" : "green";
 			wsave.innerText   = save==1 ? "Save"      : "Saved";
 			if (save==2) {

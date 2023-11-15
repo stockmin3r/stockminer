@@ -104,8 +104,8 @@ void init_config(struct server *server)
 	if (config_get("domain", CONF_TYPE_STR, &domain, NULL))
 		strncpy(server->domain, domain, sizeof(server->domain)-1);
 
-	config_get("http_port",  CONF_TYPE_INT, server->http_port,  NULL);
-	config_get("https_port", CONF_TYPE_INT, server->https_port, NULL);
+	config_get("http_port",  CONF_TYPE_INT, NULL, (uint64_t *)&server->http_port);
+	config_get("https_port", CONF_TYPE_INT, NULL, (uint64_t *)&server->https_port);
 
 	return;
 out_error:

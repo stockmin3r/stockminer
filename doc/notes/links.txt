@@ -95,6 +95,7 @@ https://github.com/yardenshafir/IoRing_Demos/blob/main/IoRingPerf/IoRingPerf/Sou
 https://yuukidach.github.io/p/makefile-for-projects-with-subdirectories/
 
 [ai]
+https://github.com/PacktPublishing/Machine-Learning-for-Algorithmic-Trading-Second-Edition
 https://lightning.ai/blog/scaling-large-language-models-with-pytorch-lightning/ # Distributed Llama modelling
 https://analyticsindiamag.com/cosine-similarity-in-machine-learning/
 https://tivadardanka.com/blog/linear-algebra-in-machine-learning

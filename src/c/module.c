@@ -71,6 +71,7 @@ __MODULE_HOOK stocks_session_alloc(struct session *session)
 	wtab = (struct wtab *)zmalloc(sizeof(*wtab));
 	wtab->colmap[0]  = 900; wtab->colmap[1]  = 901;
 	wtab->colmap[2]  = 903; wtab->colmap[3]  = 904;
+	wtab->nr_columns = 4;
 	wtab->table_type = WATCHTABLE_ROOT;
 	session->nr_watchtable_presets = 1;
 	session->watchtable_presets[0] = wtab;
@@ -81,6 +82,7 @@ __MODULE_HOOK stocks_session_alloc(struct session *session)
 __MODULE_HOOK stocks_main_pre_loop(struct server *server)
 {
 	market = get_time();
+	init_watchtable();
 	init_candles(server);
 	init_ranks(server->XLS);
 }

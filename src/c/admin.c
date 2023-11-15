@@ -14,13 +14,15 @@ static struct apc apc_commands[] = {
 	{ APC, "reload",      apc_reload_website}, // Instructs Server to reload src/website
 	{ APC, "ebuild",      apc_ebuild_stocks }, // Instructs Server to rebuild earnings .e binary files from .earn txt files
 	{ APC, "options",     lpc_options       }, // Terminal Procedure Call (alters the admin prompt for Stock Options specific commands)
+	{ APC, "auth",        apc_server_auth   }, // server admin auth entry point
+	{ LPC, "adduser",     lpc_adduser       }, // add user to db/users.db
 	{ LPC, "help",        lpc_help          }, // Local Procedure Call: calls lpc_help()
 	{ LPC, "users",       lpc_users         }, // List users from the database (Currently just a file)
 	{ LPC, "exit",        lpc_exit          }  // exit();
 };
 static unsigned int NR_APC_COMMANDS = sizeof(apc_commands)/sizeof(struct apc);
 
-static struct connection apc_connection;       // persistant client openssl connection to the server
+struct connection apc_connection;       // persistant client openssl connection to the server
 
 /*
  * Admin Procedure Call (commands & results are now strings to keep it simple)
@@ -75,6 +77,12 @@ void apc_exec(char *command)
 	char  *argv[MAX_APC_ARGV] = {0};
 	char  *args;
 
+	/* Auth Command is handled differently, see auth.c */
+	if (!strncmp(command, "auth", 4)) {
+		admin_client_auth(command);
+		return;
+	}
+
 	if (!(apc=search_apc(command))) {
 		printf("\n[-] no such command\n");
 		return;
@@ -87,12 +95,6 @@ void apc_exec(char *command)
 			command = args + 1;
 		cstring_split(command, argv, MAX_APC_ARGV, ' ');
 		apc->handler(NULL, argv);
-		return;
-	}
-
-	/* Auth Command is handled differently, see auth.c */
-	if (!strcmp(apc->name, "auth")) {
-		admin_client_auth(argv[0], argv[1]);
 		return;
 	}
 
@@ -125,17 +127,21 @@ void *admin_server_loop(void *args)
 
 	while (1) {
 		memset(argv, 0, sizeof(argv));
+		printf(BOLDRED "call read" RESET "\n");
 		packet_size = openssl_read_sync2(connection, packet, sizeof(packet)-1);
+		printf("packet_size: %d\n", packet_size);
 		if (!packet_size || packet_size >= sizeof(packet)-1)
 			goto out;
-
+int argc;
 		if ((args=strchr(packet, ' ')))
-			cstring_split(args+1, argv, MAX_APC_ARGV-1, ' ');
-
+			argc =cstring_split(args+1, argv, MAX_APC_ARGV-1, ' ');
+		else
+			argv[0] = packet;
+printf("argc: %d\n", argc);
 		/* Remote Procedure Calls (APC) */
 		if (!(apc=search_apc(packet)))
 			continue;
-	
+
 		if (apc->type == APC)
 			apc->handler(connection, argv);
 	}
