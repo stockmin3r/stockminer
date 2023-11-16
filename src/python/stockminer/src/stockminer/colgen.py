@@ -1,25 +1,21 @@
 import Stockdata
 import pdb
-from Stockdata import Stockdata
-from Stockdata import Analysis
-import datetime
-from datetime import date
-import pandas as pd
 import time
 import sys
-
-import requests
-import concurrent.futures
-import cProfile,pstats
 import os
+import datetime
+import requests
+import pandas as pd
+import concurrent.futures
+from Stockdata import Stockdata
+from Stockdata import Analysis
+from datetime import date
 
 #python_src_path=os.path.dirname(os.path.realpath(__file__))
 #python_lib_path=python_src_path+"/../stockminer"
 #sys.path.append(python_lib_path);
 import stockminer
 #config=stockminer.init(python_src_path)
-
-#t1 = time.perf_counter()
 
 def process(ticker,config):
 	stock = Analysis(ticker,config['csv_path'],config['colgen_path'])
@@ -77,34 +73,14 @@ def process(ticker,config):
 	stock.printxls()
 
 def main():
-	print("LKJSDLFKJ")
-	open("asdf.txt", "a")
 	config = stockminer.init()
 	ticker_lists = config['ticker_lists']
 	for ticker_list in ticker_lists:
 		for ticker in ticker_list:
-			print(ticker)
 			try:
 				process(ticker,config)
 			except:
-				print(ticker + " failed")
+				pass
 
 if __name__ == "__main__":
 	main()
-
-#def main(i):
-#    ticks = stockminer.ticker_list[i]
-#    for t in ticks:
-#        try:
-#            process(t)
-#        except:
-#            print(t + " failed");
-#profiler = cProfile.Profile()
-#profiler.enable()
-#if int(sys.argv[1]) == -1:
-#    process(sys.argv[2])
-#else:
-#    main(int(sys.argv[1]))
-#profiler.disable()
-#stats = pstats.Stats(profiler).sort_stats('cumtime')
-#stats.print_stats()

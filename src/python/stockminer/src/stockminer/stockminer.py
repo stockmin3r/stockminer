@@ -69,7 +69,6 @@ def load_tickers(path) -> list:
 		nr_python_threads  = int(config['nr_python_threads'])
 	config['ticker_list']  = ticker_list
 	config['ticker_lists'] = np.array_split(ticker_list, nr_python_threads)
-	print ("nr threads " + str(nr_python_threads))
 
 def init() -> dict:
 	path = os.path.dirname(os.path.realpath(__file__))
@@ -90,15 +89,10 @@ def stockminer_colgen():
 	pyfile = config['__file__'] + "/colgen.py"
 	for x in range(int(config['nr_python_threads'])):
 		procs.append(subprocess.Popen(["python3", pyfile, str(x)], close_fds=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
-#	for proc in procs:
-#		for line in iter(proc.stdout.readline,''):
-#		   print (line.rstrip())
-	[p.wait() for p in procs]
 
 if __name__ == "__main__":
 	if "__file__" not in locals():
 		__file__ = "/stockmkiner/src/python/stockminer/src/"
-	print(os.path.dirname(os.path.realpath(__file__))+ "/../../../../data/stocks/STOCKS.TXT")
 	init()
 	if (sys.argv[1] == "yahoo"):
 		yahoo.stockminer_yahoo(sys.argv[2:],config)

@@ -9,10 +9,14 @@ stockminer
 *.so
 *.py[cod]
 deps/
-build/
+build/*
 db/
+*.f
+*.fs
+*.e
+*.edates
 
-
+!build/
 www/*.pem
 www/key.pem
 !README.md
