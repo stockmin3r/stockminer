@@ -19,7 +19,7 @@ struct stock;
 struct column;
 struct column_value;
 
-typedef void (*column_cb) (struct column_value *cvalue);
+typedef void (*column_cb) (struct column_value *cvalue, int column_id);
 
 struct column {
 	char           *column_name_str;

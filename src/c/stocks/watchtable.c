@@ -13,9 +13,9 @@ struct column_hash *COLUMN_HASHTABLE_INT;
 
 struct wfunction wftable[1000];
 
-static void stock_get_common      (struct column_value *cvalue);
-static void stock_get_trend       (struct column_value *cvalue);
-static void stock_get_fundamentals(struct column_value *cvalue);
+static void stock_get_common      (struct column_value *cvalue, int column_id);
+static void stock_get_trend       (struct column_value *cvalue, int column_id);
+static void stock_get_fundamentals(struct column_value *cvalue, int column_id);
 
 struct column_value {
 	struct stock   *stock;        /* [INPUT]  stock pointer */
@@ -45,77 +45,73 @@ struct column_value {
 };
 
 struct column builtin_columns[] = {
-	{ "T",           "\"T\":\"%s\"",           COLUMN_CLASS_STOCKS_COMMON, COL_SYMBOL    },
-	{ "P",           "\"P\":\"%.2f\"",         COLUMN_CLASS_STOCKS_COMMON, COL_PRICE     },
-	{ "V",           "\"V\":\"%s\"",           COLUMN_CLASS_STOCKS_COMMON, COL_VOLUME    },
-	{ "O",           "\"O\":\"%s\"",           COLUMN_CLASS_STOCKS_COMMON, COL_OPEN      },
-	{ "H",           "\"H\":\"%s\"",           COLUMN_CLASS_STOCKS_COMMON, COL_HIGH      },
-	{ "L",           "\"L\":\"%s\"",           COLUMN_CLASS_STOCKS_COMMON, COL_LOW       },
-	{ "D",           "\"D\":\"%s\"",           COLUMN_CLASS_STOCKS_COMMON, COL_DELTA     },
-	{ "d",           "\"d\":\"%s\"",           COLUMN_CLASS_STOCKS_COMMON, COL_DATE      },
-	{ "R",           "\"R\":\"%s\"",           COLUMN_CLASS_STOCKS_COMMON, COL_RANK      },
-	{ "PC",          "\"PC\":\"%s\"",          COLUMN_CLASS_STOCKS_COMMON, COL_PC        },
-	{ "OP",          "\"OP\":\"%s\"",          COLUMN_CLASS_STOCKS_COMMON, COL_OP        },
-	{ "HP",          "\"HP\":\"%s\"",          COLUMN_CLASS_STOCKS_COMMON, COL_HP        },
-	{ "LP",          "\"LP\":\"%s\"",          COLUMN_CLASS_STOCKS_COMMON, COL_LP        },
+	{ "T",           "\"T\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_SYMBOL    },
+	{ "P",           "\"P\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_PRICE     },
+	{ "V",           "\"V\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_VOLUME    },
+	{ "O",           "\"O\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_OPEN      },
+	{ "H",           "\"H\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_HIGH      },
+	{ "L",           "\"L\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_LOW       },
+	{ "D",           "\"D\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_DELTA     },
+	{ "d",           "\"d\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_DATE      },
+	{ "R",           "\"R\":\"%d\",",           COLUMN_CLASS_STOCKS_COMMON, COL_RANK      },
+	{ "PC",          "\"PC\":\"%.2f\",",        COLUMN_CLASS_STOCKS_COMMON, COL_PC        },
+	{ "OP",          "\"OP\":\"%.2f\",",        COLUMN_CLASS_STOCKS_COMMON, COL_OP        },
+	{ "HP",          "\"HP\":\"%.2f\",",        COLUMN_CLASS_STOCKS_COMMON, COL_HP        },
+	{ "LP",          "\"LP\":\"%.2f\",",        COLUMN_CLASS_STOCKS_COMMON, COL_LP        },
 	/* Trend */
-	{ "PK",          "\"PK\":\"%s\"",          COLUMN_CLASS_STOCKS_TREND,  COL_PK        },
-	{ "PKP",         "\"PKP\":\"%s\"",         COLUMN_CLASS_STOCKS_TREND,  COL_PKP       },
-	{ "NDUP",        "\"NDUP\":\"%s\"",        COLUMN_CLASS_STOCKS_TREND,  COL_NDUP      },
-	{ "NDDW",        "\"NDDW\":\"%s\"",        COLUMN_CLASS_STOCKS_TREND,  COL_NDDW      },
-	{ "NWUP",        "\"NWUP\":\"%s\"",        COLUMN_CLASS_STOCKS_TREND,  COL_NWUP      },
-	{ "NWDW",        "\"NWDW\":\"%s\"",        COLUMN_CLASS_STOCKS_TREND,  COL_NWDW      },
-	{ "BIX",         "\"BIX\":\"%s\"",         COLUMN_CLASS_STOCKS_TREND,  COL_BIX       },
-	{ "5AD21Q1",     "\"5AD21Q1\":\"%.2f\"",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q1   },
-	{ "5AD21Q2",     "\"5AD21Q2\":\"%.2f\"",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q2   },
-	{ "5AD20Q1",     "\"5AD20Q1\":\"%.2f\"",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q1   },
-	{ "5AD20Q2",     "\"5AD20Q2\":\"%.2f\"",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q2   },
-	{ "5AD19Q1",     "\"5AD19Q1\":\"%.2f\"",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q1   },
-	{ "5AD19Q2",     "\"5AD19Q2\":\"%.2f\"",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q2   },
-	{ "10AD21Q1",    "\"10AD21Q1\":\"%.2f\"",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q1  },
-	{ "10AD21Q2",    "\"10AD21Q2\":\"%.2f\"",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q2  },
-	{ "10AD20Q1",    "\"10AD20Q1\":\"%.2f\"",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q1  },
-	{ "10AD20Q2",    "\"10AD20Q2\":\"%.2f\"",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q2  },
-	{ "10AD19Q1",    "\"10AD19Q1\":\"%.2f\"",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q1  },
-	{ "10AD19Q2",    "\"10AD19Q2\":\"%.2f\"",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q2  },
-	{ "5AD21",       "\"5AD21\":\"%.2f\"",     COLUMN_CLASS_STOCKS_TREND,  COL_5AD21     },
-	{ "5AD20",       "\"5AD20\":\"%.2f\"",     COLUMN_CLASS_STOCKS_TREND,  COL_5AD20     },
-	{ "5AD19",       "\"5AD19\":\"%.2f\"",     COLUMN_CLASS_STOCKS_TREND,  COL_5AD19     },
-	{ "10AD21",      "\"10AD21\":\"%.2f\"",    COLUMN_CLASS_STOCKS_TREND,  COL_10AD21    },
-	{ "10AD20",      "\"10AD20\":\"%.2f\"",    COLUMN_CLASS_STOCKS_TREND,  COL_10AD20    },
-	{ "10AD19",      "\"10AD19\":\"%.2f\"",    COLUMN_CLASS_STOCKS_TREND,  COL_10AD19    },
+	{ "PK",          "\"PK\":\"%.2f\",",        COLUMN_CLASS_STOCKS_TREND,  COL_PK        },
+	{ "PKP",         "\"PKP\":\"%.2f\",",       COLUMN_CLASS_STOCKS_TREND,  COL_PKP       },
+	{ "NDUP",        "\"NDUP\":\"%d\",",        COLUMN_CLASS_STOCKS_TREND,  COL_NDUP      },
+	{ "NDDW",        "\"NDDW\":\"%d\",",        COLUMN_CLASS_STOCKS_TREND,  COL_NDDW      },
+	{ "NWUP",        "\"NWUP\":\"%d\",",        COLUMN_CLASS_STOCKS_TREND,  COL_NWUP      },
+	{ "NWDW",        "\"NWDW\":\"%d\",",        COLUMN_CLASS_STOCKS_TREND,  COL_NWDW      },
+	{ "BIX",         "\"BIX\":\"%.2f\",",       COLUMN_CLASS_STOCKS_TREND,  COL_BIX       },
+	{ "5AD21Q1",     "\"5AD21Q1\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q1   },
+	{ "5AD21Q2",     "\"5AD21Q2\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q2   },
+	{ "5AD20Q1",     "\"5AD20Q1\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q1   },
+	{ "5AD20Q2",     "\"5AD20Q2\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q2   },
+	{ "5AD19Q1",     "\"5AD19Q1\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q1   },
+	{ "5AD19Q2",     "\"5AD19Q2\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q2   },
+	{ "10AD21Q1",    "\"10AD21Q1\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q1  },
+	{ "10AD21Q2",    "\"10AD21Q2\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q2  },
+	{ "10AD20Q1",    "\"10AD20Q1\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q1  },
+	{ "10AD20Q2",    "\"10AD20Q2\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q2  },
+	{ "10AD19Q1",    "\"10AD19Q1\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q1  },
+	{ "10AD19Q2",    "\"10AD19Q2\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q2  },
+	{ "5AD21",       "\"5AD21\":\"%.2f\",",     COLUMN_CLASS_STOCKS_TREND,  COL_5AD21     },
+	{ "5AD20",       "\"5AD20\":\"%.2f\",",     COLUMN_CLASS_STOCKS_TREND,  COL_5AD20     },
+	{ "5AD19",       "\"5AD19\":\"%.2f\",",     COLUMN_CLASS_STOCKS_TREND,  COL_5AD19     },
+	{ "10AD21",      "\"10AD21\":\"%.2f\",",    COLUMN_CLASS_STOCKS_TREND,  COL_10AD21    },
+	{ "10AD20",      "\"10AD20\":\"%.2f\",",    COLUMN_CLASS_STOCKS_TREND,  COL_10AD20    },
+	{ "10AD19",      "\"10AD19\":\"%.2f\",",    COLUMN_CLASS_STOCKS_TREND,  COL_10AD19    },
 	/* Fundamentals */
-	{ "fED",        "\"fED\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_ED        },
-	{ "fEDOFF",     "\"fEDOFF\":\"%d\"",       COLUMN_CLASS_STOCKS_FUND,   COL_EDOFF     },
-	{ "fSEC",       "\"fSEC\":\"%s\"",         COLUMN_CLASS_STOCKS_FUND,   COL_SEC       },
-	{ "fDY",        "\"fDY\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_DY        },
-	{ "fDIV",       "\"fDIV\":\"%s\"",         COLUMN_CLASS_STOCKS_FUND,   COL_DIV       },
-	{ "fXD",        "\"fXD\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_XD        },
-	{ "fAR",        "\"fAR\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_AR        },
-	{ "fEPS",       "\"fEPS\":\"%.2f\"",       COLUMN_CLASS_STOCKS_FUND,   COL_EPS       },
-	{ "fMCP",       "\"fMCP\":\"%s\"",         COLUMN_CLASS_STOCKS_FUND,   COL_MCP       },
-	{ "fPEG",       "\"fPEG\":\"%s\"",         COLUMN_CLASS_STOCKS_FUND,   COL_PEG       },
-	{ "fPBR",       "\"fPBR\":\"%s\"",         COLUMN_CLASS_STOCKS_FUND,   COL_PBR       },
-	{ "fPM",        "\"fPM\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_PM        },
-	{ "fROA",       "\"fROA\":\"%s\"",         COLUMN_CLASS_STOCKS_FUND,   COL_ROA       }
+	{ "fED",        "\"fED\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_ED        },
+	{ "fEDOFF",     "\"fEDOFF\":\"%d\"",        COLUMN_CLASS_STOCKS_FUND,   COL_EDOFF     },
+	{ "fSEC",       "\"fSEC\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_SEC       },
+	{ "fDY",        "\"fDY\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_DY        },
+	{ "fDIV",       "\"fDIV\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_DIV       },
+	{ "fXD",        "\"fXD\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_XD        },
+	{ "fAR",        "\"fAR\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_AR        },
+	{ "fEPS",       "\"fEPS\":\"%.2f\"",        COLUMN_CLASS_STOCKS_FUND,   COL_EPS       },
+	{ "fMCP",       "\"fMCP\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_MCP       },
+	{ "fPEG",       "\"fPEG\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_PEG       },
+	{ "fPBR",       "\"fPBR\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_PBR       },
+	{ "fPM",        "\"fPM\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_PM        },
+	{ "fROA",       "\"fROA\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_ROA       }
 };
 
 
 void init_watchtable()
 {
-	char *column_name_str;
 	int   column_name_int, column_id;
 
 	for (int x=0; x<NR_BUILTIN_COLUMNS; x++) {
 		struct column      *column = (struct column *)zmalloc(sizeof(*column));
 		struct column_hash *chash  = (struct column_hash *)zmalloc(sizeof(*chash));
 
-		chash->key_column_str = builtin_columns[x].column_name_str;
 		chash->column         = column;
+		chash->column_id      = builtin_columns[x].column_id;
 		memcpy(column, &builtin_columns[x], sizeof(*column));
-		column_name_str       = builtin_columns[x].column_name_str;
-		column_id             = builtin_columns[x].column_id;
-//		HASH_ADD_STR(COLUMN_HASHTABLE,     column_name_str, chash);
 		HASH_ADD_INT(COLUMN_HASHTABLE_INT, column_id,       chash);
 		switch(column->column_class) {
 			case COLUMN_CLASS_STOCKS_COMMON:
@@ -156,37 +152,54 @@ int column_sprintf(struct session *session, struct watchlist *watchlist, struct 
 	cvalue.m4         = (stock->mag4 ? &stock->mag4[nr_entries-entry] : NULL);
 
 	*(packet+packet_len) = '{';
-	packet_len += 1;
-
+	packet_len  += 1;
+	cvalue.stock = stock;
 	for (int x = 0; x<wtab->nr_columns; x++) {
 		struct column_hash *chash = NULL;
 
-/*		// ignore malformed dicts [1]
-		if (*(p+1) == '\0' || *(p+2) == '\0')
-			return 0;
-
-		// ignore malformed dicts [2]
-		p2 = strchr(p+2, '\\');
-		if (!p2)
-			return 0;
-		column_str = p+2;
-
-		HASH_FIND_STR(COLUMN_HASHTABLE, column_str, chash);
-		if (!chash)
-			return 0;*/
 		column_id = wtab->colmap[x];
 		HASH_FIND_INT(COLUMN_HASHTABLE_INT, &column_id, chash);
 		if (!chash)
 			return 0;
 		column      = chash->column;
-		column->cb(&cvalue);
-		nbytes      = snprintf(packet+packet_len, 256, column->column_fmt_str, cvalue.value);
+		column->cb(&cvalue, column_id);
+		switch (cvalue.value_type) {
+			case VALUE_TYPE_STR:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (char *)cvalue.value.str);
+				break;
+			case VALUE_TYPE_DOUBLE:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (double)cvalue.value.DOUBLE);
+				break;
+			case VALUE_TYPE_INT64:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (int64_t)cvalue.value.int64);
+				break;
+			case VALUE_TYPE_UINT64:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (uint64_t)cvalue.value.uint64);
+				break;
+			case VALUE_TYPE_INT32:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (int)cvalue.value.int32);
+				break;
+			case VALUE_TYPE_UINT32:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (unsigned int)cvalue.value.uint32);
+				break;
+			case VALUE_TYPE_INT16:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (short)cvalue.value.int16);
+				break;
+			case VALUE_TYPE_UINT16:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (unsigned short)cvalue.value.uint16);
+				break;
+			case VALUE_TYPE_INT8:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (char)cvalue.value.int8);
+				break;
+			case VALUE_TYPE_UINT8:
+				nbytes = snprintf(packet+packet_len, 256, column->column_fmt_str, (unsigned char)cvalue.value.uint8);
+				break;
+		}
 		packet_len += nbytes;
-		nbytes      = 0;
-		*p2++       = 0;
-		curdict     = p2;
 	}
 	*(packet+packet_len-1) = '}';
+	packet[packet_len] = 0;
+	printf("packet: %s\n", packet);
 	return (packet_len);
 }
 
@@ -195,10 +208,11 @@ int watchtable_packet(struct session *session, struct watchlist *watchlist, char
 	struct watchstock *watchstock;
 	struct wtab       *wtab;
 	struct stock      *stock;
-	int                nstocks, packet_len;
+	int                nr_stocks, packet_len;
 
 	if (!watchlist->nr_stocks) 
 		return 0;
+
 	packet_len = snprintf(packet, 32, "table %s [", watchlist->basetable);  // a watchlist is inside a basetable, use the ID of the table which is in T[table_name]
 	wtab       = watchlist->wtab;
 	/* Assign default watchtable preset */
@@ -206,20 +220,20 @@ int watchtable_packet(struct session *session, struct watchlist *watchlist, char
 		printf(BOLDRED "watchtable packet NULL for watchlist: %s" RESET "\n\n\n\n\n\n", watchlist->name);
 		watchlist->wtab = wtab = default_watchtable_preset();
 	}
-	nstocks = watchlist->nr_stocks;
-	if (verbose)
-		printf("watchtable_packet(): wtab->name: %s watchlist->name %s nstocks: %d wtab->nr_columns: %d\n", wtab->name, watchlist->name, nstocks, wtab->nr_columns);
-	for (int x=0; x<nstocks; x++) {
+	nr_stocks = watchlist->nr_stocks;
+	printf("watchtable_packet(): wtab->name: %s watchlist->name %s nstocks: %d wtab->nr_columns: %d packet: %s (%p) plen: %d\n", wtab->name, watchlist->name, nr_stocks, wtab->nr_columns, packet, packet, packet_len);
+	for (int x=0; x<nr_stocks; x++) {
 		watchstock = &watchlist->stocks[x];
 		stock      = watchstock->stock;
 		if (!stock || !stock->mag)
 			continue;
 		packet_len = column_sprintf(session, watchlist, stock, wtab, packet, packet_len, 0);
-		if (x == (nstocks-1))
+		printf(BOLDYELLOW "packet: %s packet_len: %d" RESET "\n", packet, packet_len);
+		if (x == (nr_stocks-1))
 			*(packet+packet_len++) = ']';
 		else
 			*(packet+packet_len++) = ',';
-	} // NSTOCKS
+	}
 	packet[packet_len] = 0;
 	if (verbose)
 		printf(BOLDWHITE "%s" RESET "\n", packet);
@@ -345,14 +359,14 @@ out:
 }
 
 static void
-stock_get_common(struct column_value *cvalue)
+stock_get_common(struct column_value *cvalue, int column_id)
 {
 	struct stock *stock      = cvalue->stock;
 	struct mag   *mag        = stock->mag;
 	int           nr_entries = cvalue->nr_entries;
 	int           entry      = cvalue->entry;
 
-	switch (cvalue->column_def) {
+	switch (column_id) {
 		case COL_SYMBOL:
 			cvalue->value.str    = stock->sym;
 			cvalue->value_type   = VALUE_TYPE_STR;
@@ -367,10 +381,11 @@ stock_get_common(struct column_value *cvalue)
 			break;
 		case COL_VOLUME:
 			cvalue->value.str    = get_stock_volume(stock, entry, nr_entries, cvalue->vstr);
-			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			cvalue->value_type   = VALUE_TYPE_STR;
 			break;
 		case COL_DELTA:
 			cvalue->value.DOUBLE = get_stock_delta(stock, entry, nr_entries);
+			printf(BOLDCYAN "COL DELTA: %.2f" RESET "\n", cvalue->value.DOUBLE);
 			cvalue->value_type   = VALUE_TYPE_DOUBLE;
 			break;
 		case COL_OPEN:
@@ -405,14 +420,14 @@ stock_get_common(struct column_value *cvalue)
 }
 
 static void
-stock_get_trend(struct column_value *cvalue)
+stock_get_trend(struct column_value *cvalue, int column_id)
 {
 	struct stock *stock      = cvalue->stock;
 	struct mag   *mag        = cvalue->mag;
 	int           nr_entries = cvalue->nr_entries;
 	int           entry      = cvalue->entry;
 
-	switch (cvalue->column_def) {
+	switch (column_id) {
 		case COL_RANK:
 			cvalue->value.int32 = date_to_rank(stock, mag->date[nr_entries-entry]);
 			cvalue->value_type   = VALUE_TYPE_INT32;
@@ -528,13 +543,13 @@ stock_get_trend(struct column_value *cvalue)
 }
 
 static void
-stock_get_fundamentals(struct column_value *cvalue)
+stock_get_fundamentals(struct column_value *cvalue, int column_id)
 {
 	struct stock *stock      = cvalue->stock;
 	int           nr_entries = cvalue->nr_entries;
 	int           entry      = cvalue->entry;
 
-	switch (cvalue->column_def) {
+	switch (column_id) {
 		case COL_ED:
 			cvalue->value.str    = "XX";
 			cvalue->value_type   = VALUE_TYPE_STR;

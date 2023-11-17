@@ -237,7 +237,7 @@ void rpc_watchtable_addstocks(struct rpc *rpc)
 
 //	if (watchtable->origin)
 //		watchtable = watchtable->origin;
-	printf("nr_stocks; %d argc: %d\n", nr_stocks, argc);
+	printf("nr_stocks; %d\n", nr_stocks);
 	for (int x=0; x<nr_stocks; x++)
 		if (watchtable_add(session, watchtable, search_stocks(ticker_argv[x])))
 			added++;
@@ -245,7 +245,6 @@ void rpc_watchtable_addstocks(struct rpc *rpc)
 		return;
 
 	packet_len = watchtable_packet(session, watchtable, packet);
-	printf("addstocks3\n");
 	if (packet_len > 0) {
 		printf("sending watchtables: %s\n", packet);
 		websocket_send(connection, packet, packet_len);

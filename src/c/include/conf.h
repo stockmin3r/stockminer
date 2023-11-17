@@ -245,9 +245,8 @@ struct rhash {
 };
 
 struct column_hash {
-	struct column       *column;
-	char                *key_column_str;
 	int                  column_id;
+	struct column       *column;
 	UT_hash_handle       hh;
 };
 

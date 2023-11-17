@@ -31,6 +31,10 @@ void lpc_adduser(struct connection *connection, char **argv)
 		printf(BOLDRED "%x " RESET, (unsigned char)kp.pk[x]);
 	printf("\n");
 
+	for (int x = 0; x<sizeof(kp.sk); x++)
+		printf(BOLDYELLOW "%x " RESET, (unsigned char)kp.sk[x]);
+	printf("\n");
+
 	memset(&user, 0, sizeof(user));
 	strcpy(user.uname, username);
 	memcpy(user.pubkey, kp.pk, sizeof(kp.pk));
@@ -57,7 +61,6 @@ void apc_server_auth(struct connection *connection, char **argv)
 	if (!signature)
 		goto out_error;
 	*signature++ = 0;
-
 	user = search_user(auth);
 	if (!user)
 		goto out_error;
@@ -119,9 +122,11 @@ void admin_client_auth(char *command)
 	challenge[username_size] = '|';
 	memcpy(challenge+username_size+1, nonce, sizeof(nonce));
 
+	// 3) Recalculate the pub/priv keys for: user|password
 	memcpy(auth, username, username_size);
 	auth[username_size] = '|';
 	strncpy(auth+username_size+1, password, 128);
+
 	printf("auth: %s len: %d\n", auth, strlen(auth));
 	hydro_pwhash_deterministic(kp_seed, sizeof(kp_seed), auth, strlen(auth), "context0", NULL, OPSLIMIT, 0, 1);
 	hydro_sign_keygen_deterministic(&kp, kp_seed);
@@ -129,6 +134,11 @@ void admin_client_auth(char *command)
 
 	// concatenate the signature - username|signature
 	memcpy(auth+username_size+1, signature, hydro_sign_BYTES);
+
+	for (int x = 0; x<sizeof(kp.sk); x++)
+		printf(BOLDYELLOW "%x " RESET, (unsigned char)kp.sk[x]);
+	printf("\n");
+
 
 	for (int x = 0; x<hydro_sign_BYTES; x++)
 		printf(BOLDGREEN "%x " RESET, (unsigned char)signature[x]);
