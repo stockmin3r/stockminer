@@ -32,7 +32,7 @@ struct external_api {
 	int         defer;
 } EXTERNAL_API [] = {
 /* HEAD SCRIPTS */
-{"https://code.jquery.com/jquery-2.2.4",                                  "rY/jv8mMhqDabXSo+UCggqKtdmBfd3qC2/KvyTDNQ6PcUJXaxK1tMepoQda4g5vB", LICENSE_MIT,         PERMISSIVE, !DEFER, },
+{"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery",            "rY/jv8mMhqDabXSo+UCggqKtdmBfd3qC2/KvyTDNQ6PcUJXaxK1tMepoQda4g5vB", LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://cdn.datatables.net/v/dt/dt-1.10.21/datatables",                 "qIz2SOTATpqA/FQ0hh1w5JAM66ujgfjBn3VIDHRQALyA23QzYbQvMEtlQXGiX07c", LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://code.highcharts.com/stock/highstock",                           "lMRDDWIzVUedPfSFOiOJhlEMnZufWQ2qKHeu2YP5xZHGhBLoaXgNvCTgKSEPwkzn", LICENSE_HIGHCHARTS, !PERMISSIVE, !DEFER, },
 {"https://code.highcharts.com/stock/indicators/indicators-all",           "jLpemzsfcRDYsAbWw/hErdwRLuVk6AGjCCocwf3okb6JjF4JBuhMv0W7gDk+NPhP", LICENSE_HIGHCHARTS, !PERMISSIVE, !DEFER, },
@@ -40,10 +40,11 @@ struct external_api {
 {"https://unpkg.com/draggabilly@2.2.0/dist/draggabilly.pkgd",             "JvmwKtrs1CjFC41kayyey74PQsYWrxToeXr0tsEyeYgZwi2aT4XZccR8SFqcobPC", LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://cdn.plot.ly/plotly-2.26.0",                                     NULL,                                                               LICENSE_MIT,         PERMISSIVE, !DEFER, },
 /* CSS */
-{"https://swisnl.github.io/jQuery-contextMenu/dist/jquery.contextMenu.min.css",               NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },
+{"https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css",NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css",                  NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.min.css",                           NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.34.0/css/jquery.terminal.min.css", NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },
+{"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css",         NULL,                                           LICENSE_BSD,         PERMISSIVE, !DEFER  },
 {"https://vjs.zencdn.net/7.19.2/video-js.css",                                                NULL,                                           LICENSE_APACHE2,     PERMISSIVE,  DEFER, },
 /* TAIL SCRIPTS */
 {"https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify",         "cwS6YdhLI7XS60eoDiC+egV0qHp8zI+Cms46R0nbn8JrmoAzV9uFL60etMZhAnSu", LICENSE_APACHE2_MPL,!PERMISSIVE,  DEFER  },
@@ -51,10 +52,10 @@ struct external_api {
 {"https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons",        "+s/TnIu83YK7P52PVQgRXxsBRu3lpXimVpMDKXx4z7l/YqHQ5UgMQFDsSR9LTS0e", LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5",             NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://cdn.datatables.net/plug-ins/1.10.21/sorting/natural",           "h3oS/DGBfrFl5LZtSFk9RFU+pzHmURTX7+CFwAjm6QWSTdjwxCNgPIlzA/On5XBM",                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
-{"https://swisnl.github.io/jQuery-contextMenu/dist/jquery.ui.position",   NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
+{"https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position",   NULL,                                                LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://code.highcharts.com/stock/modules/drag-panes",                  NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://code.highcharts.com/modules/full-screen",                       NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
-{"https://swisnl.github.io/jQuery-contextMenu/dist/jquery.contextMenu",   NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
+{"https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu",   NULL,                                                LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://vjs.zencdn.net/7.19.2/video",                                   NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.489/build/pdf",             NULL,                                                               LICENSE_APACHE2,     PERMISSIVE,  DEFER, },
 {"https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip",              NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },

@@ -127,17 +127,15 @@ void *admin_server_loop(void *args)
 
 	while (1) {
 		memset(argv, 0, sizeof(argv));
-		printf(BOLDRED "call read" RESET "\n");
 		packet_size = openssl_read_sync2(connection, packet, sizeof(packet)-1);
-		printf("packet_size: %d\n", packet_size);
 		if (!packet_size || packet_size >= sizeof(packet)-1)
 			goto out;
-int argc;
+
 		if ((args=strchr(packet, ' ')))
-			argc =cstring_split(args+1, argv, MAX_APC_ARGV-1, ' ');
+			cstring_split(args+1, argv, MAX_APC_ARGV-1, ' ');
 		else
 			argv[0] = packet;
-printf("argc: %d\n", argc);
+
 		/* Remote Procedure Calls (APC) */
 		if (!(apc=search_apc(packet)))
 			continue;
