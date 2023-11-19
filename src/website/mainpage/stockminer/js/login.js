@@ -27,6 +27,9 @@ function rpc_nonce(av)
  *   - The Server will verify the signature of "username|NONCE"
  *     - The NONCE will be kept server-side in struct connection and in mainpage.js::var NONCE; client-side
  */
+var keypair     = new Uint8Array(hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES);
+var kp_seed     = new Uint8Array(hydro_sign_SEEDBYTES);
+
 function login_onclick()
 {
 	var rc; // return value for libhydrogen function calls
@@ -43,12 +46,10 @@ function login_onclick()
 	var private_key = "";
 	var password    = + $("#LBOX .pwd").val();
 	var auth        = USER + "|" + password;
-	var keypair     = new Uint8Array(hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES);
-	var kp_seed     = new Uint8Array(hydro_sign_SEEDBYTES);
 
 	Module.ccall("hydro_sign_keygen_deterministic",      // function name
 					  null,                              // return type of this function (int): 0 for success -1 for failure
-					 ["number","number"],                  // argument types to hydro_sign_keygen_deterministic (two uint8arrays)
+					 ["number","number"],                // argument types to hydro_sign_keygen_deterministic (two uint8arrays)
 					 [keypair, kp_seed]);                // arguments to hydro_sign_keygen_deterministic()
 
 	rc = Module.ccall("hydro_pwhash_deterministic",      // function name
