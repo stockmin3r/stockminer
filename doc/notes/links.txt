@@ -69,6 +69,7 @@ https://www.alibabacloud.com/blog/paxos-raft-epaxos-how-has-distributed-consensu
 https://www.xmodulo.com/check-aes-ni-enabled-openssl.html
 
 [wasm]
+https://livebook.manning.com/book/webassembly-in-action/b-ccall-cwrap-and-direct-function-calls/v-8/45
 https://rob-blackbourn.github.io/blog/webassembly/wasm/array/arrays/javascript/c/2020/06/07/wasm-arrays.html
 
 [event loops]

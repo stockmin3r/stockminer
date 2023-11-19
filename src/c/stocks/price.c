@@ -280,7 +280,7 @@ void wsj_update_stock(char *ticker)
 	struct stock *stock = search_stocks(ticker);
 
 	if (!stock)
-		return;	
+		return;
 
 	WSJ = &stock->API.WSJ;
 	wsj_query(stock, WSJ->CLOSE, WSJ->CLOSE_SZ, page, wsj_get_EOD);
@@ -303,7 +303,7 @@ int load_ohlc(struct stock *stock)
 	char            path[256];
 	int              nr_ohlc = 0, mini_len = 0, nbytes, filesize;
 
-	snprintf(path, sizeof(path)-1, "data/stocks/wsj/%s", stock->sym);
+	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/wsj/%s", stock->sym);
 	if (stock->dead || !fs_file_exists(path) || !(map=MAP_FILE_RO(path, &filemap)))
 		return 0;
 

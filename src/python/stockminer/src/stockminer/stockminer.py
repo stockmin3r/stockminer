@@ -46,8 +46,8 @@ def get_options(argv, opstr_short, opstr_long) -> dict:
 	return argdict
 
 def load_tickers(path) -> list:
-	ticker_list       = []
-	nr_python_threads = 4
+	ticker_list = []
+	nr_threads  = 4
 	with open(path,'r') as fp:
 		tickers=fp.read()
 	if "ticker_delim" in config:
@@ -66,9 +66,11 @@ def load_tickers(path) -> list:
 			ticker = line;
 		ticker_list.append(ticker)
 	if "nr_python_threads" in config:
-		nr_python_threads  = int(config['nr_python_threads'])
+		nr_threads = int(config['nr_python_threads'])
+	if "tickers_per_minute" in config:
+		nr_threads = int(config['tickers_per_minute'])
 	config['ticker_list']  = ticker_list
-	config['ticker_lists'] = np.array_split(ticker_list, nr_python_threads)
+	config['ticker_lists'] = np.array_split(ticker_list, nr_threads)
 
 def init() -> dict:
 	path = os.path.dirname(os.path.realpath(__file__))

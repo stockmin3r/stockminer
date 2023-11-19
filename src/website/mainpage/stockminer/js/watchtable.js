@@ -154,7 +154,6 @@ function wdict_load(screener, dict)
 function init_stock_screener(){
 	$(".watchmgr .wsrc li").each(function(){
 		var c    = $(this).attr('n');
-		console.log("column: " + c);
 		this.setAttribute("onclick", "boxtick()");
 		WCOL[c]  = $(this).text();
 		WCOL2[c] = $(this).text().split(" ")[0]

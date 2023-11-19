@@ -160,6 +160,7 @@ void session_set_config(struct connection *connection)
 	struct session *session     = connection->session;
 	char           *packet      = connection->packet,     *qcache;
 	packet_size_t   packet_size = connection->packet_size, qcache_size;
+	char            nonce64[96];
 
 	packet     += packet_size;
 	packet_size = 0;
@@ -193,6 +194,12 @@ void session_set_config(struct connection *connection)
 		packet_size += snprintf(packet+packet_size, 24, "cookie %s@", session->user->cookies[connection->websocket_id]);
 		printf(BOLDMAGENTA "packet: %s session: %p websocket_id: %d" RESET "\n", packet, session, connection->websocket_id);
 	}
+
+	/* random nonce for Password-Based Authenticated Login (picked up by js/login.js::login_auth() */
+	hydro_random_buf(connection->nonce, sizeof(connection->nonce));
+	base64_encode   (connection->nonce, sizeof(connection->nonce), nonce64);
+	packet_size += snprintf(packet+packet_size, 96, "nonce %s@", nonce64);
+	printf(BOLDYELLOW "nonce64: %s" RESET "\n", nonce64);
 	/* Update the packet size */
 	connection->packet_size += packet_size;
 }

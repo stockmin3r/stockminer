@@ -42,10 +42,10 @@ struct request rpc_requests[] = {
 	{ "sp-anyday",           rpc_stockpage_anyday,       2, 2, ARGS_TYPE_ARGV},
 	{ "sp-etab",             rpc_stockpage_earnings,     2, 2, ARGS_TYPE_ARGV},
 	{ "sp-candle",           rpc_stockpage_candle,       3, 3, ARGS_TYPE_ARGV},
-	{ "sp-indicator",        rpc_stockpage_indicators,   1, 1, ARGS_TYPE_ARGV},
-	{ "sigmon",              rpc_stockpage_signals,      1, 1, ARGS_TYPE_ARGV},
-	{ "search",              rpc_search,                 1, 1, ARGS_TYPE_ARGV},
-	{ "ranks",               rpc_set_max_ranks,          1, 1, ARGS_TYPE_ARGV},
+	{ "sp-indicator",        rpc_stockpage_indicators,   2, 2, ARGS_TYPE_ARGV},
+	{ "sigmon",              rpc_stockpage_signals,      2, 2, ARGS_TYPE_ARGV},
+	{ "search",              rpc_search,                 2, 2, ARGS_TYPE_ARGV},
+	{ "ranks",               rpc_set_max_ranks,          2, 2, ARGS_TYPE_ARGV},
 
 	/* Airstocks QuadVerse */
 	{ "sigstat",             rpc_airstocks_sigstat,      1, 1, ARGS_TYPE_ARGV},
@@ -246,7 +246,7 @@ void www_send_wasm(struct connection *connection)
 
 void www_send_stockdata(struct connection *connection)
 {
-	websocket_send_huge(connection, stock_data_gz, stock_data_size);
+	SSL_write(connection->ssl, stock_data_gz, stock_data_size);
 }
 
 void www_load_stockdata()
@@ -979,7 +979,7 @@ void *init_www(void *args)
 	www_callback_t www_callback;
 	int            nr_www_threads;
 
-//	openssl_init();
+	www_load_stockdata();
 	www_init_requests();
 	www_load_website(&Server);
 	blob_load_images("www/img");

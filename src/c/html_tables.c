@@ -545,7 +545,7 @@ typedef void *(*job_exec_q)(void *args);
 void LIBXLS_rpc_excel2table(struct session *session, struct connection *connection, char *excel_file, char *excel_filepath, int excel_size, char **subargv, void *(*completion)(struct job *job))
 {
 	// libreoffice --invisible --convert-to html db/%d/excel/%s.xlsx --outdir db/uid/%d/html/%s.html
-	struct job *job = new_job(JOB_SCHEDULER_POPEN|JOB_READ_OUTPUT,completion);
+/*	struct job *job = new_job(JOB_SCHEDULER_POPEN|JOB_READ_OUTPUT,completion);
 	char cmdline[32 KB];
 	int nbytes, uid = session->user->uid;
 
@@ -556,5 +556,5 @@ void LIBXLS_rpc_excel2table(struct session *session, struct connection *connecti
 	if (nbytes > MAX_CMDLINE_SIZE)
 		return;
 	job->cmdline = strdup(cmdline);
-	thread_create((job_exec_q)job->execute, job);
+	thread_create((job_exec_q)job->execute, job);*/
 }

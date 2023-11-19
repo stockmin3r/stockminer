@@ -106,6 +106,23 @@ struct module {
 	bool         enabled;
 };
 
+typedef void (*task_handler_t)(void *args);
+
+struct task {
+	int            type;
+	int            priority;     // once all task nr_miners reach their nr_deal, pick task based on pririty
+	task_handler_t handler;      // task handler
+	int            nr_preferred; // minimum number of miners preferred for this task
+	int            nr_miners;    // number of servers/desktops/devices currently executing this task
+};
+
+struct miner {
+	struct task       **tasks;
+	struct connection  *connection;
+	int                 nr_tasks;
+	int                 work;
+};
+
 #define MAXEVENTS                       512
 #define MAX_PACKET_SIZE               64 KB
 
@@ -149,6 +166,7 @@ struct connection        {
 	char                *packet;          /* buffer for sending responses */
 	packet_size_t        packet_size;     /* size of response packet */
 	packet_size_t        packet_size_max; /* current maximum size of the packet, can be expanded */
+	uint8_t              nonce[32];       /* libhydrogen nonce size (32 bytes) */
 	SSL                 *ssl;
 	SSL_CTX             *ctx;
 	int                  fd;
@@ -714,6 +732,9 @@ int      get_time           (void);
 void     init_time          (struct server *server);
 void     time_EOD           (void);
 void     set_current_minute (void);
+
+/* task.c */
+void task_benchmark(char *args);
 
 /* lib.c */
 int64_t        fs_read                 (int, char *, int64_t);

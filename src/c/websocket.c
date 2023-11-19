@@ -220,7 +220,7 @@ void websockets_sendall_except(struct session *session, struct connection *this_
 
 int websocket_send_huge(struct connection *connection, char *data, uint64_t data_length)
 {
-	unsigned char message[4280 KB];
+	unsigned char message[4280 KB]; // yeah i know
 	int data_start_index;
 
 	message[0] = (unsigned char)129;

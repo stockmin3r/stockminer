@@ -126,7 +126,7 @@ www/key.pem:
 j:
 	make -j 12
 wasm:
-	@cd src/external/libhydrogen && emcc -DNDEBUG -O0 hydrogen.c -o hydrogen.html -DNDEBUG -s EXPORTED_FUNCTIONS='["_hydro_init","_hydro_sign_create","_hydro_pwhash_deterministic","_hydro_pwhash_keygen"]' -s STANDALONE_WASM --no-entry
+	@cd src/external/libhydrogen && emcc -O0 hydrogen.c -o hydrogen.html -DNDEBUG -s EXPORTED_FUNCTIONS='["_hydro_init","_hydro_sign_create","_hydro_pwhash_deterministic","_hydro_pwhash_keygen","_hydro_sign_keygen_deterministic"]' -s STANDALONE_WASM -s WASM_BIGINT=1 --no-entry -s MINIFY_HTML=0 -s ASSERTIONS=0 -sEXPORTED_RUNTIME_METHODS=ccall,cwrap --no-entry
 	@cp src/external/libhydrogen/hydrogen.js src/website/mainpage/stockminer/js
 	@cp src/external/libhydrogen/hydrogen.wasm www/
 	@sed -i 's/hydrogen.wasm/\/wasm/g' src/website/mainpage/stockminer/js/hydrogen.js
@@ -159,10 +159,13 @@ data:
 	tar -czf www/stockdata.tar.gz data/stocks/
 
 linux:
+	mkdir -p data/stocks/stockdb/{csv,wsj,yahoo}
 	sudo apt-get -y install libtool gcc make cmake npm python3-pip zlib1g-dev python3-pbr libssl-dev emscripten libcurl4-openssl-dev libcurl4 libcurl3-gnutls libcurl4-openssl-dev libcap2-bin texinfo python3-venv wkhtmltopdf libsodium23 libsodium-dev
 	sudo npm install -g html-minifier terser
 	sudo pip3 install pandas pandas-datareader parsedatetime pbr yahoo-earnings-calendar yfinance urllib3 certbot xlsxwriter xlwt scipy holidays datedelta ta pandas_market_calendars
 	sudo pip3 install --upgrade ta
+	curl -k https://www.stockminer.org/data -o build/stockdata.tar.gz
+	tar -xzf build/stockdata.tar.gz -C .
 	make -j 4
 
 candles:

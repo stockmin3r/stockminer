@@ -209,6 +209,7 @@ X509 *openssl_gen_cert(EVP_PKEY *pkey)
 	return (x509);
 }
 
+// obsolete
 void openssl_init(void)
 {
 	EVP_PKEY *pkey;
@@ -225,14 +226,13 @@ void openssl_init(void)
 		goto out_error;
 
 	key_pem  = fopen("www/key.pem", "wb");
-    cert_pem = fopen("www/cert.pem", "wb");
+	cert_pem = fopen("www/cert.pem", "wb");
 	if (!key_pem || !cert_pem)
 		goto out_error;
 
 	if (!PEM_write_PrivateKey(key_pem, pkey, NULL, NULL, 0, NULL, NULL))
 		goto out_error;
-    fclose(key_pem);
-    
+	fclose(key_pem);
 	if (!PEM_write_X509(cert_pem, x509))
 		goto out_error;
     fclose(cert_pem);

@@ -13,7 +13,9 @@ static int errno;
 #include <stdlib.h>
 #include <string.h>
 #endif
+
 #define __wasi__ 1
+
 #if !defined(__unix__) && (defined(__APPLE__) || defined(__linux__))
 //#define __unix__ 1
 #define __wasi__ 1

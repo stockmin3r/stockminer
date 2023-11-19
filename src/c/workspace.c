@@ -581,6 +581,7 @@ void rpc_stockpage(struct rpc *rpc)
 	websocket_send(connection, packet, packet_len);
 	packet[packet_len++] = ' ';
 	packet[packet_len++] = '1';
+	printf(BOLDGREEN "%s" RESET "\n", packet);
 	websockets_sendall_except(session, connection, packet, packet_len);
 }
 

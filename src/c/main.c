@@ -34,7 +34,8 @@ struct option main_options[] =
 	{ "wsjall",          1, NULL, 'w' },
 	{ "debug",           1, NULL, 'D' },
 	{ "ebuild",          0, NULL, 'e' },
-	{ "reload",          0, NULL, 'r' }
+	{ "reload",          0, NULL, 'r' },
+	{ "benchmark",       1, NULL, 'b' }
 };
 
 void stockminer_main(struct server *server)
@@ -56,11 +57,14 @@ int main(int argc, char *argv[])
 
 	init_main(&Server);
 
-	while ((op=getopt_long(argc, argv, "W:H:m:w:D:a3evr", &main_options[0], NULL)) != -1) {
+	while ((op=getopt_long(argc, argv, "W:H:m:w:D:b:a3evr", &main_options[0], NULL)) != -1) {
 		switch (op) {
 			case 'a':
 				admin_client_loop();
 				exit(0);
+			case 'b':
+				task_benchmark(optarg);
+				break;
 			case 'v':
 				verbose = 1;
 				break;

@@ -2,9 +2,20 @@
  * filename: mainpage/stockminer/js/menu.js
  * License:  Public Domain
  ********************************************/
-function spage(t)     {$('.query-div').remove();$('#autoq').css('height',"0px");stockpage(t,-1);$("#query").val('')}
-function sbox()       {spage(document.getElementById("query").value.toUpperCase())}
-function qload()      {spage($('.query-stock', window.event.target.parentNode).html())}
+function spage(t) {
+	$('.query-div').remove();
+	$('#autoq').css('height',"0px");
+	stockpage(t,-1);
+	$("#query").val('')
+}
+
+function sbox()  {
+	spage(document.getElementById("query").value.toUpperCase())
+}
+
+function query_result_onclick() {
+	spage($('.query-stock', window.event.target.parentNode).html())
+}
 function gridspace()  {
 	var w = QuadVerses['ChartSpace'];
 	QUADVERSE_SWITCH("ChartSpace");
@@ -16,7 +27,7 @@ function rpc_query(av)    {
 	$('.query-div').remove();
 	for (var x = 0; x<qv.length; x++) {
 		q = qv[x].split(" ");
-		$('#autoq').append('<div class=query-div onclick=qload()><span class=query-stock>' + q[0] + '</span><span class=query-name>' + q[1].replaceAll('%',' ') + '</span></div>');
+		$('#autoq').append('<div class=query-div onclick=query_result_onclick()><span class=query-stock>' + q[0] + '</span><span class=query-name>' + q[1].replaceAll('%',' ') + '</span></div>');
 	}
 	$('#autoq').css('height',qv.length * 32 + "px").slideDown();
 }

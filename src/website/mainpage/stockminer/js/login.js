@@ -4,6 +4,77 @@
  ********************************************/
 
 /*
+ * libhydrogen constants for Password-based Authentication
+ */
+var hydro_sign_BYTES          = 64;
+var hydro_sign_SEEDBYTES      = 32;
+var hydro_sign_PUBLICKEYBYTES = 32;
+var hydro_sign_SECRETKEYBYTES = 64;
+
+/* Server sends a random nonce upon websocket connecton */
+function rpc_nonce(av)
+{
+	NONCE = av[1];
+}
+
+/*
+ * User clicks on html/menu.html::<div id=LOGIN onclick=login()>Login</div>
+ *   - Password-Based Authentication by constructing the challenge
+ *   - NONCE was already sent by the server after the websocket is established
+ *   - Reconstruct the Pub/Priv keypair from a deterministic seed of "username|password"
+ *   - Sign the "username|nonce" with the public key and send the "username|signature"
+ *   - The Server will lookup the username and acquire its public key (stored after registering)
+ *   - The Server will verify the signature of "username|NONCE"
+ *     - The NONCE will be kept server-side in struct connection and in mainpage.js::var NONCE; client-side
+ */
+function login_onclick()
+{
+	var rc; // return value for libhydrogen function calls
+
+	$(".error").remove();
+	localStorage.user = USER=$("#LBOX .usr").val();
+
+	var challenge = new Uint8Array([
+		...new TextEncoder().encode(USER + "|"),
+		...Uint8Array.from(atob(NONCE), c => c.charCodeAt(0))
+	]);
+
+	var signature   = "";
+	var private_key = "";
+	var password    = + $("#LBOX .pwd").val();
+	var auth        = USER + "|" + password;
+	var keypair     = new Uint8Array(hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES);
+	var kp_seed     = new Uint8Array(hydro_sign_SEEDBYTES);
+
+	Module.ccall("hydro_sign_keygen_deterministic",      // function name
+					  null,                              // return type of this function (int): 0 for success -1 for failure
+					 ["number","number"],                  // argument types to hydro_sign_keygen_deterministic (two uint8arrays)
+					 [keypair, kp_seed]);                // arguments to hydro_sign_keygen_deterministic()
+
+	rc = Module.ccall("hydro_pwhash_deterministic",      // function name
+					  "number",                          // return type of this function (int): 0 for success -1 for failure
+					 ["array","number",                  // uint8_t[]: kp_seed, int: sizeof(kp_seed[])
+					  "string","number",                 // char *: auth,       int: strlen(username|password)
+					  "string", "number",                // char *: context,    int: OPSLIMIT
+					  "number","number"],                // size_t: memlimit,   uint8_t: nr_threads
+					 [keypair, kp_seed,                  // keypair seed, sizeof(kp_seed)
+					  auth, auth.length,                 // username|password, strlen(username|password)
+					  "context0", 1000, 0, 1]);
+	console.log("rc pwhash: " + rc);
+
+	var chsize = challenge.length;
+	rc = Module.ccall("hydro_sign_create",               // function name
+					  "number",                          // return type of this function (int): 0 for success -1 for failure
+					 ["string","array","number",         // [1] char *: signature,  [2] uint8_t[]: challenge, [3] size_t: challenge_size
+					  "string","array"],                 // [4] char *: context,    [5] uint8_t[]: user's private key
+					 [signature, challenge, chsize,      // signature, challenge, challenge_size
+					  "context0", private_key]);         // "context0", keypair.sk (user's private key)
+	console.log("hydro_sign_create: " + rc);
+	WS.send("login " );
+}
+
+
+/*
  * Called by the init_websocket() msg loop after a successful login
  * the "Backpage" contains the HTML/JS/CSS and the BACKPAGE JSON
  * which consists of all the QuadSpaces,Quads and their Workspace
@@ -50,12 +121,14 @@ function rpc_set_user(av)
 	UID=av[2]
 }
 
+/* cookies are unique to a single struct connect on the server */
 function rpc_set_cookie(av)
 {
 	localStorage.cookie = av[1]
 	console.log("setting local cookie: " + av[1]);
 }
 
+// login_menu_onclick
 function login() {
 	if (USER && USER == localStorage.user) {
 		QUADVERSE_SWITCH("Profile");
@@ -78,14 +151,21 @@ function register()
 
 function wslogin()    {
 	$(".error").remove();
-	USER=$("#LBOX .usr").val();
+	localStorage.user = USER=$("#LBOX .usr").val();
 	WS.send("login "    + USER + " " + $("#LBOX .pwd").val());
-	localStorage.user = USER;
 }
 function wsregister() {
 	$(".error").remove();
 	USER=$("#LBOX .usr").val();
 	WS.send("register " + USER + " " + $("#LBOX .pwd").val() + " " + $("#LBOX .mail").val())
+}
+
+
+/*
+ * Server 
+ */
+function rpc_auth_challenge() {
+
 }
 
 function elogin(e) {
@@ -116,30 +196,6 @@ function logback()
 	$(".login").attr("onclick", "wslogin()");
 	$(".reg").html("Register as a new user");
 	$(".reg").attr("onclick", "register()");
-}
-
-var OBJ;
-function init_webassembly_auth()
-{
-	var importObject={ "env": {
-		STACKTOP:0,
-		STACK_MAX:65536,
-		abortStackOverflow: function(val) { throw new Error("stackoverfow"); },
-		abort:function(){},
-		memory: new WebAssembly.Memory( { initial: 256, maximum:256 } ),
-		table:  new WebAssembly.Table ( { initial:0, maximum:0, element: "anyfunc" }),
-		memoryBase:0,
-		tableBase:0
-	}, imports: {
-		imported_func(arg) {
-		console.log(arg);
-	    },
-	  }
-	};
-
-	WebAssembly.instantiateStreaming(fetch("wasm"), importObject).then(
-	  (obj) => {OBJ=obj;}
-	);
 }
 
 function newranks(){ $("#admin-ranks-file")[0].upload() }

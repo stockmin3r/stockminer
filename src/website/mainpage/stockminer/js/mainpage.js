@@ -13,6 +13,7 @@ WMAP       = {},   /* QuadVerse Workspace QGID Map to the workspace div referenc
 WS,                /* WebSocket */
 QUADVERSE,         /* QuadVerse  <div> */
 LBX,               /* Login box  <div> */
+NONCE,             /* NONCE for Password-Based Authentication (sent by server after websocket conn */
 QuadVerses = {},   /* QuadVerse Dictionary */
 charts     = {},   /* Charts */
 QCACHE     = [],   /* Custom QuadVerse Layout */
@@ -101,8 +102,8 @@ op   = {'addPoint':addPoint,       'update':update,       'stockchart':stockchar
         'table':   table,          'ctable':ctable,       'optab':     optab,          'notify': rpc_notify,      'deftab':  rpc_deftab,    'wget':  rpc_wget,
         'watch':   rpc_watchlist,  'gwatch':rpc_gwatch,   'gexec':     rpc_gexec,      'exec':   rpc_pexec,       'preset':  rpc_indicator, 'TPset': rpc_TPset,
         'init':    rpc_init,       'fini':  rpc_fini,     'stage':     rpc_stageload,  'profile':rpc_profile,     'qspace':  rpc_qspace,    'index': rpc_menu,
-        'anyday':  rpc_anyday,     'peak':  rpc_peak,     'sc':        rpc_stockpage,  'etab':   rpc_etab,        'sigmon':  rpc_sigmon,
-        'cookie':  rpc_set_cookie, 'user':  rpc_set_user, 'regok':     rpc_regok,      'err':    rpc_login_error, 'query':   rpc_query,
+        'anyday':  rpc_anyday,     'peak':  rpc_peak,     'sc':        rpc_stockpage,  'etab':   rpc_etab,        'sigmon':  rpc_sigmon,    'err':   rpc_login_error,
+        'cookie':  rpc_set_cookie, 'user':  rpc_set_user, 'regok':     rpc_regok,      'nonce':  rpc_nonce,       'query':   rpc_query,
         'wspace':  rpc_wspace,     'qpage': rpc_qpage,    'qcache':    rpc_qcache,     'qreload':rpc_qreload,     'qupdate': rpc_qupdate,
         'candle':  candle,         'csr':   rpc_csr,      'czoom':     rpc_candle_zoom,'csp':    rpc_csp,         'candy':   rpc_stockpage_candles,
         'netsh':   rpc_netsh,      'qsh':   rpc_qsh,      'admin':     admin,          'styles': rpc_styles,      'newtab':  rpc_newtab},
@@ -206,7 +207,6 @@ function init_stockminer()
 	init_quadverse();
 	init_websocket("");
 	init_menu();
-//	init_webassembly_auth();
 };
 
 
