@@ -95,7 +95,12 @@ www/key.pem:
 j:
 	make -j 12
 wasm:
-	@cd src/external/libhydrogen && emcc -O0 hydrogen.c -o hydrogen.html -DNDEBUG -s EXPORTED_FUNCTIONS='["_hydro_init","_hydro_sign_create","_hydro_pwhash_deterministic","_hydro_pwhash_keygen","_hydro_sign_keygen_deterministic"]' -s STANDALONE_WASM -s WASM_BIGINT=1 --no-entry -s MINIFY_HTML=0 -s ASSERTIONS=0 -sEXPORTED_RUNTIME_METHODS=ccall,cwrap -s ALLOW_MEMORY_GROWTH=1 --no-entry
+#	@cd src/external/libhydrogen && emcc -O0 hydrogen.c -o hydrogen.html -DNDEBUG -s EXPORTED_FUNCTIONS='["_hydro_init","_hydro_sign_create","_hydro_pwhash_deterministic","_hydro_pwhash_keygen","_hydro_sign_keygen_deterministic", "_hydro_test"]' -s STANDALONE_WASM -s WASM_BIGINT=1 --no-entry -s MINIFY_HTML=0 -s ASSERTIONS=0 -sEXPORTED_RUNTIME_METHODS=ccall,cwrap -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_FUNCTIONS="['_malloc', '_hydro_test']" --no-entry
+	@cd src/external/libhydrogen && emcc -O0 hydrogen.c -o hydrogen.html -DNDEBUG              \
+		-s EXPORTED_FUNCTIONS='["_hydro_init","_hydro_sign_create","_hydro_pwhash_deterministic","_hydro_pwhash_keygen","_hydro_sign_keygen_deterministic", "_malloc","_hydro_test"]' \
+		-s STANDALONE_WASM -s WASM_BIGINT=1 --no-entry -s MINIFY_HTML=0               \
+		-s ASSERTIONS=0 -sEXPORTED_RUNTIME_METHODS=ccall,cwrap                        \
+		-s ALLOW_MEMORY_GROWTH=1 --no-entry
 	@cp src/external/libhydrogen/hydrogen.js src/website/mainpage/stockminer/js
 	@cp src/external/libhydrogen/hydrogen.wasm www/
 	@sed -i 's/hydrogen.wasm/\/wasm/g' src/website/mainpage/stockminer/js/hydrogen.js

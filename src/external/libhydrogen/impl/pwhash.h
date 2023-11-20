@@ -279,3 +279,8 @@ hydro_pwhash_upgrade(uint8_t       stored[hydro_pwhash_STOREDBYTES],
     return hydro_secretbox_encrypt(secretbox, params, hydro_pwhash_PARAMSBYTES, (uint64_t) *enc_alg,
                                    hydro_pwhash_CONTEXT, master_key);
 }
+
+int hydro_test(int n)
+{
+	return n+1;
+}

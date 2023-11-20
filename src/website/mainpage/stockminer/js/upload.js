@@ -178,6 +178,22 @@ function sendfile(args)
 		r.readAsText(file);
 }
 
+/* User Charts */
+var CSV;
+function upload_csv()
+{
+	var file = $("#upload-csv-file")[0], upload = $("#upload-csv")[0], QGID = upload.QGID, type, csv;
+	if (file.files.length) {
+		$("#upload-csv-file")[0].upload();
+		return;
+	}
+	type = $(".upload-select option:selected", upload).val();
+	csv  = $("textarea", upload).val();
+	sendfile({action:ACTION_DATA_CHART_SQUEAK,objtype:OBJTYPE_DATA,filetype:FILETYPE_CSV,data:csv,filesize:csv.length,filename:"dataset.csv",args:QGID});
+	CSV = csv;
+	chart({ticker:"NewChart",type:type,dtype:"csv",div:"newchart-"+QGID,data:csv.replaceAll("\n", "\\n")});
+}
+
 /* rpc: qreload */
 function rpc_qreload(av) {
 	var path = av[1];
@@ -187,8 +203,8 @@ function rpc_qreload(av) {
 }
 
 /* If user uploads a pic then qexport() will manually call rpc_qreload() to load the newly created QPAGE (via URL)
- * Otherwise, the server will be instructed on using a built-in SVG and will therefore itself
- * send a reload message as no image need be uploaded.
+ * Otherwise, the server will be instructed on using selecting a random SVG for the QuadVerse's menu "image"
+ * and will therefore itself send a reload message as no image need be uploaded.
  */
 function qexport(URL)
 {

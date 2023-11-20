@@ -1181,21 +1181,4 @@ function ChartMenu()
 			}}};}});
 }
 
-/* User Charts */
-var CSV;
-function upload_csv()
-{
-	var file = $("#upload-csv-file")[0], upload = $("#upload-csv")[0], QGID = upload.QGID, type, csv;
-	if (file.files.length) {
-		$("#upload-csv-file")[0].upload();
-		return;
-	}
-	type = $(".upload-select option:selected", upload).val();
-	csv  = $("textarea", upload).val();
-	sendfile({action:ACTION_DATA_CHART_SQUEAK,objtype:OBJTYPE_DATA,filetype:FILETYPE_CSV,data:csv,filesize:csv.length,filename:"dataset.csv",args:QGID});
-	CSV = csv;
-	chart({ticker:"NewChart",type:type,dtype:"csv",div:"newchart-"+QGID,data:csv.replaceAll("\n", "\\n")});
-}
-
-
 function csv(data){return $("<pre>"+data+"</pre>")[0].innerHTML}
