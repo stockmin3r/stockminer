@@ -22,7 +22,7 @@ var	bar_legend = {
 	shadow:true
 };
 
-var darkTheme  = {
+var highcharts_darkTheme  = {
 	global:{timezoneOffset:240},
 	lang:{rangeSelectorZoom:""},
 	chart: {
@@ -52,7 +52,7 @@ var darkTheme  = {
 
 //{title:"DeathChart",theme:"whiteTheme", type: "bar", conf:{chart{backgroundColor:{linearGradient:[0,0,500,500],stops:[[0,'rgb(130, 30, 218)'],[1,'rgb(110, 110, 110)']]}}}}
 
-purpleTheme  = {
+highcharts_purpleTheme  = {
 	chart: {
       backgroundColor:{linearGradient:[0, 0, 500, 500],stops:[[0, "rgb(130, 30, 218)"],[1, "rgb(110, 110, 110)"]]},
       gridLineWidth:1,
@@ -63,7 +63,7 @@ purpleTheme  = {
 	}
 },
 
-whiteTheme  = {
+highcharts_whiteTheme  = {
 	chart: {
       backgroundColor:{linearGradient:[0, 0, 500, 500],stops:[[0,'rgb(255, 255, 255)'],[1,'rgb(240, 240, 255)']]},
       gridLineWidth:1,
@@ -73,13 +73,14 @@ whiteTheme  = {
       plotBorderWidth:1
 	}
 },
-ChartThemesArray = [{name:"darkTheme", theme:darkTheme}, {name:"whiteTheme", theme:whiteTheme}, {name:"purpleTheme", theme:purpleTheme}],
+//ChartThemesArray = [{name:"darkTheme", theme:darkTheme}, {name:"whiteTheme", theme:whiteTheme}, {name:"purpleTheme", theme:purpleTheme}],
 ChartThemesDict  = {};
 
 function ChartTheme(theme)
 {
 	var div = window.event.target.parentNode.parentNode.classList[1].split("-")[1],
 	ticker = $("#"+div).highcharts().title.textStr;
+	console.log("chart theme ticker: " + ticker + " theme: " + theme.name + " chartware: " + theme.chartware);
 	Highcharts.setOptions(theme);
 	WS.send("chart " + ticker + " " + div);
 }
@@ -95,9 +96,83 @@ function rpc_chart_themes(av)
 function init_charts()
 {
 	// Chart Themes
-	rpc_chart_themes([{name:"darkTheme", theme:darkTheme}, {name:"whiteTheme", theme:whiteTheme}]);
-	Highcharts.setOptions(darkTheme);
+	rpc_chart_themes([{name:"darkTheme",  chartware:"highcharts", theme:highcharts_darkTheme},
+					  {name:"whiteTheme", chartware:"highcharts", theme:highcharts_whiteTheme}]);
+	Highcharts.setOptions(highcharts_darkTheme);
 }
+
+/* av['type']   = 'bar'
+   av['data']   = 'data'
+   av['dtype']  = 'array|csv|excel'
+   av['conf']   = highcharts|plotly custom config
+   av['div']    = existing chart div string (chartname-QGID) (to overwrite) or destination empty div
+   av['QGID']   = QGID of new chart
+*/
+function gui_chart_onclick(type)
+{
+	var gcharts = $("#charts")[0], args = {};
+
+	args['type']  = type;
+	args['div']   = gcharts.CID;
+	args['QGID']  = gcharts.CID.split("-")[1];
+	args['title'] = gcharts.title;
+	args['data']  = gcharts.data;
+	args['dtype'] = gcharts.dtype;
+	args['theme'] = gcharts.theme;
+	args['conf']  = gcharts.conf;
+
+	// load the chart
+	chart(args);
+
+	// close the "Chart Import" "GUI" <div>
+	qclose();
+}
+
+/*
+# {title:"DeathMeter",theme:"whiteTheme", chartware: "highcharts|plotly", type: "line", conf:HighChartsConfig }
+Date,DeathScore
+15/8,20
+16/8,26
+17/8,39
+*/
+//var conf = `# title DeathChart\n# theme whiteTheme\n--\nDate,Death\n15/8,20\n16/8,26\n17/8,39`
+function chart_import(CID)
+{
+	var gcharts = $("#charts")[0],conf,csv,file = $("#upload-csv-file"),QGID,action,objtype,filetype;
+
+	gcharts.CID = CID;
+	QGID        = CID.split("-")[1];
+
+	console.log("chart import " + CID);
+	file[0].onchange = function(){
+		readfile(file[0].files[0],function(data){
+			gcharts.dtype = file[0].files[0].type.split("/")[1];
+			gcharts.style.display='block';
+			if (gcharts.dtype == 'csv') {
+				// depending on the CSV formatting there may be a custom chart config
+				// there may be a request for a stock chart with or without volume
+				if (data.substr(0,3) == "# {") {
+					nl = data.indexOf("\n");
+					gcharts.conf  = JSON.parse(data.substr(2,nl-2));
+					gcharts.data  = data.substr(nl+1);
+					gcharts.theme = conf.theme;
+					if (gcharts.conf.title)
+						gcharts.title = gcharts.conf.title;
+				} else {
+					gcharts.data = data;
+				}
+			} else if (gcharts.dtype == 'xlsx') {
+				console.log("sending xlsx");
+				action  = ACTION_DATA_CHART_WORKSPACE;
+				objtype = OBJTYPE_DATA;
+				filetye = FILETYPE_XLSX;
+				sendfile({action:action,objtype:objype,filetype:filetype,data:data,filename:filename,argv:'/'+QGID});
+			}
+		});
+	};
+	file.click();
+}
+
 
 var AVV,NARGS,HP,CONF,CONF2,CHR;
 
@@ -110,7 +185,7 @@ var AVV,NARGS,HP,CONF,CONF2,CHR;
 function chart(av)
 {
 	CHR = av;
-	var QGID = av.QGID,series;
+	var QGID = av.QGID, div = av.div, series;
 
 	var conf = {
 		yAxis:{title:{align:'middle'}},
@@ -126,8 +201,8 @@ function chart(av)
 			},
 		}
 	},
-	data = av.data;
 
+	data = av.data;
 	switch (av.type) {
 		case 'bar':
 			conf.plotOptions.bar = bar_plotOptions;
@@ -142,7 +217,7 @@ function chart(av)
 		case 'array':
 			av.ohlc   = [];
 			av.volume = [];
-			len = data.length;
+			len       = data.length;
 			for (var x=0; x<len; x++) {
 				av.ohlc.push([data[x][0],data[x][1],data[x][2],data[x][3],data[x][4]]);
 				av.volume.push([data[x][0],data[x][5]]);
@@ -154,19 +229,24 @@ function chart(av)
 	}
 	CONF2 = conf;
 	console.log("div: " + av.div + " title: " + av.title + " QGID: " + av.QGID);
-	if (!av.div) {
+	if (!div || typeof(div) == "string") {
 		div    = document.createElement('div');
 		div.id = av.title+"-"+QGID;
 	}
+
 	if (QGID) {
 		av.quad = WMAP[av.QGID];
-		av.quad.appendChild(div);
+		if (typeof(div != "string"))
+			av.quad.appendChild(div);
 	}
-	if (av.conf) {
+
+	// Assign the custom highcharts|plotly config, if one is provided
+	if (av.conf)
 		conf = Object.assign(conf,av.conf);
-	}
+
 	if (av.title)
 		conf.title = {text:av.title};
+
 	switch (av.theme) {
 		case 'whiteTheme':
 			conf = Object.assign(conf,whiteTheme);
@@ -176,10 +256,14 @@ function chart(av)
 			break;
 	}
 	CONF = conf;
-	if (av.type == "stock")
-		stockchart(av);
-	else
-		Highcharts.chart(av.div,conf)
+	if (conf.chartware == "highcharts") {
+		if (av.type == "stock")
+			stockchart(av);
+		else
+			Highcharts.chart(av.div,conf)
+	} else if (conf.chartware == "plotly") {
+		console.log("plotly");
+	}
 }
 
 /*
@@ -471,7 +555,7 @@ function ichart(av,indi,unit)
 //				this.xAxis[0].setExtremes(D[D.length-100][0], null,true);
 				WMAP[div.split("-")[1]].w.workspace['ws0'].obj.push({type:"chart", ref:this});
 				for (var x = 0; x<indi.length; x++) {
-					menu = charts['graph'].menu;
+					menu      = charts['graph'].menu; // XXX: STATIC
 					menu.indi = indi[x];
 					this.menu = menu;
 					iadd(this, 0, t+'-price');
@@ -1054,96 +1138,6 @@ function chart_table_onclick(id)
 }
 
 
-/* av['type']   = 'bar'
-   av['data']   = 'data'
-   av['dtype']  = 'array|csv|excel'
-   av['conf']   = highcharts custom config
-   av['cdiv']   = existing chart div (to overwrite) or destination empty div
-   av['QGID']   = QGID of new chart
-*/
-function gui_chart_onclick(type)
-{
-	var gcharts = $("#charts")[0], data = gcharts.data, args = {}, conf = gcharts.conf, div = gcharts.CID.split("-");
-
-	if (div.length == 1) {
-		args['div']   = div[0];
-		args['title'] = gcharts.title;
-	} else {
-		args['title'] = div[0];
-		args['QGID']  = div[1];
-	}
-	args['type']  = type;
-	args['data']  = data;
-	args['dtype'] = gcharts.dtype;
-	args['theme'] = gcharts.theme;
-	if (conf) {
-		if (conf.highcharts)
-			args['conf'] = gcharts.conf.highcharts;
-		else if (conf.fusion)
-			args['conf'] = gcharts.conf.funsion;
-	}
-	chart(args);
-	qclose();
-}
-
-/*
-# {title:"DeathMeter",theme:"whiteTheme", type: "line", conf:HighChartsConfig }
-Date,DeathScore
-15/8,20
-16/8,26
-17/8,39
-*/
-//var conf = `# title DeathChart\n# theme whiteTheme\n--\nDate,Death\n15/8,20\n16/8,26\n17/8,39`
-function readfile(file,cb)
-{
-	if (!file)
-		return;
-
-	var r = new FileReader(), ftype = file.type.split("/")[1];
-	r.onload = function(e){
-		cb(e.target.result);
-	};
-	if (ftype == 'csv' || ftype == 'txt')
-		r.readAsText(file);
-	else
-		r.readAsArrayBuffer(file)
-}
-
-function chart_import(CID)
-{
-	var gcharts = $("#charts")[0],conf,csv,file = $("#upload-csv-file"),QGID,action,objtype,filetype;
-
-	gcharts.CID = CID;
-	QGID        = CID.split("-")[1];
-
-	console.log("chart import " + CID);
-	file[0].onchange = function(){
-		readfile(file[0].files[0],function(data){
-			gcharts.dtype = file[0].files[0].type.split("/")[1];
-			gcharts.style.display='block';
-			if (gcharts.dtype == 'csv') {
-				// depending on the CSV formatting there may be a custom chart config
-				// there may be a request for a stock chart with or without volume
-				if (data.substr(0,3) == "# {") {
-					nl = data.indexOf("\n");
-					gcharts.conf  = JSON.parse(data.substr(2,nl-2));
-					gcharts.data  = data.substr(nl+1);
-					gcharts.theme = gcharts.conf.theme;
-					if (gcharts.conf.title)
-						gcharts.title = gcharts.conf.title;
-				} else
-					gcharts.data = data;
-			} else if (gcharts.dtype == 'xlsx') {
-				console.log("sending xlsx");
-				action  = ACTION_DATA_CHART_WORKSPACE;
-				objtype = OBJTYPE_DATA;
-				filetye = FILETYPE_XLSX;
-				sendfile({action:action,objtype:objype,filetype:filetype,data:data,filename:filename,argv:'/'+QGID});
-			}
-		});
-	};
-	file.click();
-}
 
 function ChartMenu()
 {

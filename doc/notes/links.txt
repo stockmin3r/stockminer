@@ -92,9 +92,6 @@ https://windows-internals.com/one-i-o-ring-to-rule-them-all-a-full-read-write-ex
 https://windows-internals.com/wp-content/uploads/2022/07/ioring_preregistered.png
 https://github.com/yardenshafir/IoRing_Demos/blob/main/IoRingPerf/IoRingPerf/Source.cpp
 
-[makefiles]
-https://yuukidach.github.io/p/makefile-for-projects-with-subdirectories/
-
 [ai]
 https://github.com/PacktPublishing/Machine-Learning-for-Algorithmic-Trading-Second-Edition
 https://lightning.ai/blog/scaling-large-language-models-with-pytorch-lightning/ # Distributed Llama modelling
@@ -104,3 +101,14 @@ https://math.stackexchange.com/questions/317114/what-is-the-purpose-of-subtracti
 https://machinelearningmastery.com/learning-curves-for-diagnosing-machine-learning-model-performance/
 https://www.wwwinsights.com/ai/openai-text-embedding/
 https://abdbasit.hashnode.dev/build-a-qa-app-using-lang-chain-chroma-and-unreal-speech-in-python
+
+[discord]
+https://github.com/izio38/Discord.js-bot-example
+https://gist.github.com/vegeta897/b006e789fe5712cf04f257090e73230b
+https://www.sitepoint.com/discord-bot-node-js/
+https://github.com/discordjs/discord.js/blob/master/src/client/Client.js
+https://github.com/reaganmcf/discord-stock-bot/blob/ab7e7758d8cef1d70c8363edb7817dbb4361636d/index.js#L412
+https://github.com/AnthoneyKalasho/Discord-Stock-Bot/blob/master/marketAPI.py
+
+[makefiles]
+https://yuukidach.github.io/p/makefile-for-projects-with-subdirectories/

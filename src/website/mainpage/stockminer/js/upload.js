@@ -119,6 +119,21 @@ function ws_send(url,data,cb)
 	}
 }
 
+function readfile(file,cb)
+{
+	if (!file)
+		return;
+
+	var r = new FileReader(), ftype = file.type.split("/")[1];
+	r.onload = function(e){
+		cb(e.target.result);
+	};
+	if (ftype == 'csv' || ftype == 'txt')
+		r.readAsText(file);
+	else
+		r.readAsArrayBuffer(file)
+}
+
 // GET /ws/action/objtype/filetype/filename/filesize/arg1/argX
 /*
 OBJTYPES      = { img:1, doc:2, vid:3, app:4, data:5},

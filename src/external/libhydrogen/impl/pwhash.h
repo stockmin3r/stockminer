@@ -280,7 +280,8 @@ hydro_pwhash_upgrade(uint8_t       stored[hydro_pwhash_STOREDBYTES],
                                    hydro_pwhash_CONTEXT, master_key);
 }
 
-int hydro_test(int n)
+int hydro_test(uint8_t buf[8])
 {
-	return n+1;
+	strcpy(buf, "asdf");
+	return 1;
 }

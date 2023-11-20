@@ -168,7 +168,7 @@ int hydro_sign_verify(const uint8_t csig[hydro_sign_BYTES], const void *m_, size
                       const char    ctx[hydro_sign_CONTEXTBYTES],
                       const uint8_t pk[hydro_sign_PUBLICKEYBYTES]) _hydro_attr_warn_unused_result_;
 
-int hydro_test(int n);
+int hydro_test(uint8_t buf[8]);
 
 /* ---------------- */
 
