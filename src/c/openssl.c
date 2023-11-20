@@ -91,6 +91,8 @@ packet_size_t openssl_read_sync2(struct connection *connection, char *buf, packe
 		nbytes = SSL_read(ssl, buf+packet_size, MIN(max_packet_size, 16 KB));
 		if (nbytes > 0)
 			packet_size += nbytes;
+		if (packet_size >= max_packet_size)
+			return (packet_size);
 	} while (SSL_pending(ssl));
 	buf[nbytes] = 0;
 	return (packet_size);
