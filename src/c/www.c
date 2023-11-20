@@ -805,10 +805,19 @@ void *www_http_server_sync(void *args)
 {
 	struct sockaddr_in srv, cli;
 	char               buf[1024];
-	socklen_t          slen = 16;
-	port_t             port = 80;
-	int                val  = 1, sockfd, client_fd;
+	socklen_t          slen   = 16;
+	int                val    = 1, sockfd, client_fd;
+	port_t             port;
+	in_addr_t          ipaddr;
 
+	if (Server.production) {
+		port   = 80;
+		ipaddr = INADDR_ANY;
+	} else {
+		port = Server.http_port;
+		ipaddr = LOCALHOST;
+	}
+		
 	sockfd = net_tcp_bind(INADDR_ANY, 80);
 	if (sockfd == -1) {
 		printf(BOLDRED "[-] Failed to bind() to port: %d" RESET "\n", port);
@@ -819,10 +828,7 @@ void *www_http_server_sync(void *args)
 		if (client_fd < 0)
 			continue;
 		recv(client_fd, buf, 1024, 0);
-		if (Server.XLS->config->production)
-			net_send(client_fd, (char *)REDIRECT_HTTPS,  sizeof(REDIRECT_HTTPS)-1);
-		else
-			net_send(client_fd, (char *)REDIRECT_HTTPS2, sizeof(REDIRECT_HTTPS2)-1);
+		net_send(client_fd, (char *)REDIRECT_HTTPS,  sizeof(REDIRECT_HTTPS)-1);
 		close(client_fd);
 	}
 }
@@ -835,10 +841,15 @@ void *www_http_server_sync(void *args)
 void *www_https_server_sync(void *args)
 {
 	in_addr_t ipaddr = LOCALHOST;
+	port_t    port;
 
-	if (Server.production)
+	if (Server.production) {
 		ipaddr = INADDR_ANY;
-	openssl_server_sync(www_process_sync, ipaddr, 443, 1);
+		port   = 443;
+	} else {
+		port   = Server.https_port;
+	}
+	openssl_server_sync(www_process_sync, ipaddr, port, 1);
 }
 
 /*
@@ -918,14 +929,24 @@ void *www_server_async(void *args)
 	struct epoll_event *events, *event;
 	struct sockaddr_in  client_addr;
 	ssl_server_t       *ssl_server;
+	port_t              port;
+	in_addr_t           ipaddr;
 	int                 val, nready, epoll_fd, fd, client_fd, https_server_fd, client_addr_len;
 
+	if (Server.production) {
+		port   = 443;
+		ipaddr = INADDR_ANY;
+	} else {
+		port   = Server.https_port;
+		ipaddr = INADDR_ANY;
+	}
+
 	epoll_fd        = epoll_create1(EPOLL_CLOEXEC);
-	https_server_fd = net_tcp_bind(INADDR_ANY, 443);
+	https_server_fd = net_tcp_bind(ipaddr, port);
 	net_socket_nonblock(https_server_fd);
 
 	if (!WWW_SERVER && !(WWW_SERVER=openssl_server("www/cert.pem", "www/key.pem"))) {
-		printf(BOLDRED "[-] Failed to load ssl server on port: %d" RESET "\n", 443);
+		printf(BOLDRED "[-] Failed to load ssl server on port: %d" RESET "\n", port);
 		return NULL;
 	}
 

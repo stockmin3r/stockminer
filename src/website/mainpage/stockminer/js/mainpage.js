@@ -187,7 +187,7 @@ APP_TYPE_GO       = 5,
 APP_TYPE_WAVE     = 6,
 DEL_RPC           = { 'img': QUPDATE_DEL_IMG, 'pdf': QUPDATE_DEL_PDF, 'chart': QUPDATE_DEL_CHART, 'wstab': QUPDATE_DEL_WSTAB },
 tools             = [ 'pencil', 'marker', 'eraser', 'arrow', 'text', 'image', 'pdf', 'line', 'rect', 'arc', 'quad', 'bezier' ],
-WS_URL            = "wss://localhost:443/ws/";
+WS_URL            = "wss://localhost:port/ws/";
 $.fn.dataTable.ext.errMode='none';
 
 function init_stockminer()

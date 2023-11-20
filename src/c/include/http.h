@@ -95,42 +95,23 @@
                             "Content-Length:    \r\n\r\n"              \
                             "User-Agent: *\nAllow: /\n"                \
 
-#define FREEPAGE_OFFSET         243      /* FreePage Length:  offset */
-#define FREEPAGE_ETAG_OFFSET    186      /* FreePage ETag:    offset */
-#define FREEPAGE_COOKIE_OFFSET  209      /* FreePage Cookie:  offset */
 #define HTML_OFFSET             159      /* AboutPage Length: offset */
 #define HTML_ETAG_OFFSET        110      /* AboutPage ETag:   offset */
 #define JAVASCRIPT_OFFSET       147      /* JS Length:        offset */
 #define CSS_OFFSET              133      /* CSS Length:       offset */
 #define JSON_RSP_OFFSET         63       /* JSON RSP Length:  offset */
-#define REDIRECT_COOKIE_OFFSET  44       /* Redirect Cookie   offset */
 #define IMG_OFFSET              111      /* Image Length:     offset */
 #define PDF_OFFSET              117      /* PDF Length:       offset */
 #define GZIP_OFFSET             106      /* gzip Length:      offset */
 
-#define SIZEOF_FREEPAGE         sizeof(HTTP_FREEPAGE)-1
 #define SIZEOF_MAINPAGE         sizeof(HTTP_MAINPAGE)-1
 #define SIZEOF_HTML             sizeof(HTTP_HTML)-1
 #define SIZEOF_JAVASCRIPT       sizeof(HTTP_JAVASCRIPT)-1
 #define SIZEOF_CSS              sizeof(HTTP_CSS)-1
 #define SIZEOF_JSON_RSP         sizeof(JSON_RSP)-1
 
-#define SET_RCOOKIE(pg, cookie)                                     \
-({                                                                  \
-	*(uint64_t *)(pg+REDIRECT_COOKIE_OFFSET) = cookie;              \
-})                                                                  \
-
-#define SET_PCOOKIE(pg, cookie)                                     \
-({                                                                  \
-	*(uint64_t *)(pg+FREEPAGE_COOKIE_OFFSET) = cookie;              \
-})
-
 #define REDIRECT_HTTPS      "HTTP/1.1 301 Moved Permanently\r\n"           \
-                            "Location: https://www.stockminer.org\r\n\r\n" \
-
-#define REDIRECT_HTTPS2     "HTTP/1.1 301 Moved Permanently\r\n"           \
                             "Location: https://localhost\r\n\r\n"          \
-
 
 #define REDIRECT_LOGIN      "HTTP/1.1 302 Found\r\n"                       \
                             "Location: /login\r\n\r\n"                     \
@@ -141,13 +122,7 @@
 #define REDIRECT_HOME       "HTTP/1.1 301 Moved Permanently\r\n"           \
                             "Location: /\r\n\r\n"                          \
 
-
-#define HTTP_404             "HTTP/1.1 404 Not Found\r\n\r\n"
-#define HTTP_304             "HTTP/1.1 304 Not Modified\r\n\r\n"
-#define HTTP_304_COOKIE      "HTTP/1.1 304 Not Modified\r\nSet-Cookie:         \r\n"
-
-#define HTTP_COOKIE_EXPIRED  "HTTP/1.1 302 Found\r\n"                                           \
-			     "Set-Cookie: deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT;\r\n"  \
-			     "Location: /\r\n\r\n"
+#define HTTP_404            "HTTP/1.1 404 Not Found\r\n\r\n"
+#define HTTP_304            "HTTP/1.1 304 Not Modified\r\n\r\n"
 
 #endif

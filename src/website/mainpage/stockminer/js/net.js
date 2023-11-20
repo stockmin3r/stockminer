@@ -36,7 +36,7 @@ function upbox(type, action, workspace)
 }
 
 // GET /ws/action/objtype/filecode/filesize/filename/arg1/argX
-//new WebSocket("wss://localhost:443/ws/action/objtype/filecode/filename/filesize/QGID/URL);
+//new WebSocket("wss://localhost:port/ws/action/objtype/filecode/filename/filesize/QGID/URL);
 function upload()
 {
 	var n    = window.event.target,p=n.parentNode,r,C,addobj=1,QGID=p.QGID,
@@ -52,7 +52,7 @@ function upload()
 	r.onload = function(e) {
 		var data      = e.target.result,ws,obj,URL = randstr();
 		console.log("new websocket for action: " + action);
-		ws            = new WebSocket("wss://localhost:443/ws/"+action+"/"+objtype+"/"+filecode+"/"+filesize+"/"+filename+"/"+QGID+"/"+URL+"/");
+		ws            = new WebSocket("wss://localhost:port/ws/"+action+"/"+objtype+"/"+filecode+"/"+filesize+"/"+filename+"/"+QGID+"/"+URL+"/");
 		ws.binaryType = "arrayBuffer";
 		ws.onopen     = function() {
 			ws.send(data);
@@ -200,7 +200,7 @@ function qexport(URL)
 /*	r = new FileReader();
 	r.onload = function(e) {
 		data          = e.target.result;
-		ws            = new WebSocket("wss://localhost:443/ws/4/-/"+file.size+"/-/"+URL+"/");
+		ws            = new WebSocket("wss://localhost:port/ws/4/-/"+file.size+"/-/"+URL+"/");
 		ws.binaryType = "arrayBuffer";
 		ws.onopen     = function() {
 			ws.send(data);

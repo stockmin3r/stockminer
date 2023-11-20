@@ -8,6 +8,7 @@ static bool  website_load_pages    (struct page **pages, int nr_pages, int PAGE_
 static void  gzip_mainpage         (struct page *mainpage);
 static void  website_gzip_mainpage (struct page *mainpage);
 static char *website_set_domain    (char *website, char *domain);
+static char *website_set_localhost (char *website, port_t port);
 static void  free_pages            (struct page *page);
 
 #define DEFER               1
@@ -254,6 +255,8 @@ struct website *build_website(struct server *server)
 		mainpage_html  = cstring_inject(mainpage_html, page->json, mainpage_json, NULL);
 		if (server->production)
 			mainpage_html = website_set_domain(mainpage_html, server->domain);
+		else
+			mainpage_html = website_set_localhost(mainpage_html, server->https_port);
 		page->file     = mainpage_html;
 		page->filesize = strlen(mainpage_html);
 		website_gzip_mainpage(page); // sets HTTP_MAINPAGE header + gzipped content of page->file
@@ -289,6 +292,18 @@ static char *website_set_domain(char *website, char *domain)
 	char *p;
 
 	while ((p=cstring_inject(website, domain, "localhost", NULL)))
+		website = p;
+
+	return (website);
+}
+
+static char *website_set_localhost(char *website, port_t port)
+{
+	char  *p;
+	char   hostname_port[64];
+
+	snprintf(hostname_port, sizeof(hostname_port)-1, "localhost:%d", port);
+	while ((p=cstring_inject(website, hostname_port, "localhost:port", NULL)))
 		website = p;
 
 	return (website);

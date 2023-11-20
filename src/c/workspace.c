@@ -236,6 +236,58 @@ out:
 //	mutex_unlock(&this_session->watchlist_lock);
 }
 
+void rpc_stockpage(struct rpc *rpc)
+{
+	struct session    *session    = rpc->session;
+	struct connection *connection = rpc->connection;
+	char              *packet     = rpc->packet;
+	char              *ticker     = rpc->argv[1];
+	int                QVID       = atoi(rpc->argv[2]);
+	int                QSID       = atoi(rpc->argv[3]);
+	struct stock      *stock      = search_stocks(ticker);
+	struct quadverse  *quadverse;
+	struct workspace  *workspace;
+	struct chart      *chart;
+	struct wsid        WSID;
+	char               id[24];
+	int                packet_len;
+
+	if (!stock || (QVID == 0 && QSID < 5) || QVID == 2)
+		return;
+
+/*	if (stockpage_exists(session, stock)) {
+		return;
+	}*/
+
+	sprintf(id, "P%dQ%dq2ws0", QVID, QSID);
+	if (!workspace_id(session, id, &WSID))
+		return;
+	workspace = get_workspace(session, &WSID, NULL);
+	if (!workspace || workspace->nr_charts >= MAX_CHARTS)
+		return;
+	quadverse = session->quadverse[WSID.QVID];
+	quadverse->current_quadspace[connection->websocket_id] = WSID.QSID;
+	quadverse->quadspace[WSID.QSID]->stockpage = ticker;  // QuadSpace Title
+	chart = workspace->charts[workspace->nr_charts++] = (struct chart *)zmalloc(sizeof(*chart));
+	snprintf(chart->div, MAX_DIVSIZE-1, "%s-%s", stock->sym, id);
+	packet_len   = pack_stockpage(stock, packet, chart->div, &WSID, NULL);
+	chart->stock = stock;
+	chart->type  = CHART_TYPE_OHLC;
+
+	if (!session->qcache) {
+		printf(BOLDCYAN "stock_page: CREATING QCACHE" RESET "\n");
+		session->qcache = qcache_create(session, QVID, QSID, ticker, 1);
+	} else {
+		qcache_new_quadspace(session, quadverse->qpage, QVID, QSID, NULL, ticker, 1);
+		printf(BOLDYELLOW "stock_page: qcache new quadspace QVID: %d QSID: %d" RESET "\n", QVID, QSID);
+	}
+	websocket_send(connection, packet, packet_len);
+	packet[packet_len++] = ' ';
+	packet[packet_len++] = '1';
+	printf(BOLDGREEN "%s" RESET "\n", packet);
+	websockets_sendall_except(session, connection, packet, packet_len);
+}
+
 void rpc_mini_charts(struct rpc *rpc)
 {
 	char             *packet = rpc->packet;
@@ -533,58 +585,6 @@ struct chart *search_chart(struct session *session, char *ticker, int QVID, int 
 	return (NULL);
 }
 
-void rpc_stockpage(struct rpc *rpc)
-{
-	struct session    *session    = rpc->session;
-	struct connection *connection = rpc->connection;
-	char              *packet     = rpc->packet;
-	char              *ticker     = rpc->argv[1];
-	int                QVID       = atoi(rpc->argv[2]);
-	int                QSID       = atoi(rpc->argv[3]);
-	struct stock      *stock      = search_stocks(ticker);
-	struct quadverse  *quadverse;
-	struct workspace  *workspace;
-	struct chart      *chart;
-	struct wsid        WSID;
-	char               id[24];
-	int                packet_len;
-
-	if (!stock || (QVID == 0 && QSID < 5) || QVID == 2)
-		return;
-
-/*	if (stockpage_exists(session, stock)) {
-		return;
-	}*/
-
-	sprintf(id, "P%dQ%dq2ws0", QVID, QSID);
-	if (!workspace_id(session, id, &WSID))
-		return;
-	workspace = get_workspace(session, &WSID, NULL);
-	if (!workspace || workspace->nr_charts >= MAX_CHARTS)
-		return;
-	quadverse = session->quadverse[WSID.QVID];
-	quadverse->current_quadspace[connection->websocket_id] = WSID.QSID;
-	quadverse->quadspace[WSID.QSID]->stockpage = ticker;  // QuadSpace Title
-	chart = workspace->charts[workspace->nr_charts++] = (struct chart *)zmalloc(sizeof(*chart));
-	snprintf(chart->div, MAX_DIVSIZE-1, "%s-%s", stock->sym, id);
-	packet_len   = pack_stockpage(stock, packet, chart->div, &WSID, NULL);
-	chart->stock = stock;
-	chart->type  = CHART_TYPE_OHLC;
-
-	if (!session->qcache) {
-		printf(BOLDCYAN "stock_page: CREATING QCACHE" RESET "\n");
-		session->qcache = qcache_create(session, QVID, QSID, ticker, 1);
-	} else {
-		qcache_new_quadspace(session, quadverse->qpage, QVID, QSID, NULL, ticker, 1);
-		printf(BOLDYELLOW "stock_page: qcache new quadspace QVID: %d QSID: %d" RESET "\n", QVID, QSID);
-	}
-	websocket_send(connection, packet, packet_len);
-	packet[packet_len++] = ' ';
-	packet[packet_len++] = '1';
-	printf(BOLDGREEN "%s" RESET "\n", packet);
-	websockets_sendall_except(session, connection, packet, packet_len);
-}
-
 int qpage_load_qcache(struct qpage *qpage)
 {
 	yyjson_doc *doc;
@@ -646,7 +646,7 @@ void load_quadverse_pages()
 			if (qpage->flags  &= QUADVERSE_PROFILE) {
 				qpage->quadverse        = session->quadverse[QUADVERSE_PROFILE];
 				qpage->quadverse->qpage = qpage;
-				strcpy(qpage->url, session->user->uname);
+				strncpy(qpage->url, session->user->uname, MAX_USERNAME_SIZE);
 			} else {
 				session->quadverse[session->nr_quadverses++] = qpage->quadverse = new_quadverse();
 				qpage->quadverse->qpage = qpage;
