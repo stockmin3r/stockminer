@@ -12,7 +12,7 @@ LIBOBJ     := $(EXT)/libhydrogen/libhydrogen.a $(EXT)/lmdb/liblmdb.a $(EXT)/queu
 WARN       := -Wno-address-of-packed-member -Wno-unused-result -Wno-write-strings -Wno-deprecated -Wno-misleading-indentation
 DEBUG      := yes
 PLOTLY     := yes
-HIGHCHARTS := 79145WITH_HIGHCHARTS
+HIGHCHARTS := yes
 LDFLAGS    += $(LIBOBJ)
 
 # XXX: refuses to add src/external/yyjson.c for some reason (Makefile is broken)
@@ -66,19 +66,8 @@ endif
 #build/build.h#
 ###############
 ifeq ($(DEBUG),yes)
-	
 	CFLAGS += -ggdb3
 endif
-ifeq ($(WITH_HIGHCHARTS),yes)
-	
-endif
-ifeq ($(WITH_PLOTLY),yes)
-	
-endif
-ifeq ($(WITH_LIBSODIUM),yes)
-	
-endif
-
 
 ###############
 # Main Target #

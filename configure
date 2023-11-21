@@ -51,6 +51,25 @@ END
 	exit 1
 fi
 
+if [ $DEBUG = yes ]; then
+	echo "#define DEBUG 1" >> build/build.h
+fi
+
+if [ $WITH_HIGHCHARTS = yes ]; then
+	echo "#define HIGHCHARTS 1" >> build/build.h
+fi
+
+if [ $WITH_PLOTLY = yes ]; then
+	echo "#define PLOTLY 1" >> build/build.h
+fi
+
+if [ $WITH_LIBSODIUM = yes ]; then
+	echo "#define LIBSODIUM 1" >> build/build.h
+fi
+
+echo "#endif" >> build/build.h
+
+
 cat << EOF > Makefile
 
 ################
@@ -66,7 +85,7 @@ LIBOBJ     := \$(EXT)/libhydrogen/libhydrogen.a \$(EXT)/lmdb/liblmdb.a \$(EXT)/q
 WARN       := -Wno-address-of-packed-member -Wno-unused-result -Wno-write-strings -Wno-deprecated -Wno-misleading-indentation
 DEBUG      := $DEBUG
 PLOTLY     := $WITH_PLOTLY
-HIGHCHARTS := $$WITH_HIGHCHARTS
+HIGHCHARTS := $WITH_HIGHCHARTS
 LDFLAGS    += \$(LIBOBJ)
 
 # XXX: refuses to add src/external/yyjson.c for some reason (Makefile is broken)
@@ -120,19 +139,8 @@ endif
 #build/build.h#
 ###############
 ifeq (\$(DEBUG),yes)
-	$(echo "#define DEBUG 1" >> build/build.h)
 	CFLAGS += -ggdb3
 endif
-ifeq (\$(WITH_HIGHCHARTS),yes)
-	$(echo "#define HIGHCHARTS 1" >> build/build.h)
-endif
-ifeq (\$(WITH_PLOTLY),yes)
-	$(echo "#define PLOTLY 1" >> build/build.h)
-endif
-ifeq (\$(WITH_LIBSODIUM),yes)
-	$(echo "#define LIBSODIUM 1" >> build/build.h)
-endif
-$(echo "#endif" >> build/build.h)
 
 ###############
 # Main Target #
