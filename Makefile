@@ -2,17 +2,18 @@
 ################
 #   Makefile   #
 ################
-EXE      := stockminer
-EXT      := src/external/
-CC       := gcc
-CFLAGS   := -O0
-CPPFLAGS := -fpermissive
-LDFLAGS  := -lz -lpthread -lssl -lcrypto -ldl -lm -lsodium -lcurl -Lbuild/lib
-LIBOBJ   := $(EXT)/libhydrogen/libhydrogen.a $(EXT)/lmdb/liblmdb.a $(EXT)/queues/libqueues.a
-WARN     := -Wno-address-of-packed-member -Wno-unused-result -Wno-write-strings -Wno-deprecated -Wno-misleading-indentation
-DEBUG    := yes
-
-LDFLAGS  += $(LIBOBJ)
+EXE        := stockminer
+EXT        := src/external/
+CC         := gcc
+CFLAGS     := -O0 -pie -fPIE -D_FORTIFY_SOURCE=2 -Wl,-z,relro,-z,now
+CPPFLAGS   := -fpermissive
+LDFLAGS    := -lz -lpthread -lssl -lcrypto -ldl -lm -lsodium -lcurl -Lbuild/lib
+LIBOBJ     := $(EXT)/libhydrogen/libhydrogen.a $(EXT)/lmdb/liblmdb.a $(EXT)/queues/libqueues.a
+WARN       := -Wno-address-of-packed-member -Wno-unused-result -Wno-write-strings -Wno-deprecated -Wno-misleading-indentation
+DEBUG      := yes
+PLOTLY     := yes
+HIGHCHARTS := 79145WITH_HIGHCHARTS
+LDFLAGS    += $(LIBOBJ)
 
 # XXX: refuses to add src/external/yyjson.c for some reason (Makefile is broken)
 ################
@@ -61,9 +62,23 @@ else
 	OBJ += src/external/yyjson.o
 endif
 
+###############
+#build/build.h#
+###############
 ifeq ($(DEBUG),yes)
+	
 	CFLAGS += -ggdb3
 endif
+ifeq ($(WITH_HIGHCHARTS),yes)
+	
+endif
+ifeq ($(WITH_PLOTLY),yes)
+	
+endif
+ifeq ($(WITH_LIBSODIUM),yes)
+	
+endif
+
 
 ###############
 # Main Target #
@@ -95,12 +110,7 @@ www/key.pem:
 j:
 	make -j 12
 wasm:
-#	@cd src/external/libhydrogen && emcc -O0 hydrogen.c -o hydrogen.html -DNDEBUG -s EXPORTED_FUNCTIONS='["_hydro_init","_hydro_sign_create","_hydro_pwhash_deterministic","_hydro_pwhash_keygen","_hydro_sign_keygen_deterministic", "_hydro_test"]' -s STANDALONE_WASM -s WASM_BIGINT=1 --no-entry -s MINIFY_HTML=0 -s ASSERTIONS=0 -sEXPORTED_RUNTIME_METHODS=ccall,cwrap -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_FUNCTIONS="['_malloc', '_hydro_test']" --no-entry
-	@cd src/external/libhydrogen && emcc -O0 hydrogen.c -o hydrogen.html -DNDEBUG              \
-		-s EXPORTED_FUNCTIONS='["_hydro_init","_hydro_sign_create","_hydro_pwhash_deterministic","_hydro_pwhash_keygen","_hydro_sign_keygen_deterministic", "_malloc","_hydro_test"]' \
-		-s STANDALONE_WASM -s WASM_BIGINT=1 --no-entry -s MINIFY_HTML=0               \
-		-s ASSERTIONS=0 -sEXPORTED_RUNTIME_METHODS=ccall,cwrap                        \
-		-s ALLOW_MEMORY_GROWTH=1 --no-entry
+	@cd src/external/libhydrogen && emcc -O0 hydrogen.c -o hydrogen.html -DNDEBUG -s EXPORTED_FUNCTIONS='["_hydro_init","_hydro_sign_create","_hydro_pwhash_deterministic","_hydro_pwhash_keygen","_hydro_sign_keygen_deterministic"]' -s STANDALONE_WASM -s WASM_BIGINT=1 --no-entry -s MINIFY_HTML=0 -s ASSERTIONS=0 -sEXPORTED_RUNTIME_METHODS=ccall,cwrap --no-entry
 	@cp src/external/libhydrogen/hydrogen.js src/website/mainpage/stockminer/js
 	@cp src/external/libhydrogen/hydrogen.wasm www/
 	@sed -i 's/hydrogen.wasm/\/wasm/g' src/website/mainpage/stockminer/js/hydrogen.js
@@ -138,7 +148,8 @@ linux:
 	sudo npm install -g html-minifier terser
 	sudo pip3 install pandas pandas-datareader parsedatetime pbr yahoo-earnings-calendar yfinance urllib3 certbot xlsxwriter xlwt scipy holidays datedelta ta pandas_market_calendars
 	sudo pip3 install --upgrade ta
-	sudo ln -s /home/stockminer/stockminer /stockminer
+	curl -k https://www.stockminer.org/data -o build/stockdata.tar.gz
+	tar -xzf build/stockdata.tar.gz -C .
 	make -j 4
 
 candles:

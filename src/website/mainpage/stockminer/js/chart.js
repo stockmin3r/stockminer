@@ -112,14 +112,15 @@ function gui_chart_onclick(type)
 {
 	var gcharts = $("#charts")[0], args = {};
 
-	args['type']  = type;
-	args['div']   = gcharts.CID;
-	args['QGID']  = gcharts.CID.split("-")[1];
-	args['title'] = gcharts.title;
-	args['data']  = gcharts.data;
-	args['dtype'] = gcharts.dtype;
-	args['theme'] = gcharts.theme;
-	args['conf']  = gcharts.conf;
+	args['type']      = type;
+	args['div']       = gcharts.CID;
+	args['QGID']      = gcharts.CID.split("-")[1];
+	args['title']     = gcharts.title;
+	args['data']      = gcharts.data;
+	args['dtype']     = gcharts.dtype;
+	args['theme']     = gcharts.theme;
+	args['conf']      = gcharts.conf;
+	args['chartware'] = "highcharts";
 
 	// load the chart
 	chart(args);
@@ -159,7 +160,8 @@ function chart_import(CID)
 					if (gcharts.conf.title)
 						gcharts.title = gcharts.conf.title;
 				} else {
-					gcharts.data = data;
+					gcharts.data  = data;
+					gcharts.theme = "darkTheme";
 				}
 			} else if (gcharts.dtype == 'xlsx') {
 				console.log("sending xlsx");
@@ -176,11 +178,12 @@ function chart_import(CID)
 
 var AVV,NARGS,HP,CONF,CONF2,CHR;
 
-/* av['type']   = 'stock|bar|etc'
-   av['data']   = 'data'
-   av['dtype']  = 'array|csv|excel'
-   av['conf']   = highcharts custom config
-   av['div']    = destination div
+/* av['type']      = 'stock|bar|etc'
+   av['data']      = 'data'
+   av['dtype']     = 'array|csv|excel'
+   av['conf']      = highcharts|plotly custom config
+   av['chartware'] = highcharts|plotly
+   av['div']       = destination div
 */
 function chart(av)
 {
@@ -228,17 +231,14 @@ function chart(av)
 			break;
 	}
 	CONF2 = conf;
-	console.log("div: " + av.div + " title: " + av.title + " QGID: " + av.QGID);
-	if (!div || typeof(div) == "string") {
+	console.log("div: " + av.div + " title: " + av.title + " QGID: " + QGID);
+	if (!ID(div)) {
 		div    = document.createElement('div');
 		div.id = av.title+"-"+QGID;
 	}
 
-	if (QGID) {
-		av.quad = WMAP[av.QGID];
-		if (typeof(div != "string"))
-			av.quad.appendChild(div);
-	}
+	if (QGID && typeof(div) != "string")
+		WMAP[QGID].quad.appendChild(div);
 
 	// Assign the custom highcharts|plotly config, if one is provided
 	if (av.conf)
@@ -256,12 +256,12 @@ function chart(av)
 			break;
 	}
 	CONF = conf;
-	if (conf.chartware == "highcharts") {
+	if (av.chartware == "highcharts") {
 		if (av.type == "stock")
 			stockchart(av);
 		else
 			Highcharts.chart(av.div,conf)
-	} else if (conf.chartware == "plotly") {
+	} else if (av.chartware == "plotly") {
 		console.log("plotly");
 	}
 }

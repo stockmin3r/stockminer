@@ -12,7 +12,7 @@ extern "C" {
 #undef __OpenBSD__
 #undef __NetBSD__
 
-#include <os.h>
+#include <build.h>
 
 #ifdef __Linux__
 #define __LINUX__   1

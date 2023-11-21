@@ -6,44 +6,68 @@
 ARCH=`uname -m 2>/dev/null`
 OS=`uname   -s 2>/dev/null`
 DEBUG=no
+HELP=no
+WITH_HIGHCHARTS=yes
+WITH_PLOTLY=yes
+WITH_LIBSODIUM=no
+WITH_CANDLESTICKS=no
 
 mkdir -p build
-echo "#ifndef __OS_H"         > build/os.h
-echo "#define __OS_H"        >> build/os.h
-echo "#define __${OS}__ 1"   >> build/os.h
-echo "#endif" >> build/os.h
+echo "#ifndef __BUILD_H"      > build/build.h
+echo "#define __BUILD_H"     >> build/build.h
+echo "#define __${OS}__ 1"   >> build/build.h
 
-while [ $# -ne 0 ]; do
-
-case "$1" in
---prefix*)
-shift
-INSTALL=$1
-;;
---debug)
-shift
-DEBUG=yes
-esac;
-shift
+while [ $# -ne 0 ];
+do
+	case "$1" in
+		--prefix=)                  INSTALL="$1"        ;;
+		--debug)                    DEBUG=yes           ;;
+		--help)                     HELP=yes            ;;
+		--with-highcharts)          WITH_HIGHCHARTS=yes ;;
+		--without-highcharts)       WITH_HIGHCHARTS=no  ;;
+		--with-plotly)              WITH_PLOTLY=yes     ;;
+		--without-plotly)           WITH_PLOTLY=no      ;;
+		--with-libsodium)           WITH_PLOTLY=yes     ;;
+		--without-libsodium)        WITH_PLOTLY=no      ;;
+		--with-candlesticks)        WITH_PLOTLY=yes     ;;
+		--without-candlesticks)     WITH_PLOTLY=no      ;;
+	esac;
+	shift
 done
 
+if [ $HELP = yes ]; then
+cat << END
+	--help               print help
+	--prefix=PATH        set installation prefix
+	--with-highcharts    turns on highcharts (default: yes)
+	--without-highcharts disables highcharts (default: no)
+	--with-plotly        turns on highcharts (default: yes)
+	--without-plotly     disables highcharts (default: no)
+	--with-libsodium     turns on libsodium  (default: no)
+	--without-libsodium  disables libsodium  (default: yes)
+	--with-candlesticks  libta (compile errors on some platforms)  (default: no)
+	--without-without    disables libta  (default: yes)
+END
+	exit 1
+fi
 
 cat << EOF > Makefile
 
 ################
 #   Makefile   #
 ################
-EXE      := stockminer
-EXT      := src/external/
-CC       := gcc
-CFLAGS   := -O0
-CPPFLAGS := -fpermissive
-LDFLAGS  := -lz -lpthread -lssl -lcrypto -ldl -lm -lsodium -lcurl -Lbuild/lib
-LIBOBJ   := \$(EXT)/libhydrogen/libhydrogen.a \$(EXT)/lmdb/liblmdb.a \$(EXT)/queues/libqueues.a
-WARN     := -Wno-address-of-packed-member -Wno-unused-result -Wno-write-strings -Wno-deprecated -Wno-misleading-indentation
-DEBUG    := $DEBUG
-
-LDFLAGS  += \$(LIBOBJ)
+EXE        := stockminer
+EXT        := src/external/
+CC         := gcc
+CFLAGS     := -O0 -pie -fPIE -D_FORTIFY_SOURCE=2 -Wl,-z,relro,-z,now
+CPPFLAGS   := -fpermissive
+LDFLAGS    := -lz -lpthread -lssl -lcrypto -ldl -lm -lsodium -lcurl -Lbuild/lib
+LIBOBJ     := \$(EXT)/libhydrogen/libhydrogen.a \$(EXT)/lmdb/liblmdb.a \$(EXT)/queues/libqueues.a
+WARN       := -Wno-address-of-packed-member -Wno-unused-result -Wno-write-strings -Wno-deprecated -Wno-misleading-indentation
+DEBUG      := $DEBUG
+PLOTLY     := $WITH_PLOTLY
+HIGHCHARTS := $$WITH_HIGHCHARTS
+LDFLAGS    += \$(LIBOBJ)
 
 # XXX: refuses to add src/external/yyjson.c for some reason (Makefile is broken)
 ################
@@ -92,9 +116,23 @@ else
 	OBJ += src/external/yyjson.o
 endif
 
+###############
+#build/build.h#
+###############
 ifeq (\$(DEBUG),yes)
+	$(echo "#define DEBUG 1" >> build/build.h)
 	CFLAGS += -ggdb3
 endif
+ifeq (\$(WITH_HIGHCHARTS),yes)
+	$(echo "#define HIGHCHARTS 1" >> build/build.h)
+endif
+ifeq (\$(WITH_PLOTLY),yes)
+	$(echo "#define PLOTLY 1" >> build/build.h)
+endif
+ifeq (\$(WITH_LIBSODIUM),yes)
+	$(echo "#define LIBSODIUM 1" >> build/build.h)
+endif
+$(echo "#endif" >> build/build.h)
 
 ###############
 # Main Target #
