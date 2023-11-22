@@ -93,7 +93,7 @@ LINK      = ['green','red','dodgerblue','#821eda', 'yellow', 'white'],
 TCLASS    = ['MTAB', 'XLS', 'SBTAB'], 
 Themes    = {},  /* Table Themes */
 
-STAB =[{"orderable":false,"data":null,"defaultContent":''},{"data":"T"},{"data":"P"},{"data":"D"},{"data":"V"}],
+STAB =[{"orderable":false,"data":null,"defaultContent":''},{"data":"900"},{"data":"901"},{"data":"903"},{"data":"904"}],
 BTAB =[{"orderable":false,"data":null,"defaultContent":''},{"data":"900"},{"data":"901"},{"data":"903"},{"data":"904"},{"data":"700"},{"data":"701"},{"data":"702"},{"data":"704"},{"data":"704"},{"data":"705"},{"data":"706"}],
 MTAB =[{"data":"900"},{"data":"901"},{"data":"903"},{"data":"904"}],VTAB=[{"data":"900"},{"data":"901"},{"data":"903"},{"data":"905"},{"data":"904"}],
 

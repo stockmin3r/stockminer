@@ -45,61 +45,61 @@ struct column_value {
 };
 
 struct column builtin_columns[] = {
-	{ "T",           "\"T\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_SYMBOL    },
-	{ "P",           "\"P\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_PRICE     },
-	{ "V",           "\"V\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_VOLUME    },
-	{ "O",           "\"O\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_OPEN      },
-	{ "H",           "\"H\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_HIGH      },
-	{ "L",           "\"L\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_LOW       },
-	{ "D",           "\"D\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_DELTA     },
-	{ "d",           "\"d\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_DATE      },
-	{ "R",           "\"R\":\"%d\",",           COLUMN_CLASS_STOCKS_COMMON, COL_RANK      },
-	{ "PC",          "\"PC\":\"%.2f\",",        COLUMN_CLASS_STOCKS_COMMON, COL_PC        },
-	{ "OP",          "\"OP\":\"%.2f\",",        COLUMN_CLASS_STOCKS_COMMON, COL_OP        },
-	{ "HP",          "\"HP\":\"%.2f\",",        COLUMN_CLASS_STOCKS_COMMON, COL_HP        },
-	{ "LP",          "\"LP\":\"%.2f\",",        COLUMN_CLASS_STOCKS_COMMON, COL_LP        },
+	{ "d",           "\"915\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_DATE      },
+	{ "T",           "\"900\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_SYMBOL    },
+	{ "P",           "\"901\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_PRICE     },
+	{ "R",           "\"902\":\"%d\",",           COLUMN_CLASS_STOCKS_COMMON, COL_RANK      },
+	{ "D",           "\"903\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_DELTA     },
+	{ "V",           "\"904\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_VOLUME    },
+	{ "O",           "\"905\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_OPEN      },
+	{ "H",           "\"906\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_HIGH      },
+	{ "L",           "\"907\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_LOW       },
+	{ "PC",          "\"908\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_PC        },
+	{ "OP",          "\"909\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_OP        },
+	{ "HP",          "\"910\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_HP        },
+	{ "LP",          "\"911\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_LP        },
 	/* Trend */
-	{ "PK",          "\"PK\":\"%.2f\",",        COLUMN_CLASS_STOCKS_TREND,  COL_PK        },
-	{ "PKP",         "\"PKP\":\"%.2f\",",       COLUMN_CLASS_STOCKS_TREND,  COL_PKP       },
-	{ "NDUP",        "\"NDUP\":\"%d\",",        COLUMN_CLASS_STOCKS_TREND,  COL_NDUP      },
-	{ "NDDW",        "\"NDDW\":\"%d\",",        COLUMN_CLASS_STOCKS_TREND,  COL_NDDW      },
-	{ "NWUP",        "\"NWUP\":\"%d\",",        COLUMN_CLASS_STOCKS_TREND,  COL_NWUP      },
-	{ "NWDW",        "\"NWDW\":\"%d\",",        COLUMN_CLASS_STOCKS_TREND,  COL_NWDW      },
-	{ "BIX",         "\"BIX\":\"%.2f\",",       COLUMN_CLASS_STOCKS_TREND,  COL_BIX       },
-	{ "5AD21Q1",     "\"5AD21Q1\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q1   },
-	{ "5AD21Q2",     "\"5AD21Q2\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q2   },
-	{ "5AD20Q1",     "\"5AD20Q1\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q1   },
-	{ "5AD20Q2",     "\"5AD20Q2\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q2   },
-	{ "5AD19Q1",     "\"5AD19Q1\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q1   },
-	{ "5AD19Q2",     "\"5AD19Q2\":\"%.2f\",",   COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q2   },
-	{ "10AD21Q1",    "\"10AD21Q1\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q1  },
-	{ "10AD21Q2",    "\"10AD21Q2\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q2  },
-	{ "10AD20Q1",    "\"10AD20Q1\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q1  },
-	{ "10AD20Q2",    "\"10AD20Q2\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q2  },
-	{ "10AD19Q1",    "\"10AD19Q1\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q1  },
-	{ "10AD19Q2",    "\"10AD19Q2\":\"%.2f\",",  COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q2  },
-	{ "5AD21",       "\"5AD21\":\"%.2f\",",     COLUMN_CLASS_STOCKS_TREND,  COL_5AD21     },
-	{ "5AD20",       "\"5AD20\":\"%.2f\",",     COLUMN_CLASS_STOCKS_TREND,  COL_5AD20     },
-	{ "5AD19",       "\"5AD19\":\"%.2f\",",     COLUMN_CLASS_STOCKS_TREND,  COL_5AD19     },
-	{ "10AD21",      "\"10AD21\":\"%.2f\",",    COLUMN_CLASS_STOCKS_TREND,  COL_10AD21    },
-	{ "10AD20",      "\"10AD20\":\"%.2f\",",    COLUMN_CLASS_STOCKS_TREND,  COL_10AD20    },
-	{ "10AD19",      "\"10AD19\":\"%.2f\",",    COLUMN_CLASS_STOCKS_TREND,  COL_10AD19    },
+	{ "PK",          "\"912\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_PK        },
+	{ "PKP",         "\"913\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_PKP       },
+	{ "NDUP",        "\"400\":\"%d\",",           COLUMN_CLASS_STOCKS_TREND,  COL_NDUP      },
+	{ "NDDW",        "\"401\":\"%d\",",           COLUMN_CLASS_STOCKS_TREND,  COL_NDDW      },
+	{ "NWUP",        "\"402\":\"%d\",",           COLUMN_CLASS_STOCKS_TREND,  COL_NWUP      },
+	{ "NWDW",        "\"403\":\"%d\",",           COLUMN_CLASS_STOCKS_TREND,  COL_NWDW      },
+	{ "BIX",         "\"406\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_BIX       },
+	{ "5AD21Q1",     "\"418\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q1   },
+	{ "5AD21Q2",     "\"419\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q2   },
+	{ "5AD20Q1",     "\"420\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q1   },
+	{ "5AD20Q2",     "\"421\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q2   },
+	{ "5AD19Q1",     "\"422\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q1   },
+	{ "5AD19Q2",     "\"423\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q2   },
+	{ "10AD21Q1",    "\"424\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q1  },
+	{ "10AD21Q2",    "\"425\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q2  },
+	{ "10AD20Q1",    "\"426\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q1  },
+	{ "10AD20Q2",    "\"427\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q2  },
+	{ "10AD19Q1",    "\"428\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q1  },
+	{ "10AD19Q2",    "\"429\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q2  },
+	{ "5AD21",       "\"430\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD21     },
+	{ "5AD20",       "\"431\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD20     },
+	{ "5AD19",       "\"432\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD19     },
+	{ "10AD21",      "\"433\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD21    },
+	{ "10AD20",      "\"434\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD20    },
+	{ "10AD19",      "\"435\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD19    },
 	/* Fundamentals */
-	{ "fED",        "\"fED\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_ED        },
-	{ "fEDOFF",     "\"fEDOFF\":\"%d\"",        COLUMN_CLASS_STOCKS_FUND,   COL_EDOFF     },
-	{ "fSEC",       "\"fSEC\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_SEC       },
-	{ "fDY",        "\"fDY\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_DY        },
-	{ "fDIV",       "\"fDIV\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_DIV       },
-	{ "fXD",        "\"fXD\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_XD        },
-	{ "fAR",        "\"fAR\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_AR        },
-	{ "fEPS",       "\"fEPS\":\"%.2f\"",        COLUMN_CLASS_STOCKS_FUND,   COL_EPS       },
-	{ "fMCP",       "\"fMCP\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_MCP       },
-	{ "fPEG",       "\"fPEG\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_PEG       },
-	{ "fPBR",       "\"fPBR\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_PBR       },
-	{ "fPM",        "\"fPM\":\"%s\"",           COLUMN_CLASS_STOCKS_FUND,   COL_PM        },
-	{ "fROA",       "\"fROA\":\"%s\"",          COLUMN_CLASS_STOCKS_FUND,   COL_ROA       }
+	{ "fED",        "\"300\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_ED        },
+	{ "fEDOFF",     "\"313\":\"%d\"",             COLUMN_CLASS_STOCKS_FUND,   COL_EDOFF     },
+	{ "fSEC",       "\"301\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_SEC       },
+	{ "fDY",        "\"302\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_DY        },
+	{ "fDIV",       "\"303\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_DIV       },
+	{ "fXD",        "\"304\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_XD        },
+	{ "fAR",        "\"305\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_AR        },
+	{ "fEPS",       "\"306\":\"%.2f\"",           COLUMN_CLASS_STOCKS_FUND,   COL_EPS       },
+	{ "fVAR",       "\"307\":\"%.2f\"",           COLUMN_CLASS_STOCKS_FUND,   COL_EPS       },
+	{ "fMCP",       "\"308\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_MCP       },
+	{ "fPEG",       "\"309\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_PEG       },
+	{ "fPBR",       "\"310\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_PBR       },
+	{ "fPM",        "\"311\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_PM        },
+	{ "fROA",       "\"312\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_ROA       }
 };
-
 
 void init_watchtable()
 {
@@ -112,7 +112,7 @@ void init_watchtable()
 		chash->column         = column;
 		chash->column_id      = builtin_columns[x].column_id;
 		memcpy(column, &builtin_columns[x], sizeof(*column));
-		HASH_ADD_INT(COLUMN_HASHTABLE_INT, column_id,       chash);
+		HASH_ADD_INT(COLUMN_HASHTABLE_INT, column_id, chash);
 		switch(column->column_class) {
 			case COLUMN_CLASS_STOCKS_COMMON:
 				column->cb = stock_get_common;
@@ -228,12 +228,9 @@ int watchtable_packet(struct session *session, struct watchlist *watchlist, char
 		if (!stock || !stock->mag)
 			continue;
 		packet_len = column_sprintf(session, watchlist, stock, wtab, packet, packet_len, 0);
-		printf(BOLDYELLOW "packet: %s packet_len: %d" RESET "\n", packet, packet_len);
-		if (x == (nr_stocks-1))
-			*(packet+packet_len++) = ']';
-		else
-			*(packet+packet_len++) = ',';
+		*(packet+packet_len++) = ',';
 	}
+	packet[packet_len-1] = ']';
 	packet[packet_len] = 0;
 	if (verbose)
 		printf(BOLDWHITE "%s" RESET "\n", packet);
@@ -385,7 +382,6 @@ stock_get_common(struct column_value *cvalue, int column_id)
 			break;
 		case COL_DELTA:
 			cvalue->value.DOUBLE = get_stock_delta(stock, entry, nr_entries);
-			printf(BOLDCYAN "COL DELTA: %.2f" RESET "\n", cvalue->value.DOUBLE);
 			cvalue->value_type   = VALUE_TYPE_DOUBLE;
 			break;
 		case COL_OPEN:

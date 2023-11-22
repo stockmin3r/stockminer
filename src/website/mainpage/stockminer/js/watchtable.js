@@ -153,7 +153,7 @@ function wdict_load(screener, dict)
  */
 function init_stock_screener(){
 	$(".watchmgr .wsrc li").each(function(){
-		var c    = $(this).attr('n');
+		var c    = $(this).attr('v');
 		this.setAttribute("onclick", "boxtick()");
 		WCOL[c]  = $(this).text();
 		WCOL2[c] = $(this).text().split(" ")[0]
@@ -169,7 +169,7 @@ function init_stock_screener(){
 function screener_to_json(screener)
 {
 	var d = '[{"data":null,"orderable":false,"defaultContent":""},';
-	$(".wdst li", screener).each(function(){THIS=this;d += '{"data":"'+$(this).attr('n') + '"},';});
+	$(".wdst li", screener).each(function(){THIS=this;d += '{"data":"'+$(this).attr('v') + '"},';});
 	d  = d.slice(0, -1);
 	d += "]";
 	return d;
@@ -221,12 +221,12 @@ function wcat(x,y){
 	if (x == -1)
 		$(".wsrc li").css("display", "block");
 	else
-		$(".wsrc li").css("display", "block");
-		$(".wsrc li").each(function(){
-			var i = $(this).attr("v");
-			if (i < x || i > y)
-				$(this).css("display", "none")
-		});
+		$(".wsrc li").css("display", "block"); // ?!?!
+	$(".wsrc li").each(function(){
+		var i = $(this).attr("v");
+		if (i < x || i > y)
+			$(this).css("display", "none")
+	});
 }
 
 function realloc_watchtable(watchtable_id, columns, screener)
@@ -433,10 +433,10 @@ function XLS_reload(obj)
 		top  = p.style.top;
 		p.remove();
 	}
-	XLS       = Watchtable({type:"XLS",dict:JSON.parse(TP[preset_name]),QGID:obj.QGID,TID:obj.TID,menu:1,order:1,left:left,top:top});
-	obj.ref   = XLS;
-	XLS.obj   = obj;
-	obj.TID   = XLS.id;
+	XLS      = Watchtable({type:"XLS",dict:JSON.parse(TP[preset_name]),QGID:obj.QGID,TID:obj.TID,menu:1,order:1,left:left,top:top});
+	obj.ref  = XLS;
+	XLS.obj  = obj;
+	obj.TID  = XLS.id;
 	if (!obj.ticker)
 		obj.title = obj.preset;
 	else
