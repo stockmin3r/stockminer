@@ -62,7 +62,7 @@ class BackTest:
 	def __init__(self, filename):
 		self.filename         = filename
 		df                    = pd.read_csv(fullpath + self.filename + '.csv')
-		self.rank_list		  = df['Rank'].tolist()
+		self.rank_list        = df['Rank'].tolist()
 		self.ticker_list      = df['Ticker'].tolist()
 		self.entry_price_list = df['Entry Price'].tolist()
 		self.exit_price_list  = df['Exit Price'].tolist()

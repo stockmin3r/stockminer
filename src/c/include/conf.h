@@ -37,6 +37,7 @@
 
 #define CONF_TYPE_INT            1
 #define CONF_TYPE_STR            2
+#define CONF_TYPE_BOOL           3
 
 #define USERNAME_EXISTS   "err 0 fail 1"
 #define ILLEGAL_USERNAME  "err 0 fail 2"
@@ -112,6 +113,9 @@ struct task {
 	int            type;
 	int            priority;     // once all task nr_miners reach their nr_deal, pick task based on pririty
 	task_handler_t handler;      // task handler
+	int            start_day;    // run task every day from this day
+	int            end_day;      // until this day
+	const char    *start_time;   // schedule the task to run at this time from_day to_day
 	int            nr_preferred; // minimum number of miners preferred for this task
 	int            nr_miners;    // number of servers/desktops/devices currently executing this task
 };
@@ -300,6 +304,7 @@ struct server {
 	int                  nr_vcpu;
 	bool                 async;
 	bool                 production;
+	bool                 daemon;
 	port_t               http_port;
 	port_t               https_port;
 	/* Globals */

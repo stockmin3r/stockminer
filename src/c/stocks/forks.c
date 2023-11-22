@@ -294,6 +294,9 @@ void zero_signals(struct monster *monster)
 
 void monster_signal_completed(struct fquarter *fquarter, int nr_days, int rank, char *date)
 {
+	if (!fquarter)
+		return;
+
 	switch (rank) {
 		case MONSTER_RANKS_50:
 			if (!strncmp(date, "2020-", 5)) {
@@ -360,6 +363,9 @@ void monster_signal_completed(struct fquarter *fquarter, int nr_days, int rank, 
 
 void monster_signal_pending(struct fquarter *fquarter, int nr_days, int rank)
 {
+	if (!fquarter)
+		return;
+
 	switch (rank) {
 		case MONSTER_RANKS_50:
 			fquarter->nr_pending_rank50++;

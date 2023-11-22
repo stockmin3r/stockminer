@@ -106,6 +106,7 @@ void init_config(struct server *server)
 
 	config_get("http_port",  CONF_TYPE_INT, NULL, (uint64_t *)&server->http_port);
 	config_get("https_port", CONF_TYPE_INT, NULL, (uint64_t *)&server->https_port);
+	config_get("daemon",     CONF_TYPE_INT, NULL, (uint64_t *)&server->daemon);
 
 	return;
 out_error:

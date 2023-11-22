@@ -3,7 +3,7 @@ Build your own Decentralized Social/Tech Media
 -----------------------------------------------
 </h1>
 
-[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/m3M2XvZA)
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/pfHADMGz)
 
 The goals of this project are to give more digital power to individuals and businesses by allowing
 them to create their own websites without having to pay for services/hosting/infrastructure/admining.

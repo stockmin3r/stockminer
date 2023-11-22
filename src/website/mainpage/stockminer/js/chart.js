@@ -144,7 +144,6 @@ function chart_import(CID)
 	gcharts.CID = CID;
 	QGID        = CID.split("-")[1];
 
-	console.log("chart import " + CID);
 	file[0].onchange = function(){
 		readfile(file[0].files[0],function(data){
 			gcharts.dtype = file[0].files[0].type.split("/")[1];
@@ -156,9 +155,8 @@ function chart_import(CID)
 					nl = data.indexOf("\n");
 					gcharts.conf  = JSON.parse(data.substr(2,nl-2));
 					gcharts.data  = data.substr(nl+1);
-					gcharts.theme = conf.theme;
-					if (gcharts.conf.title)
-						gcharts.title = gcharts.conf.title;
+					gcharts.theme = gcharts.conf.theme;
+					gcharts.title = gcharts.conf.title;
 				} else {
 					gcharts.data  = data;
 					gcharts.theme = "darkTheme";
@@ -188,7 +186,7 @@ var AVV,NARGS,HP,CONF,CONF2,CHR;
 function chart(av)
 {
 	CHR = av;
-	var QGID = av.QGID, div = av.div, series;
+	var QGID = av.QGID, div = av.div, series, conf = {};
 
 	var conf = {
 		yAxis:{title:{align:'middle'}},
@@ -197,11 +195,6 @@ function chart(av)
 		chart:{
 			zoomType:'x',
 			type:av.type,
-			events:{
-				load:function(){
-					highcarts_load(args);
-				}
-			},
 		}
 	},
 
@@ -260,7 +253,7 @@ function chart(av)
 		if (av.type == "stock")
 			stockchart(av);
 		else
-			Highcharts.chart(av.div,conf)
+			Highcharts.chart(av.div,conf);
 	} else if (av.chartware == "plotly") {
 		console.log("plotly");
 	}

@@ -121,7 +121,7 @@ void load_days()
 	char      buf[32 KB];
 	char     *p;
 	time_t   unix_today = QDATESTAMP[1];
-	int64_t filesize;
+	int64_t  filesize;
 	int      x;
 
 	filesize = fs_readfile_str((char *)STOCK_DAYS_TXT, buf, sizeof(buf));
@@ -150,11 +150,37 @@ void load_days()
 	}
 }
 
+int utc_timezone_offset()
+{
+	time_t    abs_ts,loc_ts,gmt_ts;
+	struct tm loc_time_info,gmt_time_info;
+
+	/*Absolute time stamp.*/
+	time(&abs_ts);
+ 
+	/* Get the local time for abs_ts */
+	localtime_r(&abs_ts,&loc_time_info);
+
+	/* GMT (UTC without summer time) */        
+	gmtime_r(&abs_ts,&gmt_time_info);
+
+	/*Convert them back.*/
+	loc_ts=mktime(&loc_time_info);
+	gmt_ts=mktime(&gmt_time_info);
+
+     if (gmt_time_info.tm_isdst==1)
+		gmt_ts-=3600;
+
+	return (loc_ts-gmt_ts)/3600;
+}
+
 void init_time(struct server *server)
 {
 	char timestr[64];
 
 	SERVER = server;
+
+	server->TIMEZONE = utc_timezone_offset();
 
 	/* current day */
 	load_EOD();

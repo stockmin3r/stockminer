@@ -66,12 +66,12 @@ function init_monster_tables()
 
 	T['SB1K'] = SB1K_table = $('#SB1K').DataTable({
         "columns": [{"className":'control',"orderable":false,"data":null,"defaultContent": ''},
-            { "data": "ticker"       },
+			{ "data": "ticker"       },
 			{ "data": "rank"         },
-            { "data": "price"        },
-            { "data": "chgpc"        },
-            { "data": "1yrpkpc"      },
-            { "data": "1yrpk"        },
+			{ "data": "price"        },
+			{ "data": "chgpc"        },
+			{ "data": "1yrpkpc"      },
+			{ "data": "1yrpk"        },
 			{ "data": "one"          },
 			{ "data": "two"          },
 			{ "data": "a1q1_2020"    },
@@ -104,11 +104,11 @@ function init_monster_tables()
 
 	T['ESP'] = ESP_table = $('#ESP').DataTable({
         "columns": [
-            { "data": "T"     },
-            { "data": "DA"    },
-            { "data": "R"     },
-            { "data": "P"     },
-            { "data": "D"     },
+			{ "data": "T"     },
+			{ "data": "DA"    },
+			{ "data": "R"     },
+			{ "data": "P"     },
+			{ "data": "D"     },
 			{ "data": "CL"    },
 			{ "data": "PK"    },
 			{ "data": "O"     },
@@ -158,10 +158,10 @@ function init_monster_tables()
 	/* MONSTER 1.0 */
 	T['MSR'] = MSR_table = $('#MSR').DataTable({
         "columns": [
-            { "data": "T"               },
-            { "data": "P"               },
-            { "data": "D"               },
-            { "data": "PK"              },
+			{ "data": "T"               },
+			{ "data": "P"               },
+			{ "data": "D"               },
+			{ "data": "PK"              },
 			{ "data": "1"               },
 			{ "data": "2"               },
 			{ "data": "a1esp"           },
@@ -276,11 +276,11 @@ function init_monster_tables()
 	T['CMT'] = CMT_table = $('#CMT').DataTable({
         "columns": [
 			{ "data": "rank"  },
-            { "data": "stock" },
-            { "data": "date"  },
-            { "data": "two"   },
-            { "data": "high"  },
-            { "data": "low"   },
+			{ "data": "stock" },
+			{ "data": "date"  },
+			{ "data": "two"   },
+			{ "data": "high"  },
+			{ "data": "low"   },
 			{ "data": "close" },
 			{ "data": "daily" },
 			{ "data": "day3"  },

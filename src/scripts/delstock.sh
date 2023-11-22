@@ -1,4 +1,5 @@
 #!/bin/bash
+# obsolete
 sed_delete(){
 	STR="/"
 	STR+=$1

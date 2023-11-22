@@ -409,15 +409,6 @@ void init_os(struct server *server)
 	rlim.rlim_cur   = 16384 KB;
 	rlim.rlim_max   = 16384 KB;
 	setrlimit(RLIMIT_STACK,  &rlim);
-	if (server->production) {
-		server->TIMEZONE       = TZOFF_NL;
-		server->TIMEZONE_HOURS = 6;
-		server->UTCOFF         = 5*60*60;
-	} else {
-		server->TIMEZONE       = TZOFF_AU;
-		server->TIMEZONE_HOURS = 15;
-		server->UTCOFF         = 10*60*60;
-	}
 	setenv("TZ", ":/etc/localtime", 0);
 
 	sh.sa_handler = SIG_IGN;
@@ -428,6 +419,7 @@ void init_os(struct server *server)
 
 	signal(SIGHUP, server_restart);
 	init_fs();
-//	init_daemon();
+	if (server->daemon)
+		init_daemon();
 }
 #endif

@@ -1,4 +1,5 @@
 #!/bin/bash
+# obsolete
 mkdir /stockminer/backup
 PATH="/stockminer/backup"
 DATE=`/usr/bin/date +%F`

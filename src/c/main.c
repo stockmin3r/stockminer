@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
 	init_main(&Server);
 
-	while ((op=getopt_long(argc, argv, "W:H:m:w:D:b:a3evr", &main_options[0], NULL)) != -1) {
+	while ((op=getopt_long(argc, argv, "W:H:mw:D:b:a3evr", &main_options[0], NULL)) != -1) {
 		switch (op) {
 			case 'a':
 				admin_client_loop();

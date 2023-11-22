@@ -282,6 +282,9 @@ hydro_pwhash_upgrade(uint8_t       stored[hydro_pwhash_STOREDBYTES],
 
 int hydro_test(uint8_t buf[8])
 {
-	strcpy(buf, "asdf");
+	printf("%c\n", buf[0]);
+	buf[0] = 'a';
+	buf[1] = 'b';
+	buf[2] = 0;
 	return 1;
 }

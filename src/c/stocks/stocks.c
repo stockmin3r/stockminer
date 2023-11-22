@@ -495,11 +495,7 @@ void stock_loop(struct server *config)
 			current_minute     = timenow;
 			current_timestamp += 60000;
 			ufo_scan(XLS);
-/*			if (AFH_START && !AFH_DONE) {
-				reset_price_volume();
-				AFH_START = 0;
-				AFH_DONE = 1;
-			}*/
+			task_schedule();
 		}
 		os_usleep(500000);
 	}

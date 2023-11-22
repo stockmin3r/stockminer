@@ -1,4 +1,5 @@
 #!/bin/bash
+# obsolete
 HIGHCAPS=`cat /stockminer/data/stocks/HIGHCAPS.TXT  | tr "\n" ","|sed  "s/,/','/g"`
 LOWCAPS=`cat /stockminer/data/stocks/LOWCAPS.TXT    | tr "\n" ","|sed  "s/,/','/g"`
 STOCKS="tickers=['"

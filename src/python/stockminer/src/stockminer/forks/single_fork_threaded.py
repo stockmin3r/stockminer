@@ -50,9 +50,9 @@ def take_closest(myList, myNumber):
 
 # [1] READ IN DATA
 def read_data():
-	df			   = pd.read_csv('2020.csv')
-	rank_list		= df['Rank'].tolist()
-	ticker_list	  = df['Ticker'].tolist()
+	df               = pd.read_csv('2020.csv')
+	rank_list        = df['Rank'].tolist()
+	ticker_list      = df['Ticker'].tolist()
 	entry_price_list = df['Entry Price'].tolist()
 	exit_price_list  = df['Exit Price'].tolist()
 	entry_date_list  = df['Entry Date'].tolist()

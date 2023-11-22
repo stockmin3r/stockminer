@@ -1,4 +1,5 @@
 /*
+obsolete
 # days 5%,return 5%,max 5%,# days 10%,return 10%,max 10%,# days 15%,return 15%,max 15%,# days 20%,return 20%,max 20%,a1 ESP,action 1,a1 same,a1 ESP result,a4 ESP,action 4,
 1d,3d,5d,8d,13d,21d,42d,63d,RTD,
 streak,dir,buy(streakdir),buy delta(streakdir),sell(streakdir),sell delta(streakdir),fib,dir(fib),buy(fib),buy delta(fib),sell(fib),sell delta(fib),mean,std_dev,VaR_90,VaR_95,VaR_99,VaR_99pot,
