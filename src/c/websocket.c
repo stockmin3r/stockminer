@@ -210,7 +210,7 @@ void websockets_sendall_except(struct session *session, struct connection *this_
 
 	for (x=0; x<session->nr_websockets; x++) {
 		struct connection *connection = session->websockets[x];
-		if (!connection || connection->fd == -1)
+		if (!connection || !connection->ssl || connection->fd == -1)
 			continue;
 		if (connection->fd == this_connection->fd)
 			continue;
