@@ -60,7 +60,6 @@ void *task_yahoo_eod_update(void *args)
 void *task_quant_colgen_update(void *args)
 {	
 	char *argv[] = { "/bin/sh", "-c", "/usr/bin/python3 /stockminer/src/python/stockminer/src/stockminer/stockminer.py colgen", NULL };
-	fs_appendfile("asdf.txt", "bsdf" 4);
 	os_exec_argv(argv);	
 	return (NULL);
 }

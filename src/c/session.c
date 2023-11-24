@@ -148,7 +148,7 @@ void apc_sessions(struct connection *connection, char **argv)
 		size     = snprintf(ptr+nbytes, MAX_USERNAME_SIZE+1, "%s\n", session->user->uname);
 		ptr     += size;
 		nbytes  += size;
-		printf("session user: %s (cookie(s) will go here) %p\n", session->user->uname, session);
+		printf("session user: %s %p\n", session->user->uname, session);
 	}
 	mutex_unlock(&session_lock);
 
@@ -199,7 +199,6 @@ void session_set_config(struct connection *connection)
 	hydro_random_buf(connection->nonce, sizeof(connection->nonce));
 	base64_encode   (connection->nonce, sizeof(connection->nonce), nonce64);
 	packet_size += snprintf(packet+packet_size, 96, "nonce %s@", nonce64);
-	printf(BOLDYELLOW "nonce64: %s" RESET "\n", nonce64);
 	/* Update the packet size */
 	connection->packet_size += packet_size;
 }
