@@ -107,15 +107,17 @@ struct module {
 	bool         enabled;
 };
 
-typedef void (*task_handler_t)(void *args);
+typedef void *(*task_handler_t)(void *args);
 
 struct task {
+	char          *name;
 	int            type;
 	int            priority;     // once all task nr_miners reach their nr_deal, pick task based on pririty
 	task_handler_t handler;      // task handler
 	int            start_day;    // run task every day from this day
-	int            end_day;      // until this day
-	const char    *start_time;   // schedule the task to run at this time from_day to_day
+	int            end_day;      // run task until and including this day
+	int            start_hour;   // run the task starting at this hour (UTC)
+	int            start_min;    // run the task starting at hour:min
 	int            nr_preferred; // minimum number of miners preferred for this task
 	int            nr_miners;    // number of servers/desktops/devices currently executing this task
 };
@@ -720,6 +722,8 @@ int      zip_deflate2   (char *page, char *page_gz, int page_len);
 uint64_t zip_decompress2(unsigned char *page_gz, unsigned char *page, int compressed_size, int uncompressed_size);
 
 /* time.c */
+int      timezone_offset    (const char *tzname);
+int      weekday_offset     (const char *day);
 int      splitdate_MDY      (char *date, int *year, int *month, int *day);
 int      splitdate_YMD      (char *date, int *year, int *month, int *day);
 char    *MDY2YMD            (char *from, char *to);
@@ -740,6 +744,8 @@ void     set_current_minute (void);
 
 /* task.c */
 void task_benchmark(char *args);
+void task_schedule(void);
+void init_tasks(void);
 
 /* lib.c */
 int64_t        fs_read                 (int, char *, int64_t);

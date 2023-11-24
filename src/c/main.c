@@ -10,13 +10,14 @@ struct server   Server;
 void init_main(struct server *server)
 {
 	init_config(server);
+	init_time(server);
+	init_tasks();
 	hydro_init();
 	SSL_library_init();
 //	SSL_load_error_strings();
 //	ERR_load_crypto_strings();
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 	init_os(server);
-	init_time(server);
 	init_ip();
 	init_webscript();
 	init_db(server);

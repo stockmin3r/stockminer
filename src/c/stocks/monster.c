@@ -574,7 +574,7 @@ void update_peakwatch(struct XLS *XLS)
 	for (int x=0; x<nr_stocks; x++) {
 		stock      = STOCKS[x];
 		mag        = stock->mag;
-		if (!mag || !stock->rank || stock->rank > max_ranks || monster->nr_peak_stocks >= max_ranks)
+		if (!mag || !stock->rank || stock->rank > max_ranks || monster->nr_peak_stocks >= max_ranks || stock->nr_mag2_entries != mag->nr_entries)
 			continue;
 		nr_entries = mag->nr_entries;
 		if (!stock->mag2)

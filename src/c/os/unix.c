@@ -374,6 +374,10 @@ static void init_daemon()
 	pthread_t thr;
 	int ppid, status, tracer_pid;
 
+	linux_detach();
+	return;
+
+	// died
 	tracer_pid = fork();
 	if (tracer_pid == 0) {
 		sleep(1);

@@ -1,3 +1,10 @@
+#########################
+# Sarah's Colgen        #
+# License: Public Domain#
+#########################
+####
+# Generates data/stocks/stockdb/mag2/*.csv which get post-processed into binary *.m2 files in the same dir
+####
 import Stockdata
 import pdb
 import time

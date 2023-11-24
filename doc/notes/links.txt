@@ -112,3 +112,6 @@ https://github.com/AnthoneyKalasho/Discord-Stock-Bot/blob/master/marketAPI.py
 
 [makefiles]
 https://yuukidach.github.io/p/makefile-for-projects-with-subdirectories/
+
+[yahoo stocks]
+https://www.qmr.ai/yfinance-library-the-definitive-guide/ # earnings

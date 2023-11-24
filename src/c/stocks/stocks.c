@@ -493,7 +493,7 @@ void stock_loop(struct server *config)
 		}
 		if ((timenow - current_minute) >= 60) {
 			current_minute     = timenow;
-			current_timestamp += 60000;
+			current_timestamp += 60;
 			ufo_scan(XLS);
 			task_schedule();
 		}

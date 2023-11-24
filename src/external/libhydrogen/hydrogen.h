@@ -275,10 +275,10 @@ int hydro_kx_nk_3(hydro_kx_state *state, hydro_kx_session_keypair *kp,
 
 void hydro_pwhash_keygen(uint8_t master_key[hydro_pwhash_MASTERKEYBYTES]);
 
-int hydro_pwhash_deterministic(uint8_t *h, size_t h_len, const char *passwd, size_t passwd_len,
+int hydro_pwhash_deterministic(uint8_t *h, size_t h_len, const char *passwd, int passwd_len,
                                const char    ctx[hydro_pwhash_CONTEXTBYTES],
                                const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES],
-                               uint64_t opslimit, size_t memlimit, uint8_t threads);
+                               int opslimit, int memlimit, uint8_t threads);
 
 int hydro_pwhash_create(uint8_t stored[hydro_pwhash_STOREDBYTES], const char *passwd,
                         size_t passwd_len, const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES],

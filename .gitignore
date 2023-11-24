@@ -16,6 +16,7 @@ db/
 *.e
 *.edates
 
+!config/*
 !build/
 www/*.pem
 www/key.pem

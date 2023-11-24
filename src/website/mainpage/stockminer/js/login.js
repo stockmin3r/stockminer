@@ -46,24 +46,32 @@ function login_onclick()
 	var private_key = "";
 	var password    = + $("#LBOX .pwd").val();
 	var auth        = USER + "|" + password;
-	keypair     = Module._malloc(hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES);
-	kp_seed     = Module._malloc(hydro_sign_SEEDBYTES);
 
-	Module.ccall("hydro_sign_keygen_deterministic",      // function name
-					  null,                              // return type of this function (int): 0 for success -1 for failure
-					 ["number","number"],                // argument types to hydro_sign_keygen_deterministic (two uint8arrays)
-					 [keypair, kp_seed]);                // arguments to hydro_sign_keygen_deterministic()
+/*	var mem_offset  = hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES
+	var keypair     = Module._malloc(mem_offset);
+	var kp_seed     = Module._malloc(offset+=hydro_sign_SEEDBYTES);*/
 
+	var keypair     = new Uint8Array(wasmExports.memory, 0,          hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES);
+	var kp_seed     = new Uint8Array(wasmExports.memory, hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES, hydro_sign_SEEDBYTES);
+
+	// 1) Regenerate the seed from username|password
 	rc = Module.ccall("hydro_pwhash_deterministic",      // function name
 					  "number",                          // return type of this function (int): 0 for success -1 for failure
 					 ["array","number",                  // uint8_t[]: kp_seed, int: sizeof(kp_seed[])
 					  "string","number",                 // char *: auth,       int: strlen(username|password)
 					  "string", "number",                // char *: context,    int: OPSLIMIT
 					  "number","number"],                // size_t: memlimit,   uint8_t: nr_threads
-					 [keypair, kp_seed,                  // keypair seed, sizeof(kp_seed)
+					 [kp_seed, 32,                       // keypair seed, sizeof(kp_seed)
 					  auth, auth.length,                 // username|password, strlen(username|password)
 					  "context0", 1000, 0, 1]);
 	console.log("rc pwhash: " + rc);
+
+	// 2) Recreate the private/public keypair from the seed
+	Module.ccall("hydro_sign_keygen_deterministic",      // function name
+					  null,                              // return type of this function (int): 0 for success -1 for failure
+					 ["number","number"],                // argument types to hydro_sign_keygen_deterministic (two uint8arrays)
+					 [keypair, kp_seed]);                // arguments to hydro_sign_keygen_deterministic()
+	
 
 	var chsize = challenge.length;
 	rc = Module.ccall("hydro_sign_create",               // function name

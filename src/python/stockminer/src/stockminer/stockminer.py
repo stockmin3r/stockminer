@@ -8,12 +8,11 @@ import yahoo
 config={}
 MAX_TICKER_ROWS=1764
 def get_config_file(path) -> str:
-	print(path+"/../../../../../config.ini")
 	f=''
 	if os.access("/etc/stockminer/config.ini",os.R_OK) is True:
 		f="/etc/stockminer/config.ini"
 	elif os.access("config.ini", os.R_OK) is True:
-		f="config"
+		f="config.ini"
 	elif os.access(path+"/../../../../../config.ini",os.R_OK) is True:
 		f=path+"/../../../../../config.ini"
 	else:

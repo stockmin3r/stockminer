@@ -4,6 +4,8 @@ static struct server *SERVER;
 
 int    holiday = 1;
 time_t current_minute;
+int    current_hour_utc;
+int    current_min_utc;
 time_t current_timestamp;
 int    current_day;
 int    current_week;
@@ -17,9 +19,31 @@ int TRADETIME_YESTERDAY;
 char         **DAYS;
 int            nr_trade_days;
 char          *QDATE[3];
+char           current_date[64];
 time_t         QDATESTAMP[3];
 struct week    WEEKS[52];
 char *days[]  = { "Mon", "Tue", "Wed", "Thu", "Fri" };
+
+struct tz {
+	const char *tzname;
+	int         utc_offset;
+};
+
+struct tz timezones[] =
+{
+	{ "EST",  5   },
+	{ "AEST", 10  }
+};
+
+char *WEEKDAYS[] = {
+	"MONDAY",
+	"TUESDAY",
+	"WEDNESDAY",
+	"THURSDAY",
+	"FRIDAY",
+	"SATURDAY",
+	"SUNDAY"
+};
 
 char *hours[] = { "04:15:", "04:30:", "04:45:", "05:00:", "05:15:", "05:30:", "05:45:", "06:00:",
                   "06:15:", "06:30:", "06:45:", "07:00:", "07:15:", "07:30:", "07:45:", "08:00:",
@@ -36,25 +60,6 @@ char *hours[] = { "04:15:", "04:30:", "04:45:", "05:00:", "05:15:", "05:30:", "0
  * - clock_gettime(): UTC (epoch) in seconds + nanoseconds
  */
 
-void set_current_minute()
-{
-	struct tm       ltm;
-	time_t          time_start,time_now, time_diff;
-	char            timestr[256];
-
-	memset(&ltm, 0, sizeof(ltm));
-
-	/* current minute */
-	time_now          = get_current_time(timestr);
-	strptime(timestr, "%Y-%m-%d %H:%M", &ltm);
-	ltm.tm_isdst      = -1;
-	time_start        = mktime(&ltm);
-	time_diff         = (time_now-time_start)/60;
-	time_diff        *= 60;
-	current_timestamp = (time_now-(time_now%60))*1000;
-	current_minute    = current_timestamp;
-//	printf("(start: %s) time_now: %lu time_start: %lu, diff: %d current: %lu\n", timestr, time_now, time_start, time_now-time_start, current_timestamp);
-}
 
 void load_EOD()
 {
@@ -150,56 +155,6 @@ void load_days()
 	}
 }
 
-int utc_timezone_offset()
-{
-	time_t    abs_ts,loc_ts,gmt_ts;
-	struct tm loc_time_info,gmt_time_info;
-
-	/*Absolute time stamp.*/
-	time(&abs_ts);
- 
-	/* Get the local time for abs_ts */
-	localtime_r(&abs_ts,&loc_time_info);
-
-	/* GMT (UTC without summer time) */        
-	gmtime_r(&abs_ts,&gmt_time_info);
-
-	/*Convert them back.*/
-	loc_ts=mktime(&loc_time_info);
-	gmt_ts=mktime(&gmt_time_info);
-
-     if (gmt_time_info.tm_isdst==1)
-		gmt_ts-=3600;
-
-	return (loc_ts-gmt_ts)/3600;
-}
-
-void init_time(struct server *server)
-{
-	char timestr[64];
-
-	SERVER = server;
-
-	server->TIMEZONE = utc_timezone_offset();
-
-	/* current day */
-	load_EOD();
-	if (TODAY_IS_SUNDAY) {
-		printf(BOLDMAGENTA "TODAY IS SUNDAY" RESET "\n");
-	}else if (TODAY_IS_MONDAY) {
-		printf(BOLDMAGENTA "TODAY IS MONDAY" RESET "\n");
-	}
-
-	QDATE[1]      = strdup(unix2str(get_timestamp(), timestr));
-	QDATESTAMP[1] = str2unix(QDATE[1]);
-	QDATE[2]      = strdup(unix2str(QDATESTAMP[1]+(24*3600), timestr));
-	QDATESTAMP[2] = str2unix(QDATE[2]);
-
-	// load trading calendar
-	load_days();
-	load_weeks();
-}
-
 void time_EOD()
 {
 	char timestr[64];
@@ -212,6 +167,26 @@ void time_EOD()
 	QDATE[1]      = QDATE[2];
 	QDATE[2]      = strdup(unix2str(QDATESTAMP[2], timestr));
 	printf(BOLDMAGENTA "time_EOD: QDATE[0]: %s QDATE[1]: %s QDATE[2]: %s\n", QDATE[0], QDATE[1], QDATE[2]);
+}
+
+void set_current_minute()
+{
+	struct tm       ltm;
+	time_t          time_start,time_now, time_diff;
+	char            timestr[256];
+
+	memset(&ltm, 0, sizeof(ltm));
+
+	/* current minute */
+	time_now          = get_current_time(timestr);
+	strptime(timestr, "%Y-%m-%d %H:%M", &ltm);
+	ltm.tm_isdst      = -1;
+	time_start        = mktime(&ltm);
+	time_diff         = (time_now-time_start)/60;
+	time_diff        *= 60;
+	current_timestamp = (time_now-(time_now%60));
+	current_minute    = current_timestamp;
+//	printf("(start: %s) time_now: %lu time_start: %lu, diff: %d current: %lu\n", timestr, time_now, time_start, time_now-time_start, current_timestamp);
 }
 
 time_t get_current_time(char *timestr)
@@ -252,7 +227,7 @@ time_t get_ny_time(char *timestr)
 	if (!SERVER->production) {
 		local_tm->tm_sec += offset;
 		time_ny = mktime(local_tm);
-		tm_ny = localtime_r(&time_ny, &nytm);
+		tm_ny   = localtime_r(&time_ny, &nytm);
 	}
 	asctime_r(tm_ny, timestr);
 	return (time_ny);
@@ -306,7 +281,7 @@ time_t ny_time(char *timestr)
 	time_t      timestamp;
 
 	memset(&ltm, 0, sizeof(ltm));
-	sprintf(tbuf, "%s 00:00", timestr);
+	snprintf(tbuf, sizeof(tbuf)-1, "%s 00:00", timestr);
 	strptime(tbuf, "%Y-%m-%d %H:%M", &ltm);
 	ltm.tm_isdst = -1;
 	timestamp = mktime(&ltm);
@@ -542,3 +517,70 @@ int get_time()
 	return NO_MARKET;
 }
 
+int weekday_offset(const char *day)
+{
+	for (int x = 0; x<sizeof(WEEKDAYS)/sizeof(char *); x++)
+		if (!strcmp(WEEKDAYS[x], day))
+			return x;
+	return -1;
+}
+
+
+int timezone_offset(const char *tzname)
+{
+	for (int x = 0; x<sizeof(timezones)/sizeof(struct timezone); x++) {
+		if (!strcmp(timezones[x].tzname, tzname))
+			return timezones[x].utc_offset;
+	}
+	return 0;
+}
+
+
+int utc_timezone_offset()
+{
+	struct tm loc_tm;
+	struct tm gmt_tm;
+	time_t    loc_timestamp;
+	time_t    gmt_timestamp;
+
+	/* Get the local unix epoch timestamp & the broken down struct tm for it */
+	time(&loc_timestamp);
+ 	localtime_r(&loc_timestamp, &loc_tm);
+
+	/* GMT (UTC without summer time) */        
+	gmtime_r(&loc_timestamp, &gmt_tm);
+
+	/* Convert the broken down struct tm's to the unix timestamp */
+	loc_timestamp = mktime(&loc_tm);
+	gmt_timestamp = mktime(&gmt_tm);
+
+     if (gmt_tm.tm_isdst == 1)
+		gmt_timestamp -= 3600;
+
+	return (loc_timestamp - gmt_timestamp);
+}
+
+void init_time(struct server *server)
+{
+    char timestr[64];
+
+	SERVER = server;
+	server->TIMEZONE = utc_timezone_offset();
+
+	/* current day */
+	load_EOD();
+	if (TODAY_IS_SUNDAY) {
+		printf(BOLDMAGENTA "TODAY IS SUNDAY" RESET "\n");
+	}else if (TODAY_IS_MONDAY) {
+		printf(BOLDMAGENTA "TODAY IS MONDAY" RESET "\n");
+	}
+
+	QDATE[1]      = strdup(unix2str(get_timestamp(), timestr));
+	QDATESTAMP[1] = str2unix(QDATE[1]);
+	QDATE[2]      = strdup(unix2str(QDATESTAMP[1]+(24*3600), timestr));
+	QDATESTAMP[2] = str2unix(QDATE[2]);
+
+	// load trading calendar
+	load_days();
+	load_weeks();
+}
