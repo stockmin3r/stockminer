@@ -197,7 +197,7 @@
 		}
 	}
 	addDIV(args){
-		var div = $(args.id).detach();
+		var div = $("#"+args.id).detach();
 		div.css("display", "");
 		if (args.className)
 			div.addClass(args.className);

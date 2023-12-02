@@ -331,6 +331,7 @@
 				 "%7B%22Name%22%3A%22SignalLine%22%2C%22Value%22%3A9%7D%5D%2C%22Kind%22%3A%22MovingAverageConvergenceDivergence%22%" \
 				 "2C%22SeriesId%22%3A%22i5%22%7D%5D%7D%5D%7D&ckey=57494d5ed7"
 
+
 /* **********
  *
  * Yahoo
@@ -343,7 +344,14 @@
 #define YAHOO_EOD          "https://query1.finance.yahoo.com/v8/finance/chart/%s?interval=1d"
 #define YAHOO_CLOSE        "https://query2.finance.yahoo.com/v8/finance/chart/%s?formatted=true&crumb=tAPc%2FmxouN0&lang=en-US&interval=1d&period1=%d&period2=%d&events=div%7Csplit&corsDomain=finance.yahoo.com"
 #define YAHOO_FIVE_YEAR    "https://finance.yahoo.com/quote/%s/history?period1=1438387200&period2=1596240000&interval=1d&filter=history&frequency=1d"
-#define YAHOO_HISTORY      "https://query1.finance.yahoo.com/v7/finance/download/%s?period1=1563643249&period2=1595265649&interval=1d&events=history"
+#define YAHOO_HISTORY      "https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%lu&period2=%lu&interval=1d&events=history"
+
+#define YAHOO_HISTORY2      "GET /v7/finance/download/%s?period1=%lu&period2=%lu&interval=1d&events=history HTTP/1.0\r\n"     \
+                           "Host: query1.finance.yahoo.com\r\n"                                                               \
+                           "Accept: */*\r\n" \
+                           "Accept-Encoding: gzip,deflate\r\n"                                                                \
+                           "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0\r\n\r\n"
+
 /* Yahoo Options API */
 #define YAHOO_OPTIONS      "https://query1.finance.yahoo.com/v7/finance/options/"
 #define YAHOO_OPTIONS_DATE "https://query1.finance.yahoo.com/v7/finance/options/%s?date=%lu"

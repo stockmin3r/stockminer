@@ -695,6 +695,9 @@ bool init_talib()
 
 void init_candles(struct server *server)
 {
+	if (CANDLES_LOADED)
+		return;
+
 	if (!init_talib()) {
 		server->candles_enabled = 0;
 		return;

@@ -39,11 +39,35 @@
 #define CONF_TYPE_STR            2
 #define CONF_TYPE_BOOL           3
 
-#define USERNAME_EXISTS   "err 0 fail 1"
-#define ILLEGAL_USERNAME  "err 0 fail 2"
-#define SYSTEM_ERROR      "err 0 fail 3"
+#define USERNAME_EXISTS          "err 0 fail 1"
+#define ILLEGAL_USERNAME         "err 0 fail 2"
+#define SYSTEM_ERROR             "err 0 fail 3"
 
-#define USERS_PATH        "db/users.db"
+#define GIT_DB_PATH              "db"
+#define GIT_DB_USERS_PATH        "db/users.db"
+#define GIT_DB_REPO_PATH         "db/repo.db"
+#define GIT_STOCKS_PATH          "data/stocks/STOCKS.TXT"
+#define GIT_STOCKS_DAYS_PATH     "data/stocks/DAYS.TXT"
+#define GIT_STOCKS_WEEKS_PATH    "data/stocks/WEEKS.TXT"
+#define GIT_STOCKDB_PATH         "data/stocks/stockdb"
+#define GIT_STOCKDB_CSV_PATH     "data/stocks/stockdb/csv"
+#define GIT_GSPC_PATH            "data/stocks/stockdb/csv/^GSPC.csv"
+#define GIT_OPTIONS_PATH         "data/stocks/stockdb/options"
+
+#define LINUX_DB_PATH            "/usr/share/stockminer/db"
+#define LINUX_DB_USERS_PATH      "/usr/share/stockminer/db/users.db"
+#define LINUX_DB_REPO_PATH       "/usr/share/stockminer/db/repo.db"
+#define LINUX_STOCKS_PATH        "/usr/share/stockminer/data/stocks/STOCKS.TXT"
+#define LINUX_STOCKS_DAYS_PATH   "/usr/share/stockminer/data/stocks/DAYS.TXT"
+#define LINUX_STOCKS_WEEKS_PATH  "/usr/share/stockminer/data/stocks/WEEKS.TXT"
+#define LINUX_STOCKDB_PATH       "/usr/share/stockminer/data/stocks/stockdb"
+#define LINUX_STOCKDB_CSV_PATH   "/usr/share/stockminer/data/stockss/stockdb/csv"
+#define LINUX_GSPC_PATH          "/usr/share/stockminer/data/stocks/stockdb/csv/^GSPC.csv"
+#define LINUX_OPTIONS_PATH       "/usr/share/stockminer/data/stocks/stockdb/options"
+#define UNIX_TIMESTAMP_2016      1451642400
+#define UNIX_TIMESTAMP_1990       631198800
+
+enum { US, WW };
 
 /* XXX: move to Server-> */
 
@@ -307,7 +331,7 @@ struct server {
 	bool                 async;
 	bool                 production;
 	bool                 daemon;
-	port_t               http_port;
+	uint64_t               http_port;
 	port_t               https_port;
 	/* Globals */
 	int                  nr_global_watchlists;
@@ -427,7 +451,7 @@ struct request {
 };
 
 /* RPC */
-bool              rpc_boot                (char *request, struct connection *connection);
+bool              rpc_boot                (struct rpc *rpc); // workspace.c
 void              rpc_chart               (struct rpc *rpc); // workspace.c
 void              rpc_mini_charts         (struct rpc *rpc); // workspace.c
 void              rpc_stockpage           (struct rpc *rpc); // workspace.c
@@ -529,6 +553,8 @@ void              apc_sessions            (struct connection *connection, char *
 void              session_add             (struct session *session);
 void              session_destroy         (struct session *session);
 void              session_load_quadverse  (struct session *);
+void              sessions_update_XLS     (struct XLS *XLS);
+void              sessions_checkpoint     (void);
 void              cmd_session_list        (int http_fd);
 void              session_upload          (struct session *session, struct connection *connection, int type, char *args);
 void              SESSION_LOCK            (void);
@@ -673,7 +699,7 @@ void               init_os                  (struct server *server);
 void               thread_create            (void *(*thread)(void *), void *args);
 
 /* threads.c */
-void *market_update         (void *args);
+void *market_update_thread  (void *args);
 void *market_end            (void *args);
 void  create_stock_threads  (struct XLS *XLS);
 void  cmd_threadstat        (int);
@@ -727,6 +753,7 @@ int      weekday_offset     (const char *day);
 int      splitdate_MDY      (char *date, int *year, int *month, int *day);
 int      splitdate_YMD      (char *date, int *year, int *month, int *day);
 char    *MDY2YMD            (char *from, char *to);
+time_t   str2utc            (char *timestr);
 time_t   str2unix           (char *timestr);
 time_t   str2unix2          (char *timestr);
 time_t   get_ny_time        (char *timestr);

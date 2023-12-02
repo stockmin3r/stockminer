@@ -213,10 +213,8 @@ void load_WSJ(struct XLS *XLS)
 	nr_stocks = XLS->nr_stocks;
 	for (x=0; x<nr_stocks; x++) {
 		stock = STOCKS[x];
-		type  = stock->type;
-		switch (type) {
-			case STOCK_TYPE_LOWCAPS:
-			case STOCK_TYPE_HIGHCAPS:
+		switch (stock->type) {
+			case STOCK_TYPE_STOCK:
 				wsj_stock_api(stock);
 				break;
 			case STOCK_TYPE_INDEX:

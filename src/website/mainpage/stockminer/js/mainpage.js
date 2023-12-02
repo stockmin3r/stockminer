@@ -98,12 +98,12 @@ BTAB =[{"orderable":false,"data":null,"defaultContent":''},{"data":"900"},{"data
 MTAB =[{"data":"900"},{"data":"901"},{"data":"903"},{"data":"904"}],VTAB=[{"data":"900"},{"data":"901"},{"data":"903"},{"data":"905"},{"data":"904"}],
 
 /* RPC */
-op   = {'addPoint':addPoint,       'update':update,       'stockchart':stockchart,     'mini':   rpc_minichart,   'upmini':  rpc_upmini,    'ctheme':rpc_chart_themes,
-        'table':   table,          'ctable':ctable,       'optab':     optab,          'notify': rpc_notify,      'deftab':  rpc_deftab,    'wget':  rpc_wget,
-        'watch':   rpc_watchlist,  'gwatch':rpc_gwatch,   'gexec':     rpc_gexec,      'exec':   rpc_pexec,       'preset':  rpc_indicator, 'TPset': rpc_TPset,
-        'init':    rpc_init,       'fini':  rpc_fini,     'stage':     rpc_stageload,  'profile':rpc_profile,     'qspace':  rpc_qspace,    'index': rpc_menu,
-        'anyday':  rpc_anyday,     'peak':  rpc_peak,     'sc':        rpc_stockpage,  'etab':   rpc_etab,        'sigmon':  rpc_sigmon,    'err':   rpc_login_error,
-        'cookie':  rpc_set_cookie, 'user':  rpc_set_user, 'regok':     rpc_regok,      'nonce':  rpc_nonce,       'query':   rpc_query,
+op   = {'addPoint':addPoint,       'update':update,       'stockchart':stockchart,     'mini':   rpc_minichart,   'upmini':  rpc_upmini,    'ctheme':     rpc_chart_themes,
+        'table':   table,          'ctable':ctable,       'optab':     optab,          'notify': rpc_notify,      'deftab':  rpc_deftab,    'wget':       rpc_wget,
+        'watch':   rpc_watchlist,  'gwatch':rpc_gwatch,   'gexec':     rpc_gexec,      'exec':   rpc_pexec,       'preset':  rpc_indicator, 'TPset':      rpc_TPset,
+        'init':    rpc_init,       'fini':  rpc_fini,     'stage':     rpc_stageload,  'profile':rpc_profile,     'qspace':  rpc_qspace,    'index':      rpc_menu,
+        'anyday':  rpc_anyday,     'peak':  rpc_peak,     'sc':        rpc_stockpage,  'etab':   rpc_etab,        'sigmon':  rpc_sigmon,    'err':        rpc_login_error,
+        'cookie':  rpc_set_cookie, 'user':  rpc_set_user, 'regok':     rpc_regok,      'nonce':  rpc_nonce,       'query':   rpc_query,     'checkpoint': rpc_checkpoint,
         'wspace':  rpc_wspace,     'qpage': rpc_qpage,    'qcache':    rpc_qcache,     'qreload':rpc_qreload,     'qupdate': rpc_qupdate,
         'candle':  candle,         'csr':   rpc_csr,      'czoom':     rpc_candle_zoom,'csp':    rpc_csp,         'candy':   rpc_stockpage_candles,
         'netsh':   rpc_netsh,      'qsh':   rpc_qsh,      'admin':     admin,          'styles': rpc_styles,      'newtab':  rpc_newtab},

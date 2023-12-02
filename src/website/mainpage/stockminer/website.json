@@ -25,9 +25,10 @@
 																							order:[2,2],
 																							slope:["desc","asc"]
 																							}}},
-							{mod:"addTable",  title:"Highcaps", args:{id:"HG"}, click:"highcaps()"}]
+					{mod:"addTable",  title:"Highcaps", args:{id:"HG"}, click:"highcaps()"}]
 			},{
-				workspace: [{mod:"addChart",  title:"Chart",    args:{class:"mainchart"}, style:"@gridmain,@mainchart"}]
+				workspace: [{mod:"addChart", title:"Chart",  args:{class:"mainchart"}, style:"@gridmain,@mainchart"},
+					        {mod:"addDIV",   title:"Update", args:{id:"installer-div"},style:"@gridmain,@mainchart"}]
 			}]
 		},{
 			title:"Screener",

@@ -184,7 +184,7 @@ void update_threads(struct thread *threads, int nr_threads, int hour)
 	}
 }
 
-void *market_update(void *args)
+void *market_update_thread(void *args)
 {
 	struct XLS *XLS = CURRENT_XLS;
 	uint64_t hour   = (uint64_t)args;

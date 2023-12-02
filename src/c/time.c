@@ -1,20 +1,21 @@
 #include <conf.h>
+#include <extern.h>
 
 static struct server *SERVER;
 
 int    holiday = 1;
-time_t current_minute;
-int    current_hour_utc;
-int    current_min_utc;
 time_t current_timestamp;
-int    current_day;
-int    current_week;
+time_t current_minute;     // current unix timestamp      (UTC)
+int    current_minute_utc; // current minute of the hour  (UTC)
+int    current_hour;       // current hour   of the day   (UTC)
+int    current_day;        // current day    of the week  (UTC)
+int    current_week;       // current week   of the month (UTC) 
+//int    current_month;      // current month  of the year  (UTC)
+int    trading_day;        // offset from the start of the year (trading days only, needs to go in an eventual market struct)
 
-int TODAY_IS_FRIDAY;
 int TODAY_IS_SATURDAY;
 int TODAY_IS_SUNDAY;
 int TODAY_IS_MONDAY;
-int TRADETIME_YESTERDAY;
 
 char         **DAYS;
 int            nr_trade_days;
@@ -60,36 +61,6 @@ char *hours[] = { "04:15:", "04:30:", "04:45:", "05:00:", "05:15:", "05:30:", "0
  * - clock_gettime(): UTC (epoch) in seconds + nanoseconds
  */
 
-
-void load_EOD()
-{
-	struct stat sb;
-	char buf[256];
-	char *p;
-	int fd, nbytes;
-
-	fd = open("data/stocks/stockdb/csv/^GSPC.csv", O_RDONLY);
-	if (fd < 0) {
-		perror("open");
-		exit(-1);
-	}
-
-	fstat(fd, &sb);
-	lseek(fd, -256, SEEK_END);
-	nbytes      = read(fd, buf, 256);
-	buf[nbytes] = 0;
-	p           = buf+nbytes;
-	while (*p != '-')
-		p--;
-
-	*(p+3)        = 0;
-	p            -= 7;
-	QDATE[0]      = strdup(p);
-	QDATESTAMP[0] = str2unix(p);
-	printf(BOLDMAGENTA "load_EOD: %s" RESET "\n", QDATE[0]);
-	close(fd);
-}
-
 void load_weeks()
 {
 	struct week *week;
@@ -99,7 +70,7 @@ void load_weeks()
 	int64_t     filesize;
 	int          nr_weeks = 0;
 
-	filesize = fs_readfile_str((char *)STOCK_WEEKS_TXT, buf, sizeof(buf));
+	filesize = fs_readfile_str((char *)STOCKS_WEEKS_PATH, buf, sizeof(buf));
 	if (!filesize) {
 		printf(BOLDRED "load_weeks(): corrupt stocks/WEEKS.TXT file" RESET "\n");
 		return;
@@ -119,17 +90,17 @@ void load_weeks()
 		line = p;
 	}
 }
-
+	int       nr_trading_days = 0;
 void load_days()
 {
 	char     *date;
 	char      buf[32 KB];
 	char     *p;
-	time_t   unix_today = QDATESTAMP[1];
-	int64_t  filesize;
-	int      x;
+	time_t    unix_today = QDATESTAMP[1];
+	int64_t   filesize;
 
-	filesize = fs_readfile_str((char *)STOCK_DAYS_TXT, buf, sizeof(buf));
+
+	filesize = fs_readfile_str((char *)STOCKS_DAYS_PATH, buf, sizeof(buf));
 	if (!filesize) {
 		printf(BOLDRED "[-] load_days(): file read error" RESET "\n");
 		exit(-1);
@@ -147,11 +118,10 @@ void load_days()
 	date = buf;
 	while ((p=strchr(date, '\n'))) {
 		*p++  = 0;
-		DAYS[x] = strdup(date);
+		DAYS[nr_trading_days++] = strdup(date);
 		date = p;
 		if (unix_today == str2unix(date))
-			current_day = x;
-		x++;
+			trading_day = nr_trading_days;
 	}
 }
 
@@ -193,10 +163,10 @@ time_t get_current_time(char *timestr)
 {
 	struct tm  ltm;
 	struct tm *local_tm;
-	time_t     utc_time;
+	time_t     epoch;
 
-	utc_time = time(NULL);
-	local_tm = localtime_r(&utc_time, &ltm);
+	epoch    = time(NULL);
+	local_tm = localtime_r(&epoch, &ltm);
 	strftime(timestr, 18,"%Y-%m-%d 09:00", local_tm);
 	return mktime(local_tm);
 }
@@ -211,26 +181,6 @@ time_t get_timestamp()
 	local_tm = localtime_r(&utc_time, &ltm);
 	local_tm->tm_sec += SERVER->TIMEZONE;
 	return mktime(local_tm);
-}
-
-time_t get_ny_time(char *timestr)
-{
-	struct tm       ltm;
-	struct tm      *local_tm;
-	struct tm      *tm_ny;
-	struct tm       nytm;
-	time_t          time_ny, utc_time;
-	int             offset = SERVER->TIMEZONE;
-
-	utc_time = time(NULL);
-	local_tm = tm_ny = localtime_r(&utc_time, &ltm);
-	if (!SERVER->production) {
-		local_tm->tm_sec += offset;
-		time_ny = mktime(local_tm);
-		tm_ny   = localtime_r(&time_ny, &nytm);
-	}
-	asctime_r(tm_ny, timestr);
-	return (time_ny);
 }
 
 char *ny_date(char *buf)
@@ -286,6 +236,16 @@ time_t ny_time(char *timestr)
 	ltm.tm_isdst = -1;
 	timestamp = mktime(&ltm);
 	return timestamp+SERVER->UTCOFF;
+}
+
+time_t str2utc(char *timestr)
+{
+	struct tm ltm;
+
+	memset(&ltm, 0, sizeof(ltm));
+	strptime(timestr, "%Y-%m-%d", &ltm);
+	ltm.tm_isdst = -1;
+	return timegm(&ltm);
 }
 
 time_t str2unix(char *timestr)
@@ -432,6 +392,28 @@ int splitdate_MDY(char *date, int *year, int *month, int *day)
 
 char TRADETIME[24];
 
+
+time_t get_ny_time(char *timestr)
+{
+	struct tm       ltm;
+	struct tm      *local_tm;
+	struct tm      *tm_ny;
+	struct tm       nytm;
+	time_t          time_ny, utc_time;
+	int             offset = SERVER->TIMEZONE;
+
+	utc_time = time(NULL);
+	local_tm = tm_ny = localtime_r(&utc_time, &ltm);
+	if (!SERVER->production) {
+		local_tm->tm_sec += offset;
+		time_ny = mktime(local_tm);
+		tm_ny   = localtime_r(&time_ny, &nytm);
+	}
+	asctime_r(tm_ny, timestr);
+	return (time_ny);
+}
+
+// ancient, to be removed
 int get_time()
 {
 	//             2 45 78
@@ -481,7 +463,7 @@ int get_time()
 				unsigned long hour_args = (unsigned long)hour;
 				TRADETIME[9] = 1;
 				printf("DAYMARKET hour: %d minute: %d\n", hour, minute);
-				thread_create(market_update, (void *)hour_args);
+				thread_create(market_update_thread, (void *)hour_args);
 			}
 			return (market=DAY_MARKET);
 		} else if ((hour >= 4 && hour <= 9) && minute == 0) {
@@ -491,7 +473,7 @@ int get_time()
 			if (!TRADETIME[hour]) {
 				unsigned long hour_args = (unsigned long)hour;
 				TRADETIME[hour] = 1;
-				thread_create(market_update, (void *)hour_args);
+				thread_create(market_update_thread, (void *)hour_args);
 				printf("PREMARKET hour: %d minute: %d\n", hour, minute);
 			}
 			return (market=PRE_MARKET);
@@ -560,6 +542,23 @@ int utc_timezone_offset()
 	return (loc_timestamp - gmt_timestamp);
 }
 
+// each "market" will have to have its own EOD UTC timestamp array of [previous UTC EOD timestamp][current UTC timestamp][Next UTC EOD timestamp]
+void load_EOD()
+{
+	time_t    epoch;
+	struct tm utc_tm;
+
+	time(&epoch);
+	gmtime_r(&epoch, &utc_tm);
+
+	// if the current UTC hour
+	sprintf(current_date, "%d-%d-%d", utc_tm.tm_year+1900, utc_tm.tm_mon+1, utc_tm.tm_mday);
+	QDATE[0]      = current_date;
+	QDATESTAMP[0] = str2utc(current_date)+utc_timezone_offset();
+	printf(BOLDMAGENTA "load_EOD: %s timestamp: %lu hour: %d" RESET "\n", QDATE[0], QDATESTAMP[0], utc_tm.tm_hour);
+
+}
+
 void init_time(struct server *server)
 {
     char timestr[64];
@@ -567,13 +566,8 @@ void init_time(struct server *server)
 	SERVER = server;
 	server->TIMEZONE = utc_timezone_offset();
 
-	/* current day */
+	/* QDATE[0] will contain the previous calendar trading day */
 	load_EOD();
-	if (TODAY_IS_SUNDAY) {
-		printf(BOLDMAGENTA "TODAY IS SUNDAY" RESET "\n");
-	}else if (TODAY_IS_MONDAY) {
-		printf(BOLDMAGENTA "TODAY IS MONDAY" RESET "\n");
-	}
 
 	QDATE[1]      = strdup(unix2str(get_timestamp(), timestr));
 	QDATESTAMP[1] = str2unix(QDATE[1]);

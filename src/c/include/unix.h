@@ -81,6 +81,7 @@ void   term_erase      (int n);
 void   term_noecho     (void);
 int    fs_readline_tty (char *s, int *len);
 pipe_t fs_open_pipe    (const char *path);
+void   init_paths      (void);
 
 static __inline__ int fs_stat(char *path, struct xstat *sb)
 {

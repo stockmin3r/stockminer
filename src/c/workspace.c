@@ -190,6 +190,7 @@ void rpc_chart(struct rpc *rpc)
 		goto out;
 
 	snprintf(chart->div, 32, "%s-%s", stock->sym, QGID); // create a Chart Global ID - CGID
+	printf("chart div: %s\n", chart->div);
 	packet_len   = workspace_chart_json(stock, packet, chart->div, cfunc, className);
 	chart->stock = stock;
 	chart->type  = CHART_TYPE_OHLC;
@@ -1527,10 +1528,11 @@ void rpc_qswitch(struct rpc *rpc)
  * GET /ws/ACTION_BOOT/bootstring
  * GET /ws/ACTION_RELOAD
  */
-bool rpc_boot(char *request, struct connection *connection)
+bool rpc_boot(struct rpc *rpc)
 {
-	struct session   *session = connection->session;
-	char             *packet  = connection->packet+connection->packet_size;
+	struct session   *session = rpc->session;
+	char             *packet  = rpc->connection->packet+rpc->connection->packet_size;
+	char             *request = rpc->argv[1];
 	struct XLS       *XLS     = CURRENT_XLS;
 	struct stock     *stock;
 	struct quadverse *quadverse;
@@ -1541,9 +1543,11 @@ bool rpc_boot(char *request, struct connection *connection)
 	char             *pargv [MAX_WORKSPACE_OBJECTS];
 	char             *params[MAX_BOOTPARAM_OBJECTS];
 	char             *p = request, *p2;
-	struct rpc        rpc;
 	uint64_t          action, argc, packet_size = 0;
 	uint16_t          quadverse_profile_index;
+
+	if (stockdata_checkpoint != SD_CHECKPOINT_COMPLETE || stockdata_checkpoint != SD_CHECKPOINT_PARTIAL)
+		return true;
 
 	action = strtoul(request, NULL, 10);
 	if (action >= MAX_WEBSOCKET_ACTIONS)
@@ -1632,21 +1636,19 @@ bool rpc_boot(char *request, struct connection *connection)
 			if (!stock)
 				continue;
 
-			cargv[1]       = QGID;
-			cargv[2]       = stock->sym;
-			cargv[5]       = params[3]; // class name of an existing <div> where the chart will reside (meaning it was created already rather than by the rpc_chart() js handler
-			rpc.session    = session;
-			rpc.connection = connection;
-			rpc.packet     = packet+packet_size;
-			rpc.argv       = cargv;
-			rpc.internal   = true;
+			cargv[1]        = QGID;
+			cargv[2]        = stock->sym;
+			cargv[5]        = params[3]; // class name of an existing <div> where the chart will reside (meaning it was created already rather than by the rpc_chart() js handler
+			rpc->packet     = packet+packet_size;
+			rpc->argv       = cargv;
+			rpc->internal   = true;
 			/*
 			 * rpc_chart() is called internally to pack chart config JSON(s) into connection->packet
 			 * it will also create quadspaces/workspaces necessary to hold those charts
 			 */
-			rpc_chart(&rpc);
+			rpc_chart(rpc);
 
-			packet_size += rpc.packet_size;
+			packet_size += rpc->packet_size;
 			*(packet+packet_size++) = '@';
 //			printf("params: %s packet_size: %lld\n", params[3], packet_size);
 		} else if (!strncmp(params[0], "addProfile", 10)) {
@@ -1663,7 +1665,7 @@ bool rpc_boot(char *request, struct connection *connection)
 		}
 //		printf("argv: %s params: %d\n", argv[x], nr_params);
 	}
-	connection->packet_size = packet_size;
+	rpc->connection->packet_size = packet_size;
 	return true;
 }
 

@@ -60,7 +60,7 @@ void update_highcaps(struct board *board)
 		return;
 	for (x=0; x<nr_stocks; x++) {
 		stock = board->stocks[x];
-		if (stock->type != STOCK_TYPE_HIGHCAPS)
+		if (stock->subtype != STOCK_SUBTYPE_HIGHCAPS)
 			continue;
 		if (market == PRE_MARKET)
  			vol = stock->premarket_volume*stock->current_price;

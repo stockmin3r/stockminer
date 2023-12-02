@@ -83,7 +83,7 @@ __MODULE_HOOK stocks_main_pre_loop(struct server *server)
 {
 	market = get_time();
 	init_watchtable();
-	init_candles(server);
+	init_candles(server); // load build/libta.so, if present
 	init_ranks(server->XLS);
 }
 
@@ -130,6 +130,17 @@ __MODULE_INIT init_stocks_module(struct server *server)
 	server->XLS->config         = server;
 	if (server->XLS)
 		register_module(module);
+	/*
+	 * Checkpoint for installation/updating:
+	 *   - if user is installing for the first time then they will have no stock data
+	 *   - the data must be fetched first (from a configed provider (default: yahoo)
+	 *   - the web server will send back an "RPC checkpoint" message until the data
+	 *     has downloaded. When every x amount of tickers (eg: 50) are fetched,
+	 *     the webserver will (re)create the stock threads and send all sessions
+	 *     an RPC message to either reload the website or re-issue the "boot" RPC
+	 *     (in which case the website wouldn't need to be reloaded)
+	 */
+	thread_create(stocks_update_checkpoint, (void *)server->XLS);
 }
 
 
@@ -143,13 +154,11 @@ void module_hook(void *args, int hook)
 		if (!module || !module->enabled)
 			continue;
 
-		printf("module: %s hook: %d\n", module->name, hook);
 		switch (hook) {
 			/*
 			* Session Hooks
 			*/
 			case MODULE_SESSION_INIT:
-				printf("modue session init: %p\n", module->session_init_hook);
 				if (module->session_init_hook)
 					module->session_init_hook((struct session *)args);
 				break;

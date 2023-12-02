@@ -1,5 +1,6 @@
 #include <stdinc.h>
 #include <conf.h>
+#include <extern.h>
 
 struct termios sterm;
 
@@ -268,13 +269,50 @@ static void init_db_crypto(void)
 	system("mount /dev/mapper/cryptofs build/cryptofs");
 }
 
+void init_paths()
+{
+	struct utsname u;
+
+	if (fs_file_exists("src/c")) {
+		DB_PATH           = GIT_DB_PATH;
+		DB_REPO_PATH      = GIT_DB_REPO_PATH;
+		DB_USERS_PATH     = GIT_DB_USERS_PATH;
+		STOCKS_PATH       = GIT_STOCKS_PATH;
+		STOCKS_DAYS_PATH  = GIT_STOCKS_DAYS_PATH;
+		STOCKS_WEEKS_PATH = GIT_STOCKS_WEEKS_PATH;
+		STOCKDB_PATH      = GIT_STOCKDB_PATH;
+		STOCKDB_CSV_PATH  = GIT_STOCKDB_CSV_PATH;
+		GSPC_PATH         = GIT_GSPC_PATH;
+		OPTIONS_PATH      = GIT_OPTIONS_PATH;
+		return;
+	}
+
+	uname(&u);
+	if (strcmp(u.sysname, "Linux")) {
+		char cwd[256];
+		getcwd(cwd, sizeof(cwd)-1);
+		fs_appendfile("/log.txt", "Linux\n", 6);
+		fs_appendfile("/log.txt", cwd, strlen(cwd));
+		DB_PATH           = LINUX_DB_PATH;
+		DB_USERS_PATH     = LINUX_DB_USERS_PATH;
+		DB_REPO_PATH      = LINUX_DB_REPO_PATH;
+		STOCKS_PATH       = LINUX_STOCKS_PATH;
+		STOCKS_DAYS_PATH  = LINUX_STOCKS_DAYS_PATH;
+		STOCKS_WEEKS_PATH = LINUX_STOCKS_WEEKS_PATH;
+		STOCKDB_PATH      = LINUX_STOCKDB_PATH;
+		STOCKDB_CSV_PATH  = LINUX_STOCKDB_CSV_PATH;
+		GSPC_PATH         = LINUX_GSPC_PATH;
+		OPTIONS_PATH      = LINUX_OPTIONS_PATH;
+	}
+}
+
 static void init_fs()
 {
 	struct user user;
 	struct stat sb;
 
 	init_db_crypto();
-	if (!fs_file_exists("db") || !fs_file_exists("db/users.db")) {
+	if (!fs_file_exists((char *)DB_PATH) || !fs_file_exists((char *)DB_USERS_PATH)) {
 		fs_mkdir("db",            0755);
 		fs_mkdir("db/users",      0755);
 		fs_mkdir("db/quadverse",  0755);

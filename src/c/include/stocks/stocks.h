@@ -11,36 +11,40 @@
 #include <stocks/ranks.h>
 #include <stocks/forks.h>
 
-#define STOCK_DAYS_TXT  "data/stocks/DAYS.TXT"
-#define STOCK_WEEKS_TXT "data/stocks/WEEKS.TXT"
+#define PRE_MARKET             1
+#define DAY_MARKET             2
+#define AFH_MARKET             3
+#define NO_MARKET              4
 
-#define PRE_MARKET            1
-#define DAY_MARKET            2
-#define AFH_MARKET            3
-#define NO_MARKET             4
+#define MARKET_NASDAQ          0
+#define MARKET_NYSE            1
+#define MARKET_OTC             2
+#define MARKET_ASE             3
+#define MARKET_CRYPTO          4
 
-#define MARKET_NASDAQ         1
-#define MARKET_NYSE           2
-#define MARKET_OTC            3
-#define MARKET_ASE            4
+#define HIGHCAPS_TABLE         0
+#define LOWCAPS_TABLE          1
 
-#define HIGHCAPS_TABLE        0
-#define LOWCAPS_TABLE         1
+#define STOCK_TYPE_STOCK       0
+#define STOCK_TYPE_FOREX       1
+#define STOCK_TYPE_CRYPTO      2
+#define STOCK_TYPE_INDEX       3
+#define STOCK_TYPE_FUND        4
 
-#define STOCK_TYPE_LOWCAPS    0
-#define STOCK_TYPE_HIGHCAPS   1
-#define STOCK_TYPE_FOREX      2
-#define STOCK_TYPE_CRYPTO     4
-#define STOCK_TYPE_INDEX      8
-#define STOCK_TYPE_FUND      16
+#define STOCK_SUBTYPE_LOWCAPS  1
+#define STOCK_SUBTYPE_HIGHCAPS 2
 
-#define XLS_DATA_SOURCE_WSJ   1
-#define XLS_DATA_SOURCE_WWW   2
-#define XLS_DATA_SOURCE_YAHOO 4
+#define XLS_DATA_SOURCE_WSJ    1
+#define XLS_DATA_SOURCE_WWW    2
+#define XLS_DATA_SOURCE_YAHOO  4
 
-#define NR_FUNDS             12
-#define NR_MENU_STOCKS        4
-#define MAX_DATA_RETRIES      5
+#define NR_FUNDS              12
+#define NR_MENU_STOCKS         4
+#define MAX_DATA_RETRIES       5
+
+#define SD_CHECKPOINT_EMPTY    0
+#define SD_CHECKPOINT_PARTIAL  1
+#define SD_CHECKPOINT_COMPLETE 2
 
 struct price;
 struct ohlc;
@@ -279,8 +283,10 @@ struct stock {
 	struct XLS      *XLS;
 	struct sig     **signals;
 	struct API       API;
+	int              type;
+	int              subtype;
+	int              country_id;
 	double           sig_avgdays;
-	uint64_t         type;
 	uint64_t         indicators;
 	unsigned short   nr_signals;
 	unsigned short   max_signals;
@@ -476,6 +482,11 @@ void              update_peakwatch        (struct XLS *XLS);
 void              init_monster            (struct XLS *XLS, int do_forks);
 void              store_monster_db        (struct monster *monster);
 void              http_send_monster       (struct connection *connection);
+void             *stocks_update_checkpoint(void *args);
+
+/* market.c  */
+bool              ticker_needs_update     (struct stock *stock, time_t *update_timestamp, int *nr_trading_hours);
+int               market_update           (void);
 
 /* price.c */
 void              apc_update_WSJ          (struct connection *connection, char **argv);

@@ -1,5 +1,6 @@
 #include <conf.h>
 #include <stocks/options.h>
+#include <extern.h>
 
 int fetch_options(char *ticker, time_t date, char *page)
 {
@@ -67,7 +68,7 @@ int update_opchain(struct update *update)
 	page   = update->page;
 	expiry = update->expiry;
 
-	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/options/%s/%s", ticker, unix2str(update->expiry, expbuf));
+	snprintf(path, sizeof(path)-1, "%s/%s/%s", OPTIONS_PATH, ticker, unix2str(update->expiry, expbuf));
 	printf("saving to: %s\n", path);
 
 	update->expiry_path = path;
@@ -235,7 +236,7 @@ void update_contract_live(struct opstock *opstock)
 	struct update update;
 	char path[256];
 
-	sprintf(path, "data/stocks/stockdb/options/%s/%s", opstock->stock->sym, opstock->option->contract);
+	snprintf(path, sizeof(path)-1, "%s/%s/%s", OPTIONS_PATH, opstock->stock->sym, opstock->option->contract);
 	if (!opstock->OHLC && !opstock_csv_load(opstock, path))
 		return;
 	update.cmd = OPTION_LIVE|OPTION_1M;
@@ -329,7 +330,7 @@ void update_contract_1d(struct opstock *opstock)
 	char            expbuf[64];
 	char            csv[4 KB];
 
-	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/options/%s/%s", opstock->stock->sym, contract);
+	snprintf(path, sizeof(path)-1, "%s/%s/%s", OPTIONS_PATH, opstock->stock->sym, contract);
 	stat(path, &sb);
 	if (!opstock->OHLC && !opstock_csv_load(opstock, path))
 		return;

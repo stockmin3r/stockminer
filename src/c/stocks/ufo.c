@@ -116,7 +116,7 @@ void ufo_scan(struct XLS *XLS)
 			if (v15)
 				stock->volume_15m = ((current_volume / v15)-1)*100.0;
 		}
-		if (stock->type == STOCK_TYPE_LOWCAPS) {
+		if (stock->subtype == STOCK_SUBTYPE_LOWCAPS) {
 				add_delta_gainer(stock, boards[LOWCAP_GAINER_BOARD]);   // frontpage Lowcaps Gainer Table
 				add_delta_loser (stock, boards[LOWCAP_LOSER_BOARD]);    // frontpage Lowcaps Loser  Table
 			for (y=0; y<3; y++) {
@@ -125,7 +125,7 @@ void ufo_scan(struct XLS *XLS)
 			}
 			for (y=0; y<3; y++)
 				add_double_gainer(stock, boards[VLOW_BOARD_IDX+y]);      // UFO L Volume 15m/5m/1m Tables
-		} else if (stock->type == STOCK_TYPE_HIGHCAPS) {
+		} else if (stock->subtype == STOCK_SUBTYPE_HIGHCAPS) {
 				add_delta_gainer(stock, boards[HIGHCAP_GAINER_BOARD]);  // frontpage Highcaps Gainer Table
 				add_delta_loser (stock, boards[HIGHCAP_LOSER_BOARD]);   // frontpage Highcaps Loser Table
 			for (y=0; y<3; y++) {
@@ -744,11 +744,11 @@ void init_ufo(struct XLS *XLS)
 	for (x=0; x<nr_stocks; x++) {
 		stock = stocks[x];
 		for (y=0; y<NR_BOARDS; y++) {
-			if (stock->type == STOCK_TYPE_LOWCAPS         && board_table[y].btype & BTYPE_LOWCAPS) {
+			if (stock->type == STOCK_SUBTYPE_LOWCAPS            && board_table[y].btype & BTYPE_LOWCAPS) {
 				boards[y]->add(stock, boards[y]);
-			} else if (stock->type == STOCK_TYPE_HIGHCAPS && board_table[y].btype & BTYPE_HIGHCAPS) {
+			} else if (stock->subtype == STOCK_SUBTYPE_HIGHCAPS && board_table[y].btype & BTYPE_HIGHCAPS) {
 				boards[y]->add(stock, boards[y]);
-			} else if (board_table[y].btype == BULLCAPS   || board_table[y].btype == BEARCAPS) {
+			} else if (board_table[y].btype == BULLCAPS         || board_table[y].btype == BEARCAPS) {
 				boards[y]->add(stock, boards[y]);
 			}
 		}

@@ -155,6 +155,39 @@ void apc_sessions(struct connection *connection, char **argv)
 	apc_send_result(connection, buf);
 }
 
+void sessions_checkpoint(void)
+{
+	struct session *session;
+	char            msg[256];
+
+	mutex_lock(&session_lock);
+	printf("checkpoint session reload\n");
+	DLIST_FOR_EACH_ENTRY(session, &session_list, list) {
+		websockets_sendall(session, "qreload", 7);
+	}
+	mutex_unlock(&session_lock);
+}
+
+void sessions_update_XLS(struct XLS *XLS)
+{
+	struct session   *session;
+
+	mutex_lock(&session_lock);
+	DLIST_FOR_EACH_ENTRY(session, &session_list, list) {
+		mutex_lock(&session->session_lock);
+		for (int x=0; x<session->nr_watchlists; x++) {
+			struct watchlist *watchlist = session->watchlists[x];
+			for (int y=0; y<watchlist->nr_stocks; y++) {
+				struct watchstock *watchstock = &watchlist->stocks[y];
+				watchstock->stock = search_stocks(watchstock->ticker);
+				//printf(BOLDGREEN "replacing stock: %-8s new: %p" RESET "\n", watchstock->ticker, watchstock->stock);
+			}
+		}
+		mutex_unlock(&session->session_lock);
+	}
+	mutex_unlock(&session_lock);
+}
+
 void session_set_config(struct connection *connection)
 {
 	struct session *session     = connection->session;

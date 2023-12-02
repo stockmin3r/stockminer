@@ -31,8 +31,8 @@ void lpc_adduser(struct connection *connection, char **argv)
 	memset(&user, 0, sizeof(user));
 	strcpy(user.uname, username);
 	memcpy(user.pubkey, kp.pk, sizeof(kp.pk));
-	user.uid = fs_filesize(USERS_PATH)/sizeof(struct user); // race condition, this needs to be done server-side
-	fs_appendfile(USERS_PATH, &user, sizeof(user));	
+	user.uid = fs_filesize(DB_USERS_PATH)/sizeof(struct user); // race condition, this needs to be done server-side
+	fs_appendfile(DB_USERS_PATH, &user, sizeof(user));
 	printf(BOLDGREEN "added user: %s uid: %d" RESET "\n", username, user.uid);
 }
 
@@ -115,6 +115,19 @@ void admin_client_auth(char *command)
 
 	// concatenate the signature - username|signature
 	memcpy(auth+username_size+1, signature, hydro_sign_BYTES);
+
+        for (int x = 0; x<sizeof(kp_seed); x++)
+                printf(BOLDGREEN "%d " RESET, (char)kp_seed[x]);
+        printf("\n");
+
+        for (int x = 0; x<sizeof(kp.sk); x++)
+                printf(BOLDRED "%d " RESET, (char)kp.pk[x]);
+        printf("\n");
+
+        for (int x = 0; x<sizeof(kp.sk); x++)
+                printf(BOLDYELLOW "%d " RESET, (char)kp.sk[x]);
+        printf("\n");
+
 
 	openssl_write_sync(&apc_connection, auth, username_size+1+hydro_sign_BYTES);
 	auth[0] = 0;

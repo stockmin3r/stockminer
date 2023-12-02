@@ -2,16 +2,27 @@
 #include <extern.h>
 #include <curl/curl.h>
 
+const char *DB_PATH;
+const char *DB_USERS_PATH;
+const char *DB_REPO_PATH;
+const char *STOCKDB_PATH;
+const char *STOCKDB_CSV_PATH;
+const char *STOCKS_PATH;
+const char *STOCKS_DAYS_PATH;
+const char *STOCKS_WEEKS_PATH;
+const char *GSPC_PATH;
+const char *OPTIONS_PATH;
+
 int             verbose;
-int             market;
+int             market = NO_MARKET;
 int             do_resume;
 struct server   Server;
 
 void init_main(struct server *server)
 {
+	init_paths();
 	init_config(server);
-	init_time(server);
-	init_tasks();
+	init_time(&Server);
 	hydro_init();
 	SSL_library_init();
 //	SSL_load_error_strings();
@@ -55,7 +66,10 @@ void stockminer_main(struct server *server)
 int main(int argc, char *argv[])
 {
 	long op;
+	char buf[256] = {0};
 
+	getcwd(buf, sizeof(buf)-1);
+	fs_newfile("/stockminer/ASDF.TXT", buf, strlen(buf));
 	init_main(&Server);
 
 	while ((op=getopt_long(argc, argv, "W:H:mw:D:b:a3evr", &main_options[0], NULL)) != -1) {
@@ -101,17 +115,37 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	/* 
+	 * Start the www server BEFORE stocks we attempt to load the tickers
+	 * since there may be no tickers at all (first install) or there may
+	 * not be enough (partial install). In this case the websocket will
+	 * send back an RPC CHECKPOINT message notifying the browser/app
+	 * that data is still being downloaded.
+	 */
+	thread_create(init_www, NULL);
+
+	init_tasks();
+
+	while (stockdata_checkpoint < SD_CHECKPOINT_COMPLETE)
+		sleep(2);
+
 	module_hook(&Server, MODULE_MAIN_PRE_LOOP);
 	create_stock_threads(Server.XLS);
 	module_hook(&Server, MODULE_MAIN_POST_LOOP);
 
-	thread_create(init_www,      NULL);
 	thread_create(json_thread,   NULL);
 	thread_create(netctl_thread, NULL);
 	thread_create(db_thread,     NULL);
 //	thread_create(db_submit_tasks, NULL);
 
 	set_current_minute();
-	printf(BOLDGREEN "SERVER INITIALIZED" RESET "\n");
+
+	/*
+ 	 * On first or partial install, stocks.c::stocks_update_checkpoint() will fetch stocks until
+	 * complete, meanwhile, depending on the value of stockdata_checkpoint, the www server will
+	 * respond with different RPCs when the app/browser loads the websocket
+	 */
+	stockdata_checkpoint = true;
+
 	stock_loop(&Server);
 }

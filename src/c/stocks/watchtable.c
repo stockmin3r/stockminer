@@ -17,6 +17,8 @@ static void stock_get_common      (struct column_value *cvalue, int column_id);
 static void stock_get_trend       (struct column_value *cvalue, int column_id);
 static void stock_get_fundamentals(struct column_value *cvalue, int column_id);
 
+static bool watchtable_initialized = false;
+
 struct column_value {
 	struct stock   *stock;        /* [INPUT]  stock pointer */
 	struct mag     *mag;          /* [INPUT]  mag builtin stockminer price and trend data */
@@ -105,6 +107,9 @@ void init_watchtable()
 {
 	int   column_name_int, column_id;
 
+	if (watchtable_initialized)
+		return;
+
 	for (int x=0; x<NR_BUILTIN_COLUMNS; x++) {
 		struct column      *column = (struct column *)zmalloc(sizeof(*column));
 		struct column_hash *chash  = (struct column_hash *)zmalloc(sizeof(*chash));
@@ -125,6 +130,7 @@ void init_watchtable()
 				break;
 		}
 	}
+	watchtable_initialized = true;
 }
 
 int column_sprintf(struct session *session, struct watchlist *watchlist, struct stock *stock, struct wtab *wtab, char *packet, int packet_len, int entry)

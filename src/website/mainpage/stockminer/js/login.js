@@ -51,13 +51,13 @@ function login_onclick()
 	var keypair     = Module._malloc(mem_offset);
 	var kp_seed     = Module._malloc(offset+=hydro_sign_SEEDBYTES);*/
 
-	var keypair     = new Uint8Array(wasmExports.memory, 0,          hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES);
-	var kp_seed     = new Uint8Array(wasmExports.memory, hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES, hydro_sign_SEEDBYTES);
+	var keypair     = new Uint8Array(wasmExports.memory, 0, hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES);
+	var kp_seed     = new Uint8Array(wasmExports.memory,    hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES, hydro_sign_SEEDBYTES);
 
 	// 1) Regenerate the seed from username|password
 	rc = Module.ccall("hydro_pwhash_deterministic",      // function name
 					  "number",                          // return type of this function (int): 0 for success -1 for failure
-					 ["array","number",                  // uint8_t[]: kp_seed, int: sizeof(kp_seed[])
+					 ["number","number",                  // uint8_t[]: kp_seed, int: sizeof(kp_seed[])
 					  "string","number",                 // char *: auth,       int: strlen(username|password)
 					  "string", "number",                // char *: context,    int: OPSLIMIT
 					  "number","number"],                // size_t: memlimit,   uint8_t: nr_threads

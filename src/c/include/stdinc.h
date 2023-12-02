@@ -83,6 +83,7 @@ extern "C" {
 #include <dlfcn.h>
 #include <dirent.h>
 #include <unix.h>
+#include <sys/utsname.h>
 #endif
 
 #ifdef __LINUX__

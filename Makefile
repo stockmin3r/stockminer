@@ -144,6 +144,14 @@ linux:
 	tar -xzf build/stockdata.tar.gz -C .
 	make -j 4
 
+.PHONY:pkg
+pkg:
+	mkdir -p build/deb/stockminer_0.9.6_amd64/usr/bin
+	mkdir -p build/deb/stockminer_0.9.6_amd64/DEBIAN
+	cp pkg/deb/control build/deb/stockminer_0.9.6_amd64/DEBIAN
+	cp stockminer build/deb/stockminer_0.9.6_amd64/usr/bin
+	dpkg --build  build/deb/stockminer_0.9.6_amd64
+
 candles:
 	cd build && git clone https://github.com/stoni/ta-lib/
 	cd build/ta-lib && chmod +x autogen.sh && ./autogen.sh && ./configure && make && cp src/.libs/libta_lib.so ../../build

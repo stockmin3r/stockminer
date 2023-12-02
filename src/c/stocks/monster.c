@@ -172,7 +172,7 @@ void build_color_table(struct XLS *XLS)
 	ranked_stocks = XLS->ranked_stocks;
 	for (x=0; x<nr_stocks; x++) {
 		stock  = sb150_leaders[x];
-		if (!stock || !stock->mag || !(stock->type & STOCK_TYPE_HIGHCAPS))
+		if (!stock || !stock->mag || !(stock->subtype & STOCK_SUBTYPE_HIGHCAPS))
 			continue;
 		if (stock->mag->nr_entries <= 21)
 			continue;

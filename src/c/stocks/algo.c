@@ -846,8 +846,10 @@ void load_stock_csv(struct XLS *XLS, struct stock *stock, struct mag *mag, unsig
 	price->price_1d_close_len           = close_len;
 
 	*(price->price_1d_close+close_len-1) = ']';
-	if (count_months)
+	if (count_months) {
 		current_month = month;
+		printf("current_month: %d\n", current_month);
+	}
 }
 
 // use for stack buffers in synchronous code

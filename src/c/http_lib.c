@@ -33,7 +33,6 @@ char *curl_get(char *url, char *page)
 
 	headers = curl_slist_append(headers, "Accept-Encoding: gzip");
 	headers = curl_slist_append(headers, "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0");
-//	headers = curl_slist_append(headers, "User-Agent: Curl-7.60");
 	curl    = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_URL, url);
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -49,6 +48,7 @@ char *curl_get(char *url, char *page)
 	uncompressed_size = *(unsigned int *)(cdata.memory+cdata.size-4);
 	if (uncompressed_size < 0)
 		return NULL;
+
 	page_len = zip_decompress2((unsigned char *)cdata.memory, (unsigned char *)page, cdata.size, uncompressed_size);
 	if (page_len <= 0)
 		goto out;

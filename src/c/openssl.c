@@ -103,6 +103,8 @@ packet_size_t openssl_write_sync(struct connection *connection, char *packet, pa
 	char *p = packet;
 	int   i = 0;
 
+	if (!connection->ssl)
+		return -1;
 	do {
 		i = SSL_write(connection->ssl, p, MIN(packet_size, 16 KB));
 		if (i == 0 || errno == EPIPE)

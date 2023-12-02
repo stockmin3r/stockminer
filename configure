@@ -217,6 +217,21 @@ linux:
 	tar -xzf build/stockdata.tar.gz -C .
 	make -j 4
 
+.PHONY:pkg
+pkg:
+	mkdir -p build/deb/stockminer_0.9.6_amd64/usr/bin
+	mkdir -p build/deb/stockminer_0.9.6_amd64/etc/stockminer
+	mkdir -p build/deb/stockminer_0.9.6_amd64/var/www/stockminer/video
+	mkdir -p build/deb/stockminer_0.9.6_amd64/usr/share/stockminer/data/stocks
+	mkdir -p build/deb/stockminer_0.9.6_amd64/DEBIAN
+	cp data/stocks/*.TXT build/deb/stockminer_0.9.6_amd64/usr/share/stockminer/data/stocks/
+	cp pkg/deb/control   build/deb/stockminer_0.9.6_amd64/DEBIAN
+	cp stockminer        build/deb/stockminer_0.9.6_amd64/usr/bin
+	cp www/hydrogen.wasm build/deb/stockminer_0.9.6_amd64/usr/share/stockminer/data/stocks
+	cp www/*.pem         build/deb/stockminer_0.9.6_amd64/usr/share/stockminer/data/stocks
+	dpkg --build         build/deb/stockminer_0.9.6_amd64
+	
+
 candles:
 	cd build && git clone https://github.com/stoni/ta-lib/
 	cd build/ta-lib && chmod +x autogen.sh && ./autogen.sh && ./configure && make && cp src/.libs/libta_lib.so ../../build

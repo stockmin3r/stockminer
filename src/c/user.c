@@ -47,7 +47,7 @@ void db_user_update_cb(struct user *user)
 
 	printf(BOLDRED "db_user_update_cb: username: %s uid: %d" RESET "\n", user->uname, user->uid);
 	mutex_lock(&user_lock);
-	map       = MAP_FILE_RW(USERS_PATH, &filemap);
+	map       = MAP_FILE_RW((char *)DB_USERS_PATH, &filemap);
 	nr_users  = filemap.filesize/sizeof(struct user);
 	uptr      = (struct user *)map;
 	printf(BOLDRED "NR USERS: %d" RESET "\n", nr_users);
@@ -197,7 +197,7 @@ void init_users()
 	char           *map, *username;
 	int             username_len;
 
-	if (!(map=MAP_FILE_RO(USERS_PATH, &filemap)))
+	if (!(map=MAP_FILE_RO(DB_USERS_PATH, &filemap)))
 		return;
 
 	NR_USERS  = filemap.filesize/sizeof(struct user);

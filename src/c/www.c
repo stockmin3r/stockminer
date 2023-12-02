@@ -159,6 +159,7 @@ websocket_process_request(struct connection *connection)
 		printf(BOLDCYAN "CRITICAL: nr_frames: %d" RESET "\n", nr_frames);
 		return false;
 	}
+
 	for (int x=0; x<nr_frames; x++) {
 		frame = &frames[x];
 		msg   = (char *)frame->data;
@@ -350,6 +351,8 @@ int www_websocket_async(char *request, struct connection *connection)
 {
 	struct session *session;
 	struct url      url = {0};
+	struct rpc      rpc;
+	char           *argv[2];
 
 	printf(BOLDWHITE "www_websocket: %.60s" RESET "\n", request);
 
@@ -377,9 +380,14 @@ int www_websocket_async(char *request, struct connection *connection)
 		return websocket_upload_object(session, connection, request+8);
 
 	/* The mainpage's website.json boot RPC */
-	if (url.action == ACTION_BOOT)
-		if (!rpc_boot(request+8, connection))
+	if (url.action == ACTION_BOOT) {
+		rpc.session    = session;
+		rpc.connection = connection;
+		argv[1]        = request+8;
+		rpc.argv       = argv;
+		if (!rpc_boot(&rpc))
 			return 0;
+	}
 
 	/* pack the user's saved website customization confs into connection->packet */
 	session_set_config(connection);
@@ -592,9 +600,14 @@ int www_websocket_sync(char *req, struct connection *connection)
 		return websocket_upload_object(session, connection, req+8);
 
 	/* The mainpage's website.json boot RPC */
-	if (url.action == ACTION_BOOT)
-		if (!rpc_boot(req+8, connection))
+	if (url.action == ACTION_BOOT) {
+		rpc.session    = session;
+		rpc.connection = connection;
+		argv[1]        = req+8;
+		rpc.argv       = argv;
+		if (!rpc_boot(&rpc))
 			return 0;
+	}
 
 	/* Allocate new websocket in a bounded circular array buffer of type socket_t */
 	connection->websocket_id = www_new_websocket(session, connection);
@@ -636,6 +649,19 @@ int www_websocket_sync(char *req, struct connection *connection)
 				printf(BOLDCYAN "CRITICAL: nr_frames: %d" RESET "\n", nr_frames);
 				break;
 			}
+			if (stockdata_checkpoint == SD_CHECKPOINT_EMPTY) {
+				packet_size = sprintf(packet, "checkpoint 0 %.2f", stockdata_completion);
+				websocket_send(connection, packet, packet_size);
+				continue;
+			} else if (stockdata_checkpoint == SD_CHECKPOINT_PARTIAL) {
+				if (STOCKDATA_PENDING == 30) {
+					printf(BOLDGREEN "STOCKDATA PENDING" RESET "\n");
+					packet_size = snprintf(packet, 32, "checkpoint 3 %.2f", stockdata_completion);
+					STOCKDATA_PENDING = false;
+				} else
+					packet_size = snprintf(packet, 32, "checkpoint 1 %.2f", stockdata_completion);
+				websocket_send(connection, packet, packet_size);
+			}
 			mutex_lock(&session->session_lock);
 			for (int x=0; x<nr_frames; x++) {
 				frame = &frames[x];
@@ -666,6 +692,8 @@ int www_websocket_sync(char *req, struct connection *connection)
 	quadverse_unsubscribe(session);
 	printf(BOLDRED "CLOSED CONNECTION: %.8s client_id: %d fd: %d" RESET "\n", (char *)&session->user->cookies[connection->websocket_id], connection->websocket_id, session->websockets[connection->websocket_id]->fd);
 	session->websockets[connection->websocket_id]->fd = -1;
+	openssl_destroy(connection);
+	session->websockets[connection->websocket_id]     = NULL;
 	return 0;
 }
 
@@ -719,11 +747,11 @@ static __inline__ int www_reload(struct connection *connection)
 
 void *www_process_sync(void *args)
 {
-	char            req[2048];
+	char               req[2048];
 	struct connection *connection = (struct connection *)args;
-	int             http_fd = connection->fd;
-	unsigned int    r1, r2;
-	uint64_t        r0, r8;
+	int                http_fd    = connection->fd;
+	unsigned int       r1, r2;
+	uint64_t           r0, r8;
 
 	while (1) {
 		memset(req, 0, sizeof(req));
@@ -797,6 +825,7 @@ out:
 	if (http_fd <= 2)
 		return NULL;
 	close(http_fd);
+	memset(connection, 0, sizeof(*connection));
 	free(connection);
 	return (NULL);
 }

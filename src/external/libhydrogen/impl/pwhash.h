@@ -70,7 +70,7 @@ hydro_pwhash_keygen(uint8_t master_key[hydro_pwhash_MASTERKEYBYTES])
 }
 
 int
-hydro_pwhash_deterministic(uint8_t *h, size_t h_len, const char *passwd, int passwd_len,
+hydro_pwhash_deterministic(uint8_t *h, int h_len, const char *passwd, int passwd_len,
                            const char    ctx[hydro_pwhash_CONTEXTBYTES],
                            const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES], int opslimit,
                            int memlimit, uint8_t threads)
@@ -87,7 +87,6 @@ hydro_pwhash_deterministic(uint8_t *h, size_t h_len, const char *passwd, int pas
     }
     hydro_random_buf_deterministic(h, h_len, seed);
     hydro_memzero(seed, sizeof seed);
-
     return 0;
 }
 

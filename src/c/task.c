@@ -101,11 +101,11 @@ struct task *pick_task(int *workload)
 void task_schedule(void)
 {
 	struct tm  utc_tm;
-	time_t     utc_timestamp;
+	time_t     epoch;
 	int        ntasks = nr_tasks;
 
-	time(&utc_timestamp);
-	gmtime_r(&utc_timestamp, &utc_tm);
+	time(&epoch);
+	gmtime_r(&epoch, &utc_tm);
 	for (int x = 0; x<ntasks; x++) {
 		struct task *task = tasks[x];
 		if (!task)
@@ -185,8 +185,8 @@ void init_tasks(void)
 		*p++ = 0;
 		end_day = p;
 
-		task->start_day = weekday_offset(start_day);
-		task->end_day   = weekday_offset(end_day);
+		task->start_day  = weekday_offset(start_day);
+		task->end_day    = weekday_offset(end_day);
 
 		// the "hour:minute timezone" when the task should be started
 		task->start_hour = atoi(argv[3]);

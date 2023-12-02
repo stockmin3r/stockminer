@@ -30,6 +30,7 @@
  * /ws/ACTION_BOOT/addTable:lowcaps:P0Q0q0ws0/addTable:highcaps:P0Q0q0    - instruct the server to send back the JSON data for the lowcaps & highcaps tables
  * /ws/ACTION_RELOAD                                                      - websocket timed out; poll server and when server is back up the server will send a qreload RPC so the browser can reload
  */
+var RPC_BOOT;
 function init_websocket(action) {
 	var cmd,argv,f,rpc,backoff=1,path=document.location.pathname;
 
@@ -37,7 +38,7 @@ function init_websocket(action) {
 		action = ACTION_BOOT;
 		if (path == "/") {
 			// we're loading the standard mainpage from this server
-			rpc    = quadspace_to_rpc(WEBSITE.QuadVerse[0].QuadSpace);
+			rpc    = RPC_BOOT = quadspace_to_rpc(WEBSITE.QuadVerse[0].QuadSpace);
 			// let the server know the QVID of the Profile QuadVerse
 			rpc   += quadverse_profile(WEBSITE.QuadVerse);
 		} else {
