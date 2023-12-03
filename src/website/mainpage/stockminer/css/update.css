@@ -1,0 +1,62 @@
+/*
+ * License: Public Domain
+ */
+
+.quad #installer-div {
+	height:87vh;
+	margin-left:-15vw;
+	margin-top:-10vh;
+}
+
+#installer {
+	margin:0 auto;
+	margin-top:25vh;
+	margin-left:35vw;
+	z-index:10000;
+	width:800px;
+	height:400px;
+	border:2px solid brown;
+	border-radius:20px;
+	background-color:#292929;
+}
+
+#installer-image {
+	margin-top:120px !important;
+	margin:0 auto;
+	height:134px;
+	width:134px;
+	border-radius:50%;
+	border:2px solid grey;
+}
+
+#animated-progress {
+	width:300px;
+	height:35px;
+	border-radius:5px;
+	margin:30px 10px;
+	border:1px solid rgb(189, 113, 113);
+	background-color:#821eda;
+	overflow:hidden;
+	position:relative;
+}
+
+#animated-progress span {
+	height:100%;
+	display:block;
+	width:0;
+	color:rgb(255, 251, 251);
+	line-height:30px;
+	position:absolute;
+	text-align:end;
+	padding-right:5px;
+}
+
+#installer-percent {
+	font-weight:bold;
+	text-align:center;
+	font-size:22px;
+	margin-top:15px;
+	color:#821eda;
+}
+
+#animated-progress span {background-color:#821eda}
