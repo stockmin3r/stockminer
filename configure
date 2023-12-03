@@ -7,6 +7,7 @@ ARCH=`uname -m 2>/dev/null`
 OS=`uname   -s 2>/dev/null`
 DEBUG=no
 HELP=no
+PREFIX=/usr/local
 WITH_HIGHCHARTS=yes
 WITH_PLOTLY=yes
 WITH_LIBSODIUM=no
@@ -20,7 +21,6 @@ echo "#define __${OS}__ 1"   >> build/build.h
 while [ $# -ne 0 ];
 do
 	case "$1" in
-		--prefix=)                  INSTALL="$1"        ;;
 		--debug)                    DEBUG=yes           ;;
 		--help)                     HELP=yes            ;;
 		--with-highcharts)          WITH_HIGHCHARTS=yes ;;
@@ -38,7 +38,6 @@ done
 if [ $HELP = yes ]; then
 cat << END
 	--help               print help
-	--prefix=PATH        set installation prefix
 	--with-highcharts    turns on highcharts (default: yes)
 	--without-highcharts disables highcharts (default: no)
 	--with-plotly        turns on highcharts (default: yes)
@@ -86,6 +85,7 @@ WARN       := -Wno-address-of-packed-member -Wno-unused-result -Wno-write-string
 DEBUG      := $DEBUG
 PLOTLY     := $WITH_PLOTLY
 HIGHCHARTS := $WITH_HIGHCHARTS
+PREFIX     := $PREFIX
 LDFLAGS    += \$(LIBOBJ)
 
 # XXX: refuses to add src/external/yyjson.c for some reason (Makefile is broken)
@@ -219,18 +219,33 @@ linux:
 
 .PHONY:pkg
 pkg:
-	mkdir -p build/deb/stockminer_0.9.6_amd64/usr/bin
-	mkdir -p build/deb/stockminer_0.9.6_amd64/etc/stockminer
-	mkdir -p build/deb/stockminer_0.9.6_amd64/var/www/stockminer/video
-	mkdir -p build/deb/stockminer_0.9.6_amd64/usr/share/stockminer/data/stocks
+	mkdir -p build/deb/stockminer_0.9.6_amd64/usr/local/stockminer/bin
+	mkdir -p build/deb/stockminer_0.9.6_amd64/usr/local/stockminer/etc
+	mkdir -p build/deb/stockminer_0.9.6_amd64/usr/local/stockminer/www/video
+	mkdir -p build/deb/stockminer_0.9.6_amd64/usr/local/stockminer/data/stocks
 	mkdir -p build/deb/stockminer_0.9.6_amd64/DEBIAN
-	cp data/stocks/*.TXT build/deb/stockminer_0.9.6_amd64/usr/share/stockminer/data/stocks/
+	cp data/stocks/*.TXT build/deb/stockminer_0.9.6_amd64/usr/local/stockminer/data/stocks/
 	cp pkg/deb/control   build/deb/stockminer_0.9.6_amd64/DEBIAN
-	cp stockminer        build/deb/stockminer_0.9.6_amd64/usr/bin
+	cp stockminer        build/deb/stockminer_0.9.6_amd64/usr/local/stockminer/bin
 	cp www/hydrogen.wasm build/deb/stockminer_0.9.6_amd64/usr/share/stockminer/data/stocks
 	cp www/*.pem         build/deb/stockminer_0.9.6_amd64/usr/share/stockminer/data/stocks
 	dpkg --build         build/deb/stockminer_0.9.6_amd64
-	
+
+app:
+	cp stockminer src/app/bin
+	cp config.ini src/app/etc
+	cp config/*   src/app/etc
+	cp data/stocks/*.TXT src/app/stocks
+	cd src/app && npm pack	
+
+install:
+	sudo mkdir -p \$(PREFIX)/stockminer/www/video
+	sudo mkdir -p \$(PREFIX)/stockminer/data/stocks
+	sudo mkdir -p \$(PREFIX)/stockminer/etc
+	sudo cp data/stocks/*.TXT \$(PREFIX)/stockminer/data/stocks
+	sudo cp stockminer \$(PREFIX)/stockminer/bin
+	sudo cp www/hydrogen.wasm \$(PREFIX)/stockminer/www
+	sudo cp www/*.pem \$(PREFIX)/stockminer/www
 
 candles:
 	cd build && git clone https://github.com/stoni/ta-lib/

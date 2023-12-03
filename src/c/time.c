@@ -90,7 +90,7 @@ void load_weeks()
 		line = p;
 	}
 }
-	int       nr_trading_days = 0;
+	
 void load_days()
 {
 	char     *date;
@@ -98,7 +98,7 @@ void load_days()
 	char     *p;
 	time_t    unix_today = QDATESTAMP[1];
 	int64_t   filesize;
-
+	int       nr_trading_days = 0;
 
 	filesize = fs_readfile_str((char *)STOCKS_DAYS_PATH, buf, sizeof(buf));
 	if (!filesize) {

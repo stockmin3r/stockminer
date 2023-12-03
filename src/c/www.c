@@ -654,10 +654,12 @@ int www_websocket_sync(char *req, struct connection *connection)
 				websocket_send(connection, packet, packet_size);
 				continue;
 			} else if (stockdata_checkpoint == SD_CHECKPOINT_PARTIAL) {
-				if (STOCKDATA_PENDING == 30) {
+				if (STOCKDATA_PENDING == 30 || !session->rpc_boot) {
 					printf(BOLDGREEN "STOCKDATA PENDING" RESET "\n");
 					packet_size = snprintf(packet, 32, "checkpoint 3 %.2f", stockdata_completion);
-					STOCKDATA_PENDING = false;
+					if (session->rpc_boot)
+						STOCKDATA_PENDING = false;
+					session->rpc_boot = true;
 				} else
 					packet_size = snprintf(packet, 32, "checkpoint 1 %.2f", stockdata_completion);
 				websocket_send(connection, packet, packet_size);
@@ -846,8 +848,8 @@ void *www_http_server_sync(void *args)
 		port = Server.http_port;
 		ipaddr = LOCALHOST;
 	}
-		
-	sockfd = net_tcp_bind(INADDR_ANY, 80);
+
+	sockfd = net_tcp_bind(INADDR_ANY, port);
 	if (sockfd == -1) {
 		printf(BOLDRED "[-] Failed to bind() to port: %d" RESET "\n", port);
 		return NULL;

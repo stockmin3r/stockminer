@@ -54,6 +54,11 @@ void market_update_status(struct market *market)
 	time(&epoch);
 	gmtime_r(&epoch, &utc_tm);
 
+	if (market->trading_period == MARKET_WEEKDAYS && (utc_tm.tm_wday == 0 || utc_tm.tm_wday == 6)) {
+		market->status = NO_MARKET;
+		return;
+	}
+
 	chour = utc_tm.tm_hour;
 	cmin  = utc_tm.tm_min;
 	if (chour >= market->pre_start_hour) {
@@ -196,6 +201,12 @@ bool ticker_needs_update(struct stock *stock, time_t *update_timestamp, int *nr_
 		*update_timestamp = ticker_last_EOD(path);
 		printf("day stale: %lu QDATE[0]: %lu\n", *update_timestamp, QDATESTAMP[0]);
 		return true;
+	}
+
+	if (market->trading_period != MARKET_24_7) {
+		if (current_utc_tm.tm_wday == 0 || current_utc_tm.tm_wday == 6) {
+			printf("skipping weekend\n");
+			return false;}
 	}
 
 	printf("last_update_tm day: %d utc_tm_day: %d\n", last_update_tm.tm_mday, current_utc_tm.tm_mday);

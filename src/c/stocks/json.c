@@ -334,6 +334,10 @@ void *json_thread(void *args)
 
 	while (1) {
 		struct XLS *XLS = CURRENT_XLS;
+		if (!XLS || !XLS->boards) {
+			os_sleep(100000);
+			continue;
+		}
 		for (x=0; x<NR_BOARDS; x++) {
 			board = XLS->boards[x];
 			if (board->dirty)

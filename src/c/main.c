@@ -6,6 +6,9 @@ const char *DB_PATH;
 const char *DB_USERS_PATH;
 const char *DB_REPO_PATH;
 const char *STOCKDB_PATH;
+const char *STOCKDB_MAG2_PATH;
+const char *STOCKDB_MAG3_PATH;
+const char *STOCKDB_MAG4_PATH;
 const char *STOCKDB_CSV_PATH;
 const char *STOCKS_PATH;
 const char *STOCKS_DAYS_PATH;
@@ -50,26 +53,12 @@ struct option main_options[] =
 	{ "benchmark",       1, NULL, 'b' }
 };
 
-void stockminer_main(struct server *server)
-{
-	memcpy(&Server, server, sizeof(*server));
-
-	init_main(server);
-
-	module_hook(&Server, MODULE_MAIN_PRE_LOOP);
-	create_stock_threads(server->XLS);
-	module_hook(&Server, MODULE_MAIN_POST_LOOP);
-
-	stock_loop(server);
-}
-
 int main(int argc, char *argv[])
 {
 	long op;
 	char buf[256] = {0};
 
 	getcwd(buf, sizeof(buf)-1);
-	fs_newfile("/stockminer/ASDF.TXT", buf, strlen(buf));
 	init_main(&Server);
 
 	while ((op=getopt_long(argc, argv, "W:H:mw:D:b:a3evr", &main_options[0], NULL)) != -1) {
@@ -126,12 +115,12 @@ int main(int argc, char *argv[])
 
 	init_tasks();
 
-	while (stockdata_checkpoint < SD_CHECKPOINT_COMPLETE)
+/*	while (stockdata_checkpoint < SD_CHECKPOINT_COMPLETE)
 		sleep(2);
 
 	module_hook(&Server, MODULE_MAIN_PRE_LOOP);
 	create_stock_threads(Server.XLS);
-	module_hook(&Server, MODULE_MAIN_POST_LOOP);
+	module_hook(&Server, MODULE_MAIN_POST_LOOP);*/
 
 	thread_create(json_thread,   NULL);
 	thread_create(netctl_thread, NULL);
@@ -145,7 +134,7 @@ int main(int argc, char *argv[])
 	 * complete, meanwhile, depending on the value of stockdata_checkpoint, the www server will
 	 * respond with different RPCs when the app/browser loads the websocket
 	 */
-	stockdata_checkpoint = true;
+//	stockdata_checkpoint = true;
 
 	stock_loop(&Server);
 }

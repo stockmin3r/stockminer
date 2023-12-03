@@ -5,6 +5,7 @@ int                rmonth[100] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
 int                NR_RANKS    = 19;
 int                MAX_RANKS   = 200;
 struct rank_table *rank_tables;
+bool               ranks_initialized = false;
 
 int date_to_rank(struct stock *stock, char *date)
 {
@@ -104,6 +105,9 @@ void init_ranks(struct XLS *XLS)
 	char         *ticker, *newline, *map, *p, *p2;
 	int           x, nr_ranks, rank, year, month;
 
+	if (ranks_initialized)
+		return;
+
 	fs_readfile_str((char *)"data/stocks/ranks/ranks.txt", buf, sizeof(buf));
 	ticker = buf;
 	XLS->ranked_stocks = (struct stock **)malloc(XLS->nr_stocks * sizeof(struct stock *));
@@ -189,4 +193,5 @@ void init_ranks(struct XLS *XLS)
 				break;
 		}
 	}
+	ranks_initialized = false;
 }

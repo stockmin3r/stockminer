@@ -50,6 +50,9 @@
 #define GIT_STOCKS_DAYS_PATH     "data/stocks/DAYS.TXT"
 #define GIT_STOCKS_WEEKS_PATH    "data/stocks/WEEKS.TXT"
 #define GIT_STOCKDB_PATH         "data/stocks/stockdb"
+#define GIT_STOCKDB_MAG2_PATH    "data/stocks/stockdb/mag2"
+#define GIT_STOCKDB_MAG3_PATH    "data/stocks/stockdb/mag3"
+#define GIT_STOCKDB_MAG4_PATH    "data/stocks/stockdb/mag4"
 #define GIT_STOCKDB_CSV_PATH     "data/stocks/stockdb/csv"
 #define GIT_GSPC_PATH            "data/stocks/stockdb/csv/^GSPC.csv"
 #define GIT_OPTIONS_PATH         "data/stocks/stockdb/options"
@@ -61,6 +64,9 @@
 #define LINUX_STOCKS_DAYS_PATH   "/usr/share/stockminer/data/stocks/DAYS.TXT"
 #define LINUX_STOCKS_WEEKS_PATH  "/usr/share/stockminer/data/stocks/WEEKS.TXT"
 #define LINUX_STOCKDB_PATH       "/usr/share/stockminer/data/stocks/stockdb"
+#define LINUX_STOCKDB_MAG2_PATH  "/usr/share/stockminer/data/stocks/stockdb"
+#define LINUX_STOCKDB_MAG3_PATH  "/usr/share/stockminer/data/stocks/stockdb"
+#define LINUX_STOCKDB_MAG4_PATH  "/usr/share/stockminer/data/stocks/stockdb"
 #define LINUX_STOCKDB_CSV_PATH   "/usr/share/stockminer/data/stockss/stockdb/csv"
 #define LINUX_GSPC_PATH          "/usr/share/stockminer/data/stocks/stockdb/csv/^GSPC.csv"
 #define LINUX_OPTIONS_PATH       "/usr/share/stockminer/data/stocks/stockdb/options"
@@ -131,7 +137,8 @@ struct module {
 	bool         enabled;
 };
 
-typedef void *(*task_handler_t)(void *args);
+typedef void *(*tasklet_handler_t)(void *args);
+typedef void *(*task_handler_t)   (void *args);
 
 struct task {
 	char          *name;
@@ -256,6 +263,7 @@ struct session {
 	mutex_t              session_lock;
 	mutex_t              watchlist_lock;
 	int                  ufo_tables;
+	bool                 rpc_boot;
 	unsigned char        current_quadverse[MAX_WEBSOCKETS];
 	unsigned char        page;
 	unsigned char        nr_presets;
@@ -749,6 +757,7 @@ uint64_t zip_decompress2(unsigned char *page_gz, unsigned char *page, int compre
 
 /* time.c */
 int      timezone_offset    (const char *tzname);
+int      utc_timezone_offset(void);
 int      weekday_offset     (const char *day);
 int      splitdate_MDY      (char *date, int *year, int *month, int *day);
 int      splitdate_YMD      (char *date, int *year, int *month, int *day);
@@ -772,7 +781,10 @@ void     set_current_minute (void);
 /* task.c */
 void task_benchmark(char *args);
 void task_schedule(void);
+void tasklet_schedule(void);
 void init_tasks(void);
+void tasklet_enqueue(tasklet_handler_t handler, void *tasklet_args, int seconds, bool repeat);
+void *tasklet_free_XLS(void *args);
 
 /* lib.c */
 int64_t        fs_read                 (int, char *, int64_t);

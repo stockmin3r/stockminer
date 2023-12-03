@@ -16,6 +16,8 @@ db/
 *.e
 *.edates
 
+!src/app/main.js
+!src/app/package.json
 !config/*
 !build/
 www/*.pem
@@ -29,6 +31,7 @@ src/test/
 __pycache__/
 __pyccel__/
 cscope.out
+Makefile
 
 !.gitignore
 !*.TXT
@@ -52,7 +55,6 @@ cscope.out
 !e
 !inc
 !configure
-!Makefile
 !src/external/*
 !src/website/**/*
 !src/scripts/*

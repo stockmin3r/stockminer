@@ -366,31 +366,45 @@ void rpc_search(struct rpc *rpc)
 	websocket_send(rpc->connection, rpc->packet, packet_len-1);
 }
 
-void stockdata_reload(struct XLS *XLS)
+struct XLS *stockdata_reload(struct XLS *OLD_XLS)
 {
-	init_ranks(XLS);
+	struct XLS *NEW_XLS;
 
-	Server.stock_boot = 0;
-	create_stock_threads(XLS);
-	printf("nr stock threads: %d\n", XLS->nr_stock_threads);
+	printf("old XLS's nr stock threads: %d\n", OLD_XLS->nr_stock_threads);
 	/* Kill old threads */
-	for (int x=0; x<XLS->nr_stock_threads; x++)
-		XLS->stock_threads[x].stop = 1;
+	Server.stock_boot = 0;
+	for (int x=0; x<OLD_XLS->nr_stock_threads; x++)
+		OLD_XLS->stock_threads[x].stop = 1;
 
-	while (Server.stock_boot  != XLS->nr_stock_threads)  os_usleep(100000);
+	NEW_XLS = load_stocks(XLS_DATA_SOURCE_WSJ, DATA_FORMAT_WEBSOCKET_INTERNAL);
+	if (!NEW_XLS)
+		return NULL;
+	NEW_XLS->config = &Server;
+
+	init_ranks(NEW_XLS);
+
+	// Recreate stock threads
+	create_stock_threads(NEW_XLS);
 	printf(BOLDWHITE "stockdata_reload(): reloaded threads" RESET "\n");
 
+	// rerun various stockdata algorithms
 	unlink(SIGNALS_DB);
 	unlink(SIGNALS_CSV);
-	init_anyday(XLS);
-	init_BIX(XLS);
-	init_monster(XLS, 0);
-	init_ufo(XLS);
-//	process_mag3(XLS);
+	init_anyday (NEW_XLS);
+	init_BIX    (NEW_XLS);
+	init_monster(NEW_XLS, 0);
+	init_ufo    (NEW_XLS);
+//	process_mag3(NEW_XLS);
 
+	// free the OLD_XLS's resources 3 seconds from now
+	tasklet_enqueue(&tasklet_free_XLS, (void *)OLD_XLS, 30, 0);
+	printf("enqueued CURRENT_XLS: %p old xls: %p new xls: %p\n", CURRENT_XLS, OLD_XLS, NEW_XLS);
 	// Switch to new XLS
-	CURRENT_XLS = XLS;
-	sessions_update_XLS(XLS);	
+	CURRENT_XLS = NEW_XLS;
+
+	// switch each session's watchlist's stock pointers to the new XLS's stocks
+	sessions_update_XLS(CURRENT_XLS);
+	return (CURRENT_XLS);
 }
 
 void *stocks_update_checkpoint(void *args)
@@ -402,7 +416,7 @@ void *stocks_update_checkpoint(void *args)
 	char               response[2048 KB];
 	char               path[256];
 	char              *p;
-	int                nr_stocks = 0, nr_trading_hours;
+	int                nr_stocks = 0, nr_trading_hours, stockdata_pending_init = 0;
 	time_t             start_timestamp, end_timestamp;
 
 	/*
@@ -415,6 +429,11 @@ void *stocks_update_checkpoint(void *args)
 
 			if (!ticker_needs_update(stock, &start_timestamp, &nr_trading_hours)) { // see stocks/market.c
 				nr_stocks++;
+				if (nr_stocks == 30) {
+//					XLS = stockdata_reload(XLS);
+					stockdata_checkpoint = SD_CHECKPOINT_PARTIAL;
+					stockdata_pending_init = false;
+				}
 				continue;
 			}
 
@@ -439,7 +458,7 @@ void *stocks_update_checkpoint(void *args)
 			printf("QDATESTAMP[0]: %lu QDATESTAMP[1]: %lu\n", QDATESTAMP[0], QDATESTAMP[1]);
 			printf(BOLDGREEN "start timestamp: %lu" RESET "\n", start_timestamp);
 			printf(BOLDGREEN "end timestmap:   %lu" RESET "\n", end_timestamp);
-*/			
+*/
 			snprintf(request, sizeof(request)-1, YAHOO_HISTORY2, stock->sym, start_timestamp, end_timestamp);
 			if (!openssl_connect_sync(&yahoo_connection, Server.YAHOO_ADDR, 443))
 				continue;
@@ -485,7 +504,7 @@ void *stocks_update_checkpoint(void *args)
 			 */
 			if (stockdata_pending++ >= 30) {
 				stockdata_pending  = 0;
-				stockdata_reload(XLS);
+//				stockdata_reload(XLS);
 				STOCKDATA_PENDING  = true;
 			}
 			printf("fetched stock: %s fetched: %d total: %d f: %.2f pending: %d\n", stock->sym, nr_stocks, XLS->nr_stocks, (double)((double)nr_stocks/(double)XLS->nr_stocks)*100.0, stockdata_pending);
@@ -518,11 +537,13 @@ void stock_loop(struct server *config)
 	int             nr_stocks, x;
 
 	while (1) {
-		XLS = config->XLS;
+		XLS = CURRENT_XLS;
 		nr_stocks = XLS->nr_stocks;
 		for (x=0; x<nr_stocks; x++) {
 			stock  = &XLS->STOCKS_ARRAY[x];
 			boards = XLS->boards;
+			if (!boards)
+				break;
 			/* *****************************
 			 *       Gainers/Losers
 			 *******************************
@@ -543,18 +564,13 @@ void stock_loop(struct server *config)
 			if (stock->pr_percent > 0 && stock->pr_percent < 1600 && stock->current_price != 0.0)
 				(stock->subtype == STOCK_SUBTYPE_LOWCAPS) ? add_delta_gainer(stock, boards[LOWCAP_GAINER_BOARD]) : add_delta_gainer(stock, boards[HIGHCAP_GAINER_BOARD]);
 			else if (stock->pr_percent < 0 && stock->pr_percent > -100.0 && stock->current_price != 0.0)
-				(stock->subtype == STOCK_SUBTYPE_LOWCAPS) ? add_delta_loser (stock, boards[LOWCAP_LOSER_BOARD])  : add_delta_loser (stock, boards[HIGHCAP_LOSER_BOARD]);			
+				(stock->subtype == STOCK_SUBTYPE_LOWCAPS) ? add_delta_loser (stock, boards[LOWCAP_LOSER_BOARD])  : add_delta_loser (stock, boards[HIGHCAP_LOSER_BOARD]);
 		}
 
 		timenow = time(NULL);
 		if (timenow-timecheck > 1) {
 			timecheck = timenow;
-//			market    = get_time();
 			market    = market_update();
-			if (market != NO_MARKET) {
-				printf("market is: %d\n", market);
-				market = NO_MARKET;
-			}
 		}
 		if ((timenow - current_minute) >= 60) {
 			current_minute     = timenow;
@@ -562,6 +578,7 @@ void stock_loop(struct server *config)
 			ufo_scan(XLS);
 			task_schedule();
 		}
+		tasklet_schedule();
 		os_usleep(500000);
 	}
 }

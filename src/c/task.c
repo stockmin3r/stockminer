@@ -18,6 +18,28 @@ void *task_backtest_forks_update(void *args);
 struct task **tasks;
 int nr_tasks;
 
+struct tasklet {
+	tasklet_handler_t  handler;
+	void              *args;
+	int                seconds;   // run function every x seconds (if repeatable otherwise just once)
+	time_t             timestamp; // unix timestamp of the last time the function was called
+	bool               repeat;
+};
+
+struct tasklet_queue {
+        struct tasklet             *tasklet;
+        TAILQ_ENTRY(tasklet_queue)  tasklets;
+};
+
+typedef struct tasklet_queue        tasklet_queue_t;
+typedef struct tasklet              tasklet_t;
+
+TAILQ_HEAD(, tasklet_queue)         tasklet_queue_head;
+mutex_t                             tasklet_lock;
+
+/*
+ * User Defined Tasks
+ */
 char *TASKS[] = {
 		"STOCKS_QUANT_COLGEN_UPDATE",
 		"STOCKS_BACKTEST_FORKS_UPDATE",
@@ -142,6 +164,7 @@ void init_tasks(void)
 	int            argc;
 
 	tasks = zmalloc(sizeof(struct task *) * MAX_TASKS);
+	TAILQ_INIT(&tasklet_queue_head);
 
 	fs_readfile_str((char *)"config/tasks.csv", buf, sizeof(buf));
 	line = buf;
@@ -207,3 +230,55 @@ void init_tasks(void)
 	task_schedule();
 }
 
+void *tasklet_free_XLS(void *args)
+{
+	struct XLS *XLS = (struct XLS *)args;
+
+	for (int x = 0; x<XLS->nr_stocks; x++) {
+		struct stock *stock = &XLS->STOCKS_ARRAY[x];
+		free(stock->mag);
+		if (stock->mag2)
+			free(stock->mag2);
+		if (stock->mag3)
+			free(stock->mag3);
+		free(stock);
+	}
+	free(XLS);
+}
+
+void tasklet_enqueue(tasklet_handler_t handler, void *args, int seconds, bool repeat)
+{
+	tasklet_queue_t *tasklet_queue_entry = zmalloc(sizeof(tasklet_queue_t));
+	tasklet_t  *tasklet                  = zmalloc(sizeof(tasklet_t));
+
+	if (!tasklet || !tasklet_queue_entry)
+		return;
+
+	tasklet->handler   = handler;
+	tasklet->seconds   = seconds;
+	tasklet->repeat    = repeat;
+	tasklet->args      = args;
+	tasklet->timestamp = time(NULL);
+	tasklet_queue_entry->tasklet = tasklet;
+
+	mutex_lock(&tasklet_lock);
+	TAILQ_INSERT_TAIL(&tasklet_queue_head, tasklet_queue_entry, tasklets);
+	mutex_unlock(&tasklet_lock);
+}
+
+void tasklet_schedule(void)
+{
+	struct tasklet_queue *tasklet_queue;
+	struct tasklet       *tasklet;
+	time_t                curtime = time(NULL);
+
+	mutex_lock(&tasklet_lock);
+	TAILQ_FOREACH(tasklet_queue, &tasklet_queue_head, tasklets) {
+		tasklet = tasklet_queue->tasklet;
+		if (curtime-tasklet->timestamp >= tasklet->seconds) {
+			printf("tasklet func: %p\n", tasklet->handler);
+			tasklet->handler(tasklet->args);
+		}
+	}
+	mutex_unlock(&tasklet_lock);
+}

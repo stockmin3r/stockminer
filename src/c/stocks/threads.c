@@ -70,14 +70,21 @@ void alloc_stock_threads(struct XLS *XLS)
 
 void create_stock_threads(struct XLS *XLS)
 {
-	int x;
-
 	alloc_stock_threads(XLS);
-	for (x=0; x<XLS->nr_stock_threads; x++)
+	for (int x=0; x<XLS->nr_stock_threads; x++)
 		thread_create(stock_thread, &XLS->stock_threads[x]);
 
 	// synchronize until all stocks have been loaded from this market
 	while (Server.stock_boot != XLS->nr_stock_threads) os_usleep(100000);
+}
+
+void free_thread_resources(struct thread *thread)
+{
+	for (int x = 0; x<thread->stocks_per_thread; x++) {
+		struct stock *stock = thread->stocks[x];
+		
+	}
+
 }
 
 void *stock_thread(void *args)
@@ -86,12 +93,12 @@ void *stock_thread(void *args)
 	struct stock  *stock;
 	struct server *config;
 	struct XLS    *XLS;
-	int            x, stocks_per_thread;
+	int            stocks_per_thread;
 
 	stocks_per_thread = thread->stocks_per_thread;
 	XLS               = thread->XLS;
 	config            = XLS->config;
-	for (x=0; x<stocks_per_thread; x++) {
+	for (int x=0; x<stocks_per_thread; x++) {
 		stock = thread->stocks[x];
 		init_algo(XLS, stock);
 		if (XLS->config->production) {
@@ -105,7 +112,7 @@ void *stock_thread(void *args)
 	config->stock_boot++;
 	mutex_unlock(&config->stock_lock);
 
-	for (x=0; x<stocks_per_thread; x++) {
+	for (int x=0; x<stocks_per_thread; x++) {
 		stock = thread->stocks[x];
 		update_allday_price(XLS, stock);
 	}
@@ -115,7 +122,7 @@ void *stock_thread(void *args)
 			os_sleep(4);
 		if (thread->stop)
 			return NULL;
-		for (x=0; x<stocks_per_thread; x++) {
+		for (int x=0; x<stocks_per_thread; x++) {
 			stock = thread->stocks[x];
 			/* Current Price */
 			if (config->DEBUG_STOCK && !strcmp(stock->sym, config->DEBUG_STOCK))
