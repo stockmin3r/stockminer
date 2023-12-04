@@ -77,7 +77,7 @@ void do_trends(struct stock *stock, struct mag *mag)
 			stock->nr_days_down++;
 	}
 
-	if (max_entries < 63)
+	if (max_entries < 63 || (short)mag->year_2022 == -1)
 		return;
 	day1           = mag->close[max_entries-1-1];
 	day3           = mag->close[max_entries-1-3];
@@ -807,8 +807,6 @@ void load_stock_csv(struct XLS *XLS, struct stock *stock, struct mag *mag, unsig
 		case YEAR_2022: start_entry = mag->year_2022; break;
 		case YEAR_2023: start_entry = mag->year_2023; break;
 		case YEAR_2024: start_entry = mag->year_2024; break;
-		case YEAR_2025: start_entry = mag->year_2025; break;
-		case YEAR_2026: start_entry = mag->year_2026; break;
 		default: return;
 	}
 
@@ -879,7 +877,7 @@ bool readfile_csv(char *ticker, char *csvbuf, int64_t max)
 void init_algo(struct XLS *XLS, struct stock *stock)
 {
 	struct mag   *mag;
-	char          csvbuf[256 KB];
+	char          csvbuf[2048 KB];
 	char         *p, *p2, *line;
 	int           nr_entries, entry = 0;
 
@@ -901,6 +899,7 @@ void init_algo(struct XLS *XLS, struct stock *stock)
 
 	/* [1] Extract CSV */
 	line = csvbuf;
+	char buf[256];
 	while ((p2=strchr(line, '\n'))) {
 		unsigned int year = *(unsigned int *)line;
 		switch (year) {
@@ -940,6 +939,10 @@ void init_algo(struct XLS *XLS, struct stock *stock)
 		*p++ = 0;
 		// Close
 		mag->close[entry] = strtod(p, NULL);
+		while (*p != ',') p++;
+		p += 1;
+		// AdjClose
+//		mag->adj_close[entry] = strtod(p, NULL);
 		while (*p != ',') p++;
 		p += 1;
 		// Volume

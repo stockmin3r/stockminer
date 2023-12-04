@@ -102,6 +102,7 @@ struct request rpc_requests[] = {
 	{ "opchain",             rpc_option_chain,           2, 2, ARGS_TYPE_ARGV},
 
 	/* Session */
+	{ "boot",                rpc_boot,                   2, 2, ARGS_TYPE_ARGV},
 	{ "fini",                rpc_session_finish,         1, 1, ARGS_TYPE_ARGV},
 	{ "login",               rpc_user_login,             3, 3, ARGS_TYPE_ARGV},
 	{ "register",            rpc_user_register,          3, 3, ARGS_TYPE_ARGV}
@@ -586,7 +587,7 @@ int www_websocket_sync(char *req, struct connection *connection)
 	/* extract the URL segments */
 	if (!www_get_route(req+8, &url))
 		return 0;
-	printf("url seg: %s url2: %s\n", url.segment[0], url.segment[1]);
+
 	/* Send websocket handshake response */
 	if (!websocket_handshake(connection, req))
 		return 0;
@@ -694,7 +695,7 @@ int www_websocket_sync(char *req, struct connection *connection)
 	quadverse_unsubscribe(session);
 	printf(BOLDRED "CLOSED CONNECTION: %.8s client_id: %d fd: %d" RESET "\n", (char *)&session->user->cookies[connection->websocket_id], connection->websocket_id, session->websockets[connection->websocket_id]->fd);
 	session->websockets[connection->websocket_id]->fd = -1;
-	openssl_destroy(connection);
+//	openssl_destroy(connection);
 	session->websockets[connection->websocket_id]     = NULL;
 	return 0;
 }
@@ -828,7 +829,7 @@ out:
 		return NULL;
 	close(http_fd);
 	memset(connection, 0, sizeof(*connection));
-	free(connection);
+//	free(connection);
 	return (NULL);
 }
 

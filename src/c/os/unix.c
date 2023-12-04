@@ -272,36 +272,63 @@ static void init_db_crypto(void)
 void init_paths()
 {
 	struct utsname u;
+	char *home = getenv("HOME");
+	char homepath[256];
+	char procpath[256];
+	char exepath[256];
+	bool relative = false;
 
-	if (fs_file_exists("src/c")) {
-		DB_PATH           = GIT_DB_PATH;
-		DB_REPO_PATH      = GIT_DB_REPO_PATH;
-		DB_USERS_PATH     = GIT_DB_USERS_PATH;
-		STOCKS_PATH       = GIT_STOCKS_PATH;
-		STOCKS_DAYS_PATH  = GIT_STOCKS_DAYS_PATH;
-		STOCKS_WEEKS_PATH = GIT_STOCKS_WEEKS_PATH;
-		STOCKDB_PATH      = GIT_STOCKDB_PATH;
-		STOCKDB_CSV_PATH  = GIT_STOCKDB_CSV_PATH;
-		GSPC_PATH         = GIT_GSPC_PATH;
-		OPTIONS_PATH      = GIT_OPTIONS_PATH;
+	if (!home)
+		exit(-1);
+
+	snprintf(procpath, sizeof(procpath)-1, "/proc/%d/exe", getpid());
+	readlink(procpath, exepath, sizeof(exepath)-1);
+	if (strstr(procpath, "/usr/local/stockminer/bin")) {
+		relative = false;
+	} else if (fs_file_exists("src/c")) {
+		relative = true;
+	} else {
+		snprintf(homepath, sizeof(homepath)-1, "%s/.config/stockminer", home);
+		char buf[512];
+		snprintf(buf, sizeof(buf)-1, "chdir: %s\n", homepath);
+		fs_log(buf);
+		chdir(homepath);
+		relative = true;
+	}
+
+	if (relative) {
+		DB_PATH           = RELATIVE_DB_PATH;
+		DB_REPO_PATH      = RELATIVE_DB_REPO_PATH;
+		DB_USERS_PATH     = RELATIVE_DB_USERS_PATH;
+		DB_LOG_PATH       = RELATIVE_DB_LOG_PATH;
+		STOCKS_PATH       = RELATIVE_STOCKS_PATH;
+		STOCKS_DAYS_PATH  = RELATIVE_STOCKS_DAYS_PATH;
+		STOCKS_WEEKS_PATH = RELATIVE_STOCKS_WEEKS_PATH;
+		STOCKDB_PATH      = RELATIVE_STOCKDB_PATH;
+		STOCKDB_CSV_PATH  = RELATIVE_STOCKDB_CSV_PATH;
+		GSPC_PATH         = RELATIVE_GSPC_PATH;
+		OPTIONS_PATH      = RELATIVE_OPTIONS_PATH;
+		truncate(DB_LOG_PATH, 0);
 		return;
 	}
 
 	uname(&u);
 	if (strcmp(u.sysname, "Linux")) {
-		DB_PATH           = LINUX_DB_PATH;
-		DB_USERS_PATH     = LINUX_DB_USERS_PATH;
-		DB_REPO_PATH      = LINUX_DB_REPO_PATH;
-		STOCKS_PATH       = LINUX_STOCKS_PATH;
-		STOCKS_DAYS_PATH  = LINUX_STOCKS_DAYS_PATH;
-		STOCKS_WEEKS_PATH = LINUX_STOCKS_WEEKS_PATH;
-		STOCKDB_PATH      = LINUX_STOCKDB_PATH;
-		STOCKDB_MAG2_PATH = LINUX_STOCKDB_MAG2_PATH;
-		STOCKDB_MAG3_PATH = LINUX_STOCKDB_MAG3_PATH;
-		STOCKDB_MAG4_PATH = LINUX_STOCKDB_MAG4_PATH;
-		STOCKDB_CSV_PATH  = LINUX_STOCKDB_CSV_PATH;
-		GSPC_PATH         = LINUX_GSPC_PATH;
-		OPTIONS_PATH      = LINUX_OPTIONS_PATH;
+		DB_PATH           = UNIX_DB_PATH;
+		DB_USERS_PATH     = UNIX_DB_USERS_PATH;
+		DB_REPO_PATH      = UNIX_DB_REPO_PATH;
+		DB_LOG_PATH       = UNIX_DB_LOG_PATH;
+		STOCKS_PATH       = UNIX_STOCKS_PATH;
+		STOCKS_DAYS_PATH  = UNIX_STOCKS_DAYS_PATH;
+		STOCKS_WEEKS_PATH = UNIX_STOCKS_WEEKS_PATH;
+		STOCKDB_PATH      = UNIX_STOCKDB_PATH;
+		STOCKDB_MAG2_PATH = UNIX_STOCKDB_MAG2_PATH;
+		STOCKDB_MAG3_PATH = UNIX_STOCKDB_MAG3_PATH;
+		STOCKDB_MAG4_PATH = UNIX_STOCKDB_MAG4_PATH;
+		STOCKDB_CSV_PATH  = UNIX_STOCKDB_CSV_PATH;
+		GSPC_PATH         = UNIX_GSPC_PATH;
+		OPTIONS_PATH      = UNIX_OPTIONS_PATH;
+		truncate(DB_LOG_PATH, 0);
 	}
 }
 
@@ -410,7 +437,7 @@ static void init_daemon()
 {
 	pthread_t thr;
 	int ppid, status, tracer_pid;
-
+	
 	linux_detach();
 	return;
 

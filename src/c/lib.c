@@ -1,5 +1,6 @@
 #include <stdinc.h>
 #include <conf.h>
+#include <extern.h>
 
 /* **********************
  *
@@ -197,6 +198,11 @@ void fs_appendfile_nl(char *path, char *file, int64_t filesize)
 	write(fd, file, filesize);
 	write(fd, "\n", 1);
 	close(fd);
+}
+
+void fs_log(char *msg)
+{
+	fs_appendfile_nl(DB_LOG_PATH, msg, strlen(msg));
 }
 
 int64_t fs_readfile_str_mtime(char *path, char *buf, time_t *mtime)

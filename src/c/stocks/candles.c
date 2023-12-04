@@ -488,12 +488,18 @@ void candle_process(struct stock *stock, struct candle *candle, int mag_entry, i
  */
 void candle_scan(struct stock *stock, struct mag *mag)
 {
-//	int year_index = (mag->year_2020 == -1) ? (mag->year_2021) : (mag->year_2020);
-	int year_index = mag->year_2021;
-	int nr_days    = mag->nr_entries-year_index-1;
-	int candles[nr_days+1];
-	int beginIndex, endIndex, x, y = 0, candle_day, days_left, bull_flags_len, bear_flags_len, nr_candles, nr_candlesticks;
+	int nr_days, year_index, beginIndex, endIndex, x, y = 0, candle_day, days_left, bull_flags_len, bear_flags_len, nr_candles, nr_candlesticks;
 	double prior_close, delta, next_close;
+
+	if (mag->year_2022 == -1)
+		return;
+
+	year_index = mag->year_2022;
+	nr_days    = mag->nr_entries-year_index-1;
+	if (nr_days <= 0)
+		return;
+
+	int candles[nr_days+1];
 
 	if (!CANDLES_LOADED)
 		return;

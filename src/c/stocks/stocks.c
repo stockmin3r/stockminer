@@ -196,6 +196,7 @@ void init_ip()
 
 	Server.CBOE_ADDR  = net_get_hostname("cdn.cboe.com");
 	Server.YAHOO_ADDR = net_get_hostname("finance.yahoo.com");
+	Server.CC_ADDR    = net_get_hostname("streamer.cryptocompare.com");
 }
 
 static __inline__ void preset_path(struct session *session, char *path)
@@ -370,7 +371,7 @@ struct XLS *stockdata_reload(struct XLS *OLD_XLS)
 {
 	struct XLS *NEW_XLS;
 
-	printf("old XLS's nr stock threads: %d\n", OLD_XLS->nr_stock_threads);
+	printf(BOLDRED "old XLS: %p nr stock threads: %d" RESET "\n", OLD_XLS, OLD_XLS->nr_stock_threads);
 	/* Kill old threads */
 	Server.stock_boot = 0;
 	for (int x=0; x<OLD_XLS->nr_stock_threads; x++)
@@ -397,7 +398,7 @@ struct XLS *stockdata_reload(struct XLS *OLD_XLS)
 //	process_mag3(NEW_XLS);
 
 	// free the OLD_XLS's resources 3 seconds from now
-	tasklet_enqueue(&tasklet_free_XLS, (void *)OLD_XLS, 30, 0);
+	tasklet_enqueue(&tasklet_free_XLS, (void *)OLD_XLS, 5, 0);
 	printf("enqueued CURRENT_XLS: %p old xls: %p new xls: %p\n", CURRENT_XLS, OLD_XLS, NEW_XLS);
 	// Switch to new XLS
 	CURRENT_XLS = NEW_XLS;
@@ -431,12 +432,15 @@ void *stocks_update_checkpoint(void *args)
 				nr_stocks++;
 				if (nr_stocks == 30) {
 //					XLS = stockdata_reload(XLS);
-					stockdata_checkpoint = SD_CHECKPOINT_PARTIAL;
+					stockdata_checkpoint   = SD_CHECKPOINT_PARTIAL;
 					stockdata_pending_init = false;
 				}
+				stockdata_completion = (double)((double)nr_stocks/(double)XLS->nr_stocks)*100.0;
 				continue;
 			}
-
+			char buf[256];	
+			sprintf(buf, "fetching: %s\n", stock->sym);
+			fs_log(buf);
 			/*
 			 * If the file does not exist then fetch several years worth of data and store it
 			 * into a csv which will be updated automatically as time passes
@@ -510,6 +514,10 @@ void *stocks_update_checkpoint(void *args)
 			printf("fetched stock: %s fetched: %d total: %d f: %.2f pending: %d\n", stock->sym, nr_stocks, XLS->nr_stocks, (double)((double)nr_stocks/(double)XLS->nr_stocks)*100.0, stockdata_pending);
 		}
 	}
+	printf(BOLDWHITE "nr_stocks: %d" RESET "\n", nr_stocks);
+	stockdata_reload(XLS);
+	if (stockdata_completion >= 90.0)
+		stockdata_completion = 100.0;
 	stockdata_checkpoint = SD_CHECKPOINT_COMPLETE;
 }
 

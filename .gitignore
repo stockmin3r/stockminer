@@ -16,8 +16,9 @@ db/
 *.e
 *.edates
 
-!src/app/main.js
-!src/app/package.json
+!pkg/npm/main.js
+!pkg/npm/package.json
+!pkg/npm/Makefile
 !config/*
 !build/
 www/*.pem
@@ -31,7 +32,7 @@ src/test/
 __pycache__/
 __pyccel__/
 cscope.out
-Makefile
+./Makefile
 
 !.gitignore
 !*.TXT

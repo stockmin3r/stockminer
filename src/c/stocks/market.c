@@ -174,7 +174,7 @@ bool ticker_needs_update(struct stock *stock, time_t *update_timestamp, int *nr_
 	*nr_trading_hours = market->nr_trading_hours;
 
 	snprintf(path, sizeof(path)-1, "%s/%s.csv", STOCKDB_CSV_PATH , stock->sym);
-	printf("path: %s\n", path);
+//	printf("path: %s\n", path);
 
 	// fetch data for ticker if it doesn't exist
 	if (stat(path, &sb) == -1) {
@@ -188,28 +188,27 @@ bool ticker_needs_update(struct stock *stock, time_t *update_timestamp, int *nr_
 	// get the current utc tm - Current UTC time in broken down time format
 	time(&epoch);
 	gmtime_r(&epoch, &current_utc_tm);
-	printf("file_modified_time: %lu curday: %d lastday: %d\n", last_update_timestamp, current_utc_tm.tm_mday, last_update_tm.tm_mday);
+//	printf("file_modified_time: %lu curday: %d lastday: %d\n", last_update_timestamp, current_utc_tm.tm_mday, last_update_tm.tm_mday);
 
 	if (current_utc_tm.tm_year > last_update_tm.tm_year || current_utc_tm.tm_mon > last_update_tm.tm_mon) {
 		*update_timestamp = ticker_last_EOD(path);
-		printf("month stale: %lu QDATE[0]: %lu\n", *update_timestamp, QDATESTAMP[0]);
+		printf("[%s] month stale: %lu QDATE[0]: %lu\n", stock->sym, *update_timestamp, QDATESTAMP[0]);
 		return true;
 	}
 
 	// update the ticker if it has been more than one day (unless it's sunday & market is weekdays)
 	if ((current_utc_tm.tm_mday - last_update_tm.tm_mday) > 1) {
 		*update_timestamp = ticker_last_EOD(path);
-		printf("day stale: %lu QDATE[0]: %lu\n", *update_timestamp, QDATESTAMP[0]);
+		printf("[%s] day stale: %lu QDATE[0]: %lu\n", stock->sym, *update_timestamp, QDATESTAMP[0]);
 		return true;
 	}
 
 	if (market->trading_period != MARKET_24_7) {
-		if (current_utc_tm.tm_wday == 0 || current_utc_tm.tm_wday == 6) {
-			printf("skipping weekend\n");
-			return false;}
+		if (current_utc_tm.tm_wday == 0 || current_utc_tm.tm_wday == 6)
+			return false;
 	}
 
-	printf("last_update_tm day: %d utc_tm_day: %d\n", last_update_tm.tm_mday, current_utc_tm.tm_mday);
+//	printf("last_update_tm day: %d utc_tm_day: %d\n", last_update_tm.tm_mday, current_utc_tm.tm_mday);
 	if (current_utc_tm.tm_hour >= market->afh_start_hour) {
 		printf("curren_utc hour: %d EOD hour: %d\n", current_utc_tm.tm_hour, market->afh_start_hour);
 		*update_timestamp = ticker_last_EOD(path);

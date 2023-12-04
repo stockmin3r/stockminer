@@ -20,6 +20,7 @@ extern bool               STOCKDATA_PENDING;
 extern const char *DB_PATH;
 extern const char *DB_USERS_PATH;
 extern const char *DB_REPO_PATH;
+extern const char *DB_LOG_PATH;
 extern const char *STOCKDB_PATH;
 extern const char *STOCKDB_MAG2_PATH;
 extern const char *STOCKDB_MAG3_PATH;

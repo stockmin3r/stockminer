@@ -43,33 +43,36 @@
 #define ILLEGAL_USERNAME         "err 0 fail 2"
 #define SYSTEM_ERROR             "err 0 fail 3"
 
-#define GIT_DB_PATH              "db"
-#define GIT_DB_USERS_PATH        "db/users.db"
-#define GIT_DB_REPO_PATH         "db/repo.db"
-#define GIT_STOCKS_PATH          "data/stocks/STOCKS.TXT"
-#define GIT_STOCKS_DAYS_PATH     "data/stocks/DAYS.TXT"
-#define GIT_STOCKS_WEEKS_PATH    "data/stocks/WEEKS.TXT"
-#define GIT_STOCKDB_PATH         "data/stocks/stockdb"
-#define GIT_STOCKDB_MAG2_PATH    "data/stocks/stockdb/mag2"
-#define GIT_STOCKDB_MAG3_PATH    "data/stocks/stockdb/mag3"
-#define GIT_STOCKDB_MAG4_PATH    "data/stocks/stockdb/mag4"
-#define GIT_STOCKDB_CSV_PATH     "data/stocks/stockdb/csv"
-#define GIT_GSPC_PATH            "data/stocks/stockdb/csv/^GSPC.csv"
-#define GIT_OPTIONS_PATH         "data/stocks/stockdb/options"
+#define RELATIVE_DB_PATH              "db"
+#define RELATIVE_DB_USERS_PATH        "db/users.db"
+#define RELATIVE_DB_REPO_PATH         "db/repo.db"
+#define RELATIVE_DB_LOG_PATH          "db/log.txt"
+#define RELATIVE_STOCKS_PATH          "data/stocks/STOCKS.TXT"
+#define RELATIVE_STOCKS_DAYS_PATH     "data/stocks/DAYS.TXT"
+#define RELATIVE_STOCKS_WEEKS_PATH    "data/stocks/WEEKS.TXT"
+#define RELATIVE_STOCKDB_PATH         "data/stocks/stockdb"
+#define RELATIVE_STOCKDB_MAG2_PATH    "data/stocks/stockdb/mag2"
+#define RELATIVE_STOCKDB_MAG3_PATH    "data/stocks/stockdb/mag3"
+#define RELATIVE_STOCKDB_MAG4_PATH    "data/stocks/stockdb/mag4"
+#define RELATIVE_STOCKDB_CSV_PATH     "data/stocks/stockdb/csv"
+#define RELATIVE_GSPC_PATH            "data/stocks/stockdb/csv/^GSPC.csv"
+#define RELATIVE_OPTIONS_PATH         "data/stocks/stockdb/options"
 
-#define LINUX_DB_PATH            "/usr/share/stockminer/db"
-#define LINUX_DB_USERS_PATH      "/usr/share/stockminer/db/users.db"
-#define LINUX_DB_REPO_PATH       "/usr/share/stockminer/db/repo.db"
-#define LINUX_STOCKS_PATH        "/usr/share/stockminer/data/stocks/STOCKS.TXT"
-#define LINUX_STOCKS_DAYS_PATH   "/usr/share/stockminer/data/stocks/DAYS.TXT"
-#define LINUX_STOCKS_WEEKS_PATH  "/usr/share/stockminer/data/stocks/WEEKS.TXT"
-#define LINUX_STOCKDB_PATH       "/usr/share/stockminer/data/stocks/stockdb"
-#define LINUX_STOCKDB_MAG2_PATH  "/usr/share/stockminer/data/stocks/stockdb"
-#define LINUX_STOCKDB_MAG3_PATH  "/usr/share/stockminer/data/stocks/stockdb"
-#define LINUX_STOCKDB_MAG4_PATH  "/usr/share/stockminer/data/stocks/stockdb"
-#define LINUX_STOCKDB_CSV_PATH   "/usr/share/stockminer/data/stockss/stockdb/csv"
-#define LINUX_GSPC_PATH          "/usr/share/stockminer/data/stocks/stockdb/csv/^GSPC.csv"
-#define LINUX_OPTIONS_PATH       "/usr/share/stockminer/data/stocks/stockdb/options"
+#define UNIX_DB_PATH            "/usr/local/stockminer/db"
+#define UNIX_DB_USERS_PATH      "/usr/local/stockminer/db/users.db"
+#define UNIX_DB_REPO_PATH       "/usr/local/stockminer/db/repo.db"
+#define UNIX_DB_LOG_PATH        "/usr/local/stockminer/db/log.txt"
+#define UNIX_STOCKS_PATH        "/usr/local/stockminer/data/stocks/STOCKS.TXT"
+#define UNIX_STOCKS_DAYS_PATH   "/usr/local/stockminer/data/stocks/DAYS.TXT"
+#define UNIX_STOCKS_WEEKS_PATH  "/usr/local/stockminer/data/stocks/WEEKS.TXT"
+#define UNIX_STOCKDB_PATH       "/usr/local/stockminer/data/stocks/stockdb"
+#define UNIX_STOCKDB_MAG2_PATH  "/usr/local/stockminer/data/stocks/stockdb"
+#define UNIX_STOCKDB_MAG3_PATH  "/usr/local/stockminer/data/stocks/stockdb"
+#define UNIX_STOCKDB_MAG4_PATH  "/usr/local/stockminer/data/stocks/stockdb"
+#define UNIX_STOCKDB_CSV_PATH   "/usr/local/stockminer/data/stockss/stockdb/csv"
+#define UNIX_GSPC_PATH          "/usr/local/stockminer/data/stocks/stockdb/csv/^GSPC.csv"
+#define UNIX_OPTIONS_PATH       "/usr/local/stockminer/data/stocks/stockdb/options"
+
 #define UNIX_TIMESTAMP_2016      1451642400
 #define UNIX_TIMESTAMP_1990       631198800
 
@@ -159,6 +162,8 @@ struct miner {
 	int                 nr_tasks;
 	int                 work;
 };
+
+typedef void (*websocket_handler_t)(struct connection *connection);
 
 #define MAXEVENTS                       512
 #define MAX_PACKET_SIZE               64 KB
@@ -360,6 +365,7 @@ struct server {
 	unsigned int         WSJ_ADDR;
 	unsigned int         YAHOO_ADDR;
 	unsigned int         CBOE_ADDR;
+	unsigned int         CC_ADDR;    // streamer.cryptocompare.com
 };
 
 /* Websocket Frame */
@@ -798,6 +804,7 @@ void           fs_writefile            (char *path, char *file, int64_t len);
 void           fs_newfile              (char *path, void *file, int64_t len);
 void           fs_appendfile           (char *path, void *file, int64_t filesize);
 void           fs_appendfile_nl        (char *path, char *file, int64_t filesize);
+void           fs_log                  (char *msg);
 int            fs_line_count           (char *filename);
 void           fs_copy_file            (char *src, char *dst);
 void           fs_copy_big_file        (char *src, char *dst);
@@ -851,6 +858,7 @@ int                connection_ssl_send        (struct connection *connection);
 int                connection_ssl_recv        (struct connection *connection);
 
 /* websocket.c */
+void websocket_connect_sync(char *host, unsigned int ip_address, char *api, websocket_handler_t handler);
 int  websocket_recv      (char *data, uint64_t data_length, struct frame *frames, char *msg, int mask);
 int  websocket_send      (struct connection *connection, char *data, uint64_t data_length);
 int  websocket_send2     (struct connection *connection, char *data, uint64_t data_length);

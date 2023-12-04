@@ -1,0 +1,22 @@
+{
+  "name": "stockminer",
+  "version": "0.9.6",
+  "description": "stockminer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "make npm"
+  },
+  "repository": "https://github.com/stockmin3r/stockminer",
+  "keywords": [
+    "stockminer"
+  ],
+  "author": "stockkminer",
+  "license": "Public Domain",
+  "devDependencies": {
+    "electron": "^27.1.2"
+  },
+  "dependencies": {
+    "stockminer": "file:stockminer-0.9.6.tgz"
+  }
+}

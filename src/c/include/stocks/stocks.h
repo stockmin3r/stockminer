@@ -551,6 +551,10 @@ void          init_forks           (struct XLS *XLS);
 void          init_signals         (struct XLS *XLS);
 void          build_flight_info    (struct monster *monster);
 
+/* crypto.c */
+void         *cryptocompare_thread (void *args);
+
+
 static __inline__ double get_stock_price(struct stock *stock, int entry, int nr_entries)
 {
 	if (entry == 0)

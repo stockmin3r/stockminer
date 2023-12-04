@@ -30,7 +30,7 @@
 }
 
 #animated-progress {
-	width:300px;
+	width:97%!important;
 	height:35px;
 	border-radius:5px;
 	margin:30px 10px;

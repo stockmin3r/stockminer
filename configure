@@ -213,8 +213,8 @@ linux:
 	sudo npm install -g html-minifier terser
 	sudo pip3 install pandas pandas-datareader parsedatetime pbr yahoo-earnings-calendar yfinance urllib3 certbot xlsxwriter xlwt scipy holidays datedelta ta pandas_market_calendars
 	sudo pip3 install --upgrade ta
-	curl -k https://www.stockminer.org/data -o build/stockdata.tar.gz
-	tar -xzf build/stockdata.tar.gz -C .
+#	curl -k https://www.stockminer.org/data -o build/stockdata.tar.gz
+#	tar -xzf build/stockdata.tar.gz -C .
 	make -j 4
 
 .PHONY:pkg
@@ -231,21 +231,24 @@ pkg:
 	cp www/*.pem         build/deb/stockminer_0.9.6_amd64/usr/share/stockminer/data/stocks
 	dpkg --build         build/deb/stockminer_0.9.6_amd64
 
-app:
-	cp stockminer src/app/bin
-	cp config.ini src/app/etc
-	cp config/*   src/app/etc
-	cp data/stocks/*.TXT src/app/stocks
-	cd src/app && npm pack	
+npm:
+	cp stockminer pkg/npm/bin
+	cp config.ini pkg/npm/etc
+	cp config/*   pkg/npm/etc
+	cp data/stocks/*.TXT pkg/npm/stocks
+	cp -rp src/website pkg/npm/src/website
+	cd pkg/npm && npm pack	
 
 install:
 	sudo mkdir -p \$(PREFIX)/stockminer/www/video
 	sudo mkdir -p \$(PREFIX)/stockminer/data/stocks
 	sudo mkdir -p \$(PREFIX)/stockminer/etc
+	sudo mkdir -p \$(PREFIX)/stockminer/src
 	sudo cp data/stocks/*.TXT \$(PREFIX)/stockminer/data/stocks
-	sudo cp stockminer \$(PREFIX)/stockminer/bin
+	sudo cp stockminer        \$(PREFIX)/stockminer/bin
+	sudo cp src/website       \$(PREFIX)/stockminer/src
 	sudo cp www/hydrogen.wasm \$(PREFIX)/stockminer/www
-	sudo cp www/*.pem \$(PREFIX)/stockminer/www
+	sudo cp www/*.pem         \$(PREFIX)/stockminer/www
 
 candles:
 	cd build && git clone https://github.com/stoni/ta-lib/

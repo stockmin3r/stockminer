@@ -5,6 +5,7 @@
 const char *DB_PATH;
 const char *DB_USERS_PATH;
 const char *DB_REPO_PATH;
+const char *DB_LOG_PATH;
 const char *STOCKDB_PATH;
 const char *STOCKDB_MAG2_PATH;
 const char *STOCKDB_MAG3_PATH;
@@ -28,14 +29,11 @@ void init_main(struct server *server)
 	init_time(&Server);
 	hydro_init();
 	SSL_library_init();
-//	SSL_load_error_strings();
-//	ERR_load_crypto_strings();
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 	init_os(server);
 	init_ip();
 	init_webscript();
 	init_db(server);
-	init_modules(server);
 }
 
 struct option main_options[] =
@@ -48,6 +46,7 @@ struct option main_options[] =
 	{ "holiday",         1, NULL, 'H' },
 	{ "wsjall",          1, NULL, 'w' },
 	{ "debug",           1, NULL, 'D' },
+	{ "daemon",          1, NULL, 'd' },
 	{ "ebuild",          0, NULL, 'e' },
 	{ "reload",          0, NULL, 'r' },
 	{ "benchmark",       1, NULL, 'b' }
@@ -56,18 +55,18 @@ struct option main_options[] =
 int main(int argc, char *argv[])
 {
 	long op;
-	char buf[256] = {0};
-
-	getcwd(buf, sizeof(buf)-1);
 	init_main(&Server);
 
-	while ((op=getopt_long(argc, argv, "W:H:mw:D:b:a3evr", &main_options[0], NULL)) != -1) {
+	while ((op=getopt_long(argc, argv, "W:H:mw:D:b:a3evrd", &main_options[0], NULL)) != -1) {
 		switch (op) {
 			case 'a':
 				admin_client_loop();
 				exit(0);
 			case 'b':
 				task_benchmark(optarg);
+				break;
+			case 'd':
+				Server.daemon = true;
 				break;
 			case 'v':
 				verbose = 1;
@@ -104,6 +103,10 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	thread_create(cryptocompare_thread, NULL);
+
+	init_modules(&Server);
+
 	/* 
 	 * Start the www server BEFORE stocks we attempt to load the tickers
 	 * since there may be no tickers at all (first install) or there may
@@ -114,18 +117,17 @@ int main(int argc, char *argv[])
 	thread_create(init_www, NULL);
 
 	init_tasks();
-
-/*	while (stockdata_checkpoint < SD_CHECKPOINT_COMPLETE)
-		sleep(2);
-
+	fs_log("init_tasks");
+	while (stockdata_checkpoint < SD_CHECKPOINT_COMPLETE)
+		sleep(1);
+	fs_log("checkpoint");
 	module_hook(&Server, MODULE_MAIN_PRE_LOOP);
-	create_stock_threads(Server.XLS);
-	module_hook(&Server, MODULE_MAIN_POST_LOOP);*/
+//	create_stock_threads(Server.XLS);
+	module_hook(&Server, MODULE_MAIN_POST_LOOP);
 
-	thread_create(json_thread,   NULL);
-	thread_create(netctl_thread, NULL);
-	thread_create(db_thread,     NULL);
-//	thread_create(db_submit_tasks, NULL);
+	thread_create(json_thread,          NULL);
+	thread_create(netctl_thread,        NULL);
+	thread_create(db_thread,            NULL);
 
 	set_current_minute();
 

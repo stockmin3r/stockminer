@@ -140,6 +140,10 @@ extern "C" {
 #define uint8_t unsigned char
 #endif
 
+#ifndef int16_t
+#define int16_t short
+#endif
+
 #ifndef size_t
 #define size_t uint64_t
 #endif

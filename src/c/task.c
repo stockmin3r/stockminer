@@ -24,6 +24,7 @@ struct tasklet {
 	int                seconds;   // run function every x seconds (if repeatable otherwise just once)
 	time_t             timestamp; // unix timestamp of the last time the function was called
 	bool               repeat;
+	bool               completed;
 };
 
 struct tasklet_queue {
@@ -235,14 +236,20 @@ void *tasklet_free_XLS(void *args)
 	struct XLS *XLS = (struct XLS *)args;
 
 	for (int x = 0; x<XLS->nr_stocks; x++) {
-		struct stock *stock = &XLS->STOCKS_ARRAY[x];
-		free(stock->mag);
+		struct stock *stock = XLS->STOCKS_PTR[x];
+		if (stock->mag)
+			free(stock->mag);
 		if (stock->mag2)
 			free(stock->mag2);
 		if (stock->mag3)
 			free(stock->mag3);
-		free(stock);
 	}
+	free(XLS->STOCKS_PTR);
+	free(XLS->STOCKS_ARRAY);
+	free(XLS->STOCKS_STR);
+	free(XLS->tickers);
+	free(XLS->HIGHCAPS);
+	free(XLS->LOWCAPS);
 	free(XLS);
 }
 
@@ -259,6 +266,7 @@ void tasklet_enqueue(tasklet_handler_t handler, void *args, int seconds, bool re
 	tasklet->repeat    = repeat;
 	tasklet->args      = args;
 	tasklet->timestamp = time(NULL);
+	tasklet->completed = false;
 	tasklet_queue_entry->tasklet = tasklet;
 
 	mutex_lock(&tasklet_lock);
@@ -275,9 +283,12 @@ void tasklet_schedule(void)
 	mutex_lock(&tasklet_lock);
 	TAILQ_FOREACH(tasklet_queue, &tasklet_queue_head, tasklets) {
 		tasklet = tasklet_queue->tasklet;
+		if (!tasklet->repeat && tasklet->completed)
+			continue;
 		if (curtime-tasklet->timestamp >= tasklet->seconds) {
 			printf("tasklet func: %p\n", tasklet->handler);
 			tasklet->handler(tasklet->args);
+			tasklet->completed = true;
 		}
 	}
 	mutex_unlock(&tasklet_lock);

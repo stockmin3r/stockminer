@@ -42,6 +42,25 @@ bool websocket_handshake(struct connection *connection, char *data)
 	return (true);
 }
 
+void websocket_connect_sync(char *host, unsigned int ip_address, char *api, websocket_handler_t handler)
+{
+	struct connection *connection = zmalloc(sizeof(*connection));
+	char request[1024];
+	char response[1024];
+
+	if (!connection)
+		return;
+
+	if (!openssl_connect_sync(connection, ip_address, 443)) {
+		printf(BOLDRED "openssl_connect_sync failure" RESET "\n");
+		return;
+	}
+	snprintf(request, sizeof(request)-1, WEBSOCKET_CLIENT, api, host);
+	openssl_write_sync(connection, request, strlen(request));
+	openssl_read_sync2(connection, response, sizeof(response)-1);
+	handler(connection);
+}
+
 static int
 extract_frames(char *packet, struct frame *frames, int packet_length)
 {

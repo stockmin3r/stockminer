@@ -9,8 +9,8 @@ char *alloc_config_file()
 	struct stat sb;
 	const char *path;
 
-	if (stat("/etc/stockminer/config.ini", &sb) != -1)
-		path = "/etc/stockminer/config.ini";
+	if (stat("etc/config.ini", &sb) != -1)
+		path = "etc/config.ini";
 	else if (stat("config.ini", &sb) != -1)
 			path = "config.ini";
 	else

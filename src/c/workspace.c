@@ -43,7 +43,7 @@ int workspace_chart_json(struct stock *stock, char *packet, char *div, char *cfu
 
 	price  = stock->price;
 	packet_len = snprintf(packet, 256, "stockchart {\"type\":\"stock\",\"dtype\":\"array\",\"ticker\":\"%s\",\"div\":\"%s\",\"nr_1d\":\"%d\",\"cb\":\"%s\",\"class\":\"%s\",\"data\":",
-						stock->sym, div, price->nr_points_1d, cfunc?cfunc:"-", className?className:"");
+						stock->sym, div, price->nr_points_1d==-1?0:price->nr_points_1d, cfunc?cfunc:"-", className?className:"");
 	memcpy(packet+packet_len, price->price_1d, price->price_1d_len);
 	packet_len += price->price_1d_len;
 	packet[packet_len++] = '}';
@@ -190,12 +190,10 @@ void rpc_chart(struct rpc *rpc)
 		goto out;
 
 	snprintf(chart->div, 32, "%s-%s", stock->sym, QGID); // create a Chart Global ID - CGID
-	printf("chart div: %s\n", chart->div);
 	packet_len   = workspace_chart_json(stock, packet, chart->div, cfunc, className);
 	chart->stock = stock;
 	chart->type  = CHART_TYPE_OHLC;
 	if (!packet_len || rpc->internal) {
-		printf(BOLDGREEN "rpc_chart: %s" RESET "\n", chart->div);
 		rpc->packet_size = packet_len;
 		goto out;
 	}
@@ -1546,7 +1544,7 @@ bool rpc_boot(struct rpc *rpc)
 	uint64_t          action, argc, packet_size = 0;
 	uint16_t          quadverse_profile_index;
 
-	if (stockdata_checkpoint != SD_CHECKPOINT_COMPLETE || stockdata_checkpoint != SD_CHECKPOINT_PARTIAL)
+	if (stockdata_checkpoint != SD_CHECKPOINT_COMPLETE)
 		return true;
 
 	action = strtoul(request, NULL, 10);
