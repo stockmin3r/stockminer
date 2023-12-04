@@ -15,8 +15,5 @@
   "license": "Public Domain",
   "devDependencies": {
     "electron": "^27.1.2"
-  },
-  "dependencies": {
-    "stockminer": "file:stockminer-0.9.6.tgz"
   }
 }

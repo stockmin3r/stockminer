@@ -19,7 +19,7 @@ which resides in src/website/(mainpage|backpage)/name/website.json
 </h1>
 
 <h1 align="center">
-	Demo: <a href="https://www.stockminer.org"/>
+	Demo: <a href="https://www.stockminer.org">https://www.stockminer.org</a>
 </h1>
 
 Currently this version is running only on Ubuntu 22.04 but other systems will be added
@@ -28,13 +28,11 @@ in time eg: *BSD, Windows, MacOSX
 To install all dependencies use the "make linux" target otherwise make j will do a make -j 12
 
 ```
-make linux
 ./configure
+make linux
 make npm
-cd pkg/npm
-npm pack
-npm install stockminer-*.tgz
-npm start
+npm install pkg/npm/stockminer*.tgz
+cd pkg/npm && npm start
 ```
 
 It is also possible to just run ./stockminer and connect to https://localhost:4443

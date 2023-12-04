@@ -232,11 +232,18 @@ pkg:
 	dpkg --build         build/deb/stockminer_0.9.6_amd64
 
 npm:
+	mkdir -p      pkg/npm/bin
+	mkdir -p      pkg/npm/etc
+	mkdir -p      pkg/npm/stocks
+	mkdir -p      pkg/npm/src
+	mkdir -p      pkg/npm/www
 	cp stockminer pkg/npm/bin
 	cp config.ini pkg/npm/etc
 	cp config/*   pkg/npm/etc
 	cp data/stocks/*.TXT pkg/npm/stocks
-	cp -rp src/website pkg/npm/src/website
+	cp -r src/website    pkg/npm/src/website
+	cp www/*.pem         pkg/npm/www
+	cp www/*.wasm        pkg/npm/www
 	cd pkg/npm && npm pack	
 
 install:

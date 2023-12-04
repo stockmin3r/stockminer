@@ -10,4 +10,4 @@ npm:
 	cp www/* ~/.config/stockminer/www
 	cp main.js ~/.config/stockminer/
 	cp *.json ~/.config/stockminer/
-	cp -rp src/website ~/.config/stockminer/src
+	cp -r src/website ~/.config/stockminer/src
