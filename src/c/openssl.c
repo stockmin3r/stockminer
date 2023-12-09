@@ -20,9 +20,10 @@ openssl_connect_retry(SSL *ssl)
 
 bool openssl_connect_sync(struct connection *connection, unsigned int ipaddr, unsigned short port)
 {
-	connection->ctx = SSL_CTX_new(TLS_client_method());
-	connection->ssl = SSL_new(connection->ctx);
-	connection->fd  = net_tcp_connect2(ipaddr, port);
+	connection->ctx      = SSL_CTX_new(TLS_client_method());
+	connection->ssl      = SSL_new(connection->ctx);
+	connection->fd       = net_tcp_connect2(ipaddr, port);
+	connection->protocol = TLS_CLIENT;
 	SSL_set_fd(connection->ssl, connection->fd);
 	SSL_set_connect_state(connection->ssl);
 
@@ -134,7 +135,7 @@ packet_size_t openssl_read_http(struct connection *connection, char *buf, packet
 	packet_size_t nbytes, gzlen, header_len, total_len;
 
 	buf[0] = 0;
-	nbytes = openssl_read_sync(connection, buf, max_packet_size);
+	nbytes = openssl_read_sync2(connection, buf, max_packet_size);
 	if (nbytes <= 0)
 		return 0;
 

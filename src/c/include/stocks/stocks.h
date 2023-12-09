@@ -46,6 +46,11 @@
 #define SD_CHECKPOINT_PARTIAL  1
 #define SD_CHECKPOINT_COMPLETE 2
 
+#define STOCKDATA_OFF           0
+#define STOCKDATA_YAHOO         1
+#define STOCKDATA_WSJ           2
+#define STOCKDATA_CRYPTOCOMPARE 3
+
 struct price;
 struct ohlc;
 struct tick;
@@ -461,7 +466,7 @@ __MODULE_HOOK    stocks_main_pre_loop     (struct server  *server);
 __MODULE_HOOK    stocks_main_post_loop    (struct server  *server);
 struct stock     *search_stocks           (char *name);
 struct stock     *search_stocks_XLS       (struct XLS *XLS, char *ticker);
-struct XLS       *load_stocks             (int data_source, int data_format);
+struct XLS       *load_stocks             (void);
 void              apc_update_EOD          (struct connection *connection, char **argv);
 void              stock_loop              (struct server *config);
 void              verify_stocks           (struct XLS *XLS);
@@ -474,7 +479,6 @@ int               is_index                (char *ticker);
 int               is_fund                 (char *ticker);
 void              set_index               (struct stock *stock);
 unsigned short    stock_id                (char *ticker);
-void              load_WSJ                (struct XLS *XLS);
 char             *json_board              (struct board *board, int *json_len);
 void              generate_monster_db     (struct XLS *XLS);
 void              update_quicklook        (struct XLS *XLS);
@@ -485,20 +489,29 @@ void              http_send_monster       (struct connection *connection);
 void             *stocks_update_checkpoint(void *args);
 
 /* market.c  */
-bool              ticker_needs_update     (struct stock *stock, time_t *update_timestamp, int *nr_trading_hours);
+bool              ticker_needs_update     (struct stock *stock, time_t *start_timestamp, time_t *end_timestamp);
 int               market_update           (void);
+int               market_get_nr_minutes   (struct stock *stock);
+int               market_get_nr_hours     (struct stock *stock);
+void              market_set_EOD          (time_t current_utc_time, int country_id, char *prev_day, char *curr_day, char *next_day);
+time_t            market_prev_eod_unix    (struct stock *stock);
+char             *market_prev_eod_str     (struct stock *stock);
 
 /* price.c */
+void              init_ip                 (void);
+void              update_current_price    (struct stock *stock);
+void              addPoint                (struct stock *stock, time_t new_tick, double new_open, double new_high, double new_low, double new_close, uint64_t new_volume);
+
+/* wsj.c */
+void              WSJ_update_current_price(struct stock *stock);
 void              apc_update_WSJ          (struct connection *connection, char **argv);
 void              wsj_update_stock        (char *ticker);
 void              wsj_get_EOD             (struct stock *stock, char *page);
 int               wsj_query               (struct stock *stock, char *url, int url_size, char *page, void (*query)(struct stock *stock, char *page));
-void              update_current_price    (struct stock *stock);
-int               update_allday_price     (struct XLS *XLS, struct stock *stock);
-int               load_ohlc               (struct stock *stock);
+int               WSJ_update_allday_price (struct stock *stock);
 double            price_by_date           (struct stock *stock, char *date);
 void              argv_wsj_allday         (char *ticker);
-void              init_ip                 (void);
+void              load_WSJ                (struct XLS *XLS);
 
 /* volume.c */
 char             *volume                  (uint64_t vol, char *buf);
@@ -550,6 +563,20 @@ void          load_forks           (struct XLS *XLS);
 void          init_forks           (struct XLS *XLS);
 void          init_signals         (struct XLS *XLS);
 void          build_flight_info    (struct monster *monster);
+
+/* algo.c */
+void   algorithm_mag1(struct stock *stock, struct mag *mag);
+void   init_algo     (struct XLS *XLS, struct stock *stock);
+void   init_ctable   (struct XLS *XLS);
+void   init_anyday   (struct XLS *XLS);
+void   init_BIX      (struct XLS *XLS);
+
+/* mag.c */
+void   load_mag2     (struct stock *stock);
+void   load_mag3     (struct stock *stock);
+void   load_mag4     (struct stock *stock);
+void   build_mag     (char *ticker, struct XLS *XLS);
+void   process_mag3  (struct XLS *XLS);
 
 /* crypto.c */
 void         *cryptocompare_thread (void *args);

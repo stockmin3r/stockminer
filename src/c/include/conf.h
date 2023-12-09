@@ -48,7 +48,7 @@
 #define RELATIVE_DB_REPO_PATH         "db/repo.db"
 #define RELATIVE_DB_LOG_PATH          "db/log.txt"
 #define RELATIVE_STOCKS_PATH          "data/stocks/STOCKS.TXT"
-#define RELATIVE_STOCKS_DAYS_PATH     "data/stocks/DAYS.TXT"
+#define RELATIVE_STOCKS_DIR_PATH      "data/stocks"
 #define RELATIVE_STOCKS_WEEKS_PATH    "data/stocks/WEEKS.TXT"
 #define RELATIVE_STOCKDB_PATH         "data/stocks/stockdb"
 #define RELATIVE_STOCKDB_MAG2_PATH    "data/stocks/stockdb/mag2"
@@ -63,7 +63,7 @@
 #define UNIX_DB_REPO_PATH       "/usr/local/stockminer/db/repo.db"
 #define UNIX_DB_LOG_PATH        "/usr/local/stockminer/db/log.txt"
 #define UNIX_STOCKS_PATH        "/usr/local/stockminer/data/stocks/STOCKS.TXT"
-#define UNIX_STOCKS_DAYS_PATH   "/usr/local/stockminer/data/stocks/DAYS.TXT"
+#define UNIX_STOCKS_DIR_PATH    "/usr/local/stockminer/data/stocks"
 #define UNIX_STOCKS_WEEKS_PATH  "/usr/local/stockminer/data/stocks/WEEKS.TXT"
 #define UNIX_STOCKDB_PATH       "/usr/local/stockminer/data/stocks/stockdb"
 #define UNIX_STOCKDB_MAG2_PATH  "/usr/local/stockminer/data/stocks/stockdb"
@@ -344,7 +344,7 @@ struct server {
 	bool                 async;
 	bool                 production;
 	bool                 daemon;
-	uint64_t               http_port;
+	uint64_t             http_port;
 	port_t               https_port;
 	/* Globals */
 	int                  nr_global_watchlists;
@@ -353,6 +353,11 @@ struct server {
 	int                  nr_failed_stocks;
 	int                  modules_enabled;
 	int                  candles_enabled;
+	int                  stocks_1D;
+	int                  stocks_1M;
+	int                  crypto_1D;
+	int                  crypto_1M;
+	int                  crypto_WS;
 	int                  UTCOFF;
 	int                  TIMEZONE;
 	int                  TIMEZONE_HOURS;
@@ -593,40 +598,10 @@ void             *db_submit_tasks         (void *args);
 void              fdb_user_list           (void);
 uid_t             fdb_user_uid            (char *username);
 
-/* price.c */
-void              apc_update_EOD          (struct connection *connection, char **argv);
-void              wsj_update_stock        (char *ticker);
-void              wsj_get_EOD             (struct stock *stock, char *page);
-int               wsj_query               (struct stock *stock, char *url, int url_size, char *page, void (*query)(struct stock *stock, char *page));
-void              update_current_price    (struct stock *stock);
-int               update_allday_price     (struct XLS *XLS, struct stock *stock);
-int               load_ohlc               (struct stock *stock);
-double            price_by_date           (struct stock *stock, char *date);
-void              argv_wsj_allday         (char *ticker);
-void              init_ip                 (void);
-
-/* volume.c */
-char             *volume                  (uint64_t vol, char *buf);
-
 /* watchtable.c */
 void              init_watchtable(void);
 
-double stock_intraday_low (struct stock *stock);
 size_t curl_get_data      (char *buf, size_t size, size_t count, void *data);
-
-/* algo.c */
-void   algorithm_mag1(struct stock *stock, struct mag *mag);
-void   init_algo     (struct XLS *XLS, struct stock *stock);
-void   init_ctable   (struct XLS *XLS);
-void   init_anyday   (struct XLS *XLS);
-void   init_BIX      (struct XLS *XLS);
-
-/* mag.c */
-void   load_mag2     (struct stock *stock);
-void   load_mag3     (struct stock *stock);
-void   load_mag4     (struct stock *stock);
-void   build_mag     (char *ticker, struct XLS *XLS);
-void   process_mag3  (struct XLS *XLS);
 
 /* blob.c */
 int  websocket_upload_object         (struct session *session, struct connection *connection, char *req);

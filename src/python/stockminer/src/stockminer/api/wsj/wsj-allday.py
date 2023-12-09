@@ -1,12 +1,13 @@
+# https://stackoverflow.com/questions/57919492/scraping-extract-data-from-chart
 import requests
 import json
 import time
 from datetime import datetime as dt
-from urllib.parse import urlencode 
+from urllib.parse import urlencode
 
 data = {
         "Step":"PT1M",
-        "TimeFrame":"PT1M",
+        "TimeFrame":"D1",
         "EntitlementToken":"57494d5ed7ad44af85bc59a51dd87c90",
         "IncludeMockTick":True,
         "FilterNullSlots":True,

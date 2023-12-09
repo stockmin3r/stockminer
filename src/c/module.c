@@ -126,8 +126,9 @@ __MODULE_INIT init_stocks_module(struct server *server)
 	module->session_alloc_hook  = stocks_session_alloc;
 	module->main_pre_loop_hook  = stocks_main_pre_loop;
 	module->main_post_loop_hook = stocks_main_post_loop;
-	server->XLS = CURRENT_XLS   = load_stocks(XLS_DATA_SOURCE_WSJ, DATA_FORMAT_WEBSOCKET_INTERNAL);
+	server->XLS = CURRENT_XLS   = load_stocks(); // load data/stocks/STOCKS.TXT into server->XLS
 	server->XLS->config         = server;
+	init_wtable();
 	if (server->XLS)
 		register_module(module);
 	/*

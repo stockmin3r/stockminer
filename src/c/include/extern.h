@@ -27,7 +27,7 @@ extern const char *STOCKDB_MAG3_PATH;
 extern const char *STOCKDB_MAG4_PATH;
 extern const char *STOCKDB_CSV_PATH;
 extern const char *STOCKS_PATH;
-extern const char *STOCKS_DAYS_PATH;
+extern const char *STOCKS_DIR_PATH;
 extern const char *STOCKS_WEEKS_PATH;
 extern const char *GSPC_PATH;
 extern const char *OPTIONS_PATH;

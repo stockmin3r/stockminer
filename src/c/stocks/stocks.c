@@ -377,7 +377,7 @@ struct XLS *stockdata_reload(struct XLS *OLD_XLS)
 	for (int x=0; x<OLD_XLS->nr_stock_threads; x++)
 		OLD_XLS->stock_threads[x].stop = 1;
 
-	NEW_XLS = load_stocks(XLS_DATA_SOURCE_WSJ, DATA_FORMAT_WEBSOCKET_INTERNAL);
+	NEW_XLS = load_stocks();
 	if (!NEW_XLS)
 		return NULL;
 	NEW_XLS->config = &Server;
@@ -428,7 +428,7 @@ void *stocks_update_checkpoint(void *args)
 			struct stock *stock       = &XLS->STOCKS_ARRAY[x];
 			packet_size_t packet_size = 0, nbytes;
 
-			if (!ticker_needs_update(stock, &start_timestamp, &nr_trading_hours)) { // see stocks/market.c
+			if (!ticker_needs_update(stock, &start_timestamp, &end_timestamp)) { // see stocks/market.c
 				nr_stocks++;
 				if (nr_stocks == 30) {
 //					XLS = stockdata_reload(XLS);
@@ -438,31 +438,19 @@ void *stocks_update_checkpoint(void *args)
 				stockdata_completion = (double)((double)nr_stocks/(double)XLS->nr_stocks)*100.0;
 				continue;
 			}
-			char buf[256];	
-			sprintf(buf, "fetching: %s\n", stock->sym);
-			fs_log(buf);
 			/*
 			 * If the file does not exist then fetch several years worth of data and store it
 			 * into a csv which will be updated automatically as time passes
 			 */
-			if (!start_timestamp) {
+			if (!start_timestamp)
 				start_timestamp = UNIX_TIMESTAMP_1990;
-//				printf(BOLDCYAN "start timestamp 1990" RESET "\n");
-			} else if (start_timestamp == QDATESTAMP[0]) {
-//				printf(BOLDRED "start timestamp is the same as last EOD" RESET "\n");
+
+			if (start_timestamp >= end_timestamp) {
+				printf(BOLDWHITE "skipping: %s" RESET "\n", stock->sym);
 				continue;
 			}
-			start_timestamp += utc_timezone_offset();
-			end_timestamp    = QDATESTAMP[0] + (nr_trading_hours*3600);
-			if (start_timestamp >= end_timestamp || !end_timestamp) {
-//				printf(BOLDWHITE "skipping: %s" RESET "\n", stock->sym);
-				continue;
-			}
-/*			printf(BOLDRED "%s" RESET "\n", stock->sym);
-			printf("QDATESTAMP[0]: %lu QDATESTAMP[1]: %lu\n", QDATESTAMP[0], QDATESTAMP[1]);
-			printf(BOLDGREEN "start timestamp: %lu" RESET "\n", start_timestamp);
-			printf(BOLDGREEN "end timestmap:   %lu" RESET "\n", end_timestamp);
-*/
+//			printf(BOLDGREEN "start timestamp: %lu" RESET "\n", start_timestamp);
+//			printf(BOLDGREEN "end timestmap:   %lu" RESET "\n", end_timestamp);
 			snprintf(request, sizeof(request)-1, YAHOO_HISTORY2, stock->sym, start_timestamp, end_timestamp);
 			if (!openssl_connect_sync(&yahoo_connection, Server.YAHOO_ADDR, 443))
 				continue;
@@ -488,8 +476,7 @@ void *stocks_update_checkpoint(void *args)
 			snprintf(path, sizeof(path)-1, "%s/%s.csv", STOCKDB_CSV_PATH, stock->sym);
 			p[packet_size-(p-response)-1] = '\n';
 			fs_appendfile(path, p+1, packet_size-(p-response)-1);
-			printf(BOLDGREEN "start_timestamp: %lu end_timestamp: %lu" RESET "\n", start_timestamp, end_timestamp);
-//			printf(BOLDWHITE "%s" RESET "\n", p+1);
+//			printf(BOLDGREEN "start_timestamp: %lu end_timestamp: %lu" RESET "\n", start_timestamp, end_timestamp);
 
 			nr_stocks++;
 			stockdata_completion = (double)((double)nr_stocks/(double)XLS->nr_stocks)*100.0;
@@ -527,7 +514,7 @@ void apc_update_EOD(struct connection *connection, char **argv)
 	struct XLS *OLD_XLS = CURRENT_XLS;
 
 	printf(BOLDWHITE "UPDATE_EOD(): ENTER" RESET "\n");
-	XLS = load_stocks(XLS_DATA_SOURCE_WSJ, DATA_FORMAT_WEBSOCKET_INTERNAL);
+	XLS = load_stocks();
 	if (!XLS)
 		return;
 	stockdata_reload(XLS);
@@ -591,18 +578,6 @@ void stock_loop(struct server *config)
 	}
 }
 
-
-void setDataSource(struct XLS *XLS, int data_source, int network_protocol)
-{
-	switch (data_source) {
-		case XLS_DATA_SOURCE_WSJ:
-			load_WSJ(XLS);
-			break;
-	}
-	XLS->data_source      = network_protocol;
-	XLS->network_protocol = data_source;
-}
-
 const char *COUNTRY[] = { "US", "WW" };
 
 int country_id(char *country)
@@ -622,17 +597,19 @@ int country_id(char *country)
 #define STOCKS_SECTOR_IDX   6
 #define STOCKS_INDUSTRY_IDX 7
 
-struct XLS *load_stocks(int data_source, int data_format)
+struct XLS *load_stocks(void)
 {
 	struct XLS   *XLS = (struct XLS *)zmalloc(sizeof(struct XLS));
 	struct stock *stock;
+	struct stock *crypto[512];
 	char         *line_argv[8];
 	char         *line, *p, *ticker, *stock_type, *market_cap, *ticker_path = NULL;
-	int           x, argc, count = 0, nr_stocks = 0;
+	int           x, argc, count = 0, nr_stocks = 0, nr_crypto = 0;
 
 	if (!XLS)
 		return NULL;
 
+	// the menu stocks will be moved
 	MENU_STOCKS_PTR = (struct stock **)malloc(NR_MENU_STOCKS * sizeof(struct stock *));
 	if (!MENU_STOCKS_PTR)
 		return NULL;
@@ -669,8 +646,8 @@ struct XLS *load_stocks(int data_source, int data_format)
 		if (argc <= 0 || argc > 8)
 			continue;
 
-		stock              = &XLS->STOCKS_ARRAY[x];
-		XLS->STOCKS_PTR[x] = stock;
+		stock                   = &XLS->STOCKS_ARRAY[x];
+		XLS->STOCKS_PTR[x]      = stock;
 
 		// "AAPL,STOCK,US,NASDAQ,H|L,Apple,Tech,InfoTech", stock->sym, security_type, stock->exchange_str, Highcaps/Lowcaps, stock->name, stock->sector, stock->industry);
 		//   0    1    2    3    4   5     6    7
@@ -690,8 +667,10 @@ struct XLS *load_stocks(int data_source, int data_format)
 				}
 			}
 		} else if (!strcmp(stock_type, "CRYPTO")) {
-			stock->type = STOCK_TYPE_CRYPTO;
-			XLS->CRYPTO[XLS->nr_crypto++] = stock;
+			if (nr_crypto < 512) {
+				stock->type = STOCK_TYPE_CRYPTO;
+				crypto[nr_crypto++] = stock;
+			}
 		} else if (!strcmp(stock_type, "FOREX")) {
 			stock->type = STOCK_TYPE_FOREX;
 			XLS->nr_forex++;
@@ -716,11 +695,14 @@ struct XLS *load_stocks(int data_source, int data_format)
 
 	XLS->HIGHCAPS = (struct stock **)malloc(XLS->nr_highcaps * sizeof(struct stock *));
 	XLS->LOWCAPS  = (struct stock **)malloc(XLS->nr_lowcaps  * sizeof(struct stock *));
-
 	memcpy(XLS->HIGHCAPS, HIGHCAPS, XLS->nr_highcaps * sizeof(struct stock *));
 	memcpy(XLS->LOWCAPS,  LOWCAPS,  XLS->nr_lowcaps  * sizeof(struct stock *));
+
+	XLS->CRYPTO = zmalloc(nr_crypto       * sizeof(struct stock *));
+	memcpy(XLS->CRYPTO, crypto, nr_crypto * sizeof(struct stock *));
+	XLS->nr_crypto = nr_crypto;
+
 	init_ticker_hashtable(XLS);
-	setDataSource(XLS, data_source, data_format);
-	init_wtable();
+	load_WSJ(XLS);
 	return (XLS);
 }

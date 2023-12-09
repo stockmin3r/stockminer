@@ -83,15 +83,12 @@
  * CRYPTO
  */
 
-#define WSJ_CRYPTO_ALL "GET /api/michelangelo/timeseries/history?json=%7B%22Step%22%3A%22PT1M%22%2C%22TimeFrame%22%3A%22D1%22%2C%22"    \
+#define WSJ_CRYPTO_1M "GET /api/michelangelo/timeseries/history?json=%7B%22Step%22%3A%22PT1M%22%2C%22TimeFrame%22%3A%22D1%22%2C%22"     \
 					"EntitlementToken%22%3A%2257494d5ed7ad44af85bc59a51dd87c90%22%2C%22IncludeMockTick%22%3Atrue%2C%22FilterNull"       \
 					"Slots%22%3Atrue%2C%22FilterClosedPoints%22%3Atrue%2C%22IncludeClosedSlots%22%3Afalse%2C%22IncludeOfficialC"        \
 					"lose%22%3Atrue%2C%22InjectOpen%22%3Afalse%2C%22ShowPreMarket%22%3Afalse%2C%22ShowAfterHours%22%3Afalse%2C%22U"     \
 					"seExtendedTimeFrame%22%3Atrue%2C%22WantPriorClose%22%3Afalse%2C%22IncludeCurrentQuotes%22%3Afalse%2C%22Reset"      \
-					"TodaysAfterHoursPercentChange%22%3Afalse%2C%22Series%22%3A%5B%7B%22Key%22%3A%22CRYPTOCURRENCY%2FUS%2FCOINDESK%2F"  \
-					"%22%2C%22Dialect%22%3A%22Charting%22%2C%22Kind%22%3A%22Ticker%22%2C%22SeriesId%22%3A%22s1%22%2C%22DataTypes"       \
-					"%22%3A%5B%22Open%22%2C%22High%22%2C%22Low%22%2C%22Last%22%5D%2C%22Indicators%22%3A%5B%7B%22Parameters%22%3A"       \
-					"%5B%5D%2C%22Kind%22%3A%22Volume%22%2C%22SeriesId%22%3A%22i3%22%7D%5D%7D%5D%7D&ckey=57494d5ed7 HTTP/1.1\r\n"
+					"TodaysAfterHoursPercentChange%22%3Afalse%2C%22Series%22%3A%5B%7B%22Key%22%3A%22CRYPTOCURRENCY%2FUS%2FCOINDESK%2F"
 
 /*
  * INDEX & FUND ALLDAY
@@ -365,8 +362,8 @@
  * Crypto
  *
  ***********/
-#define WEBSOCKET_CLIENT                "GET /v2?format=streamer HTTP/1.1\r\n" \
-										"Host: streamer.cryptocompare.com\r\n" \
+#define WEBSOCKET_CLIENT                "GET %s HTTP/1.1\r\n" \
+										"Host: %s\r\n" \
 										"Sec-WebSocket-Version: 13\r\n" \
 										"Sec-WebSocket-Key: ez+qrkibwLq1++fta7rJcQ==\r\n" \
 										"Sec-Fetch-Dest: websocket\r\n"   \

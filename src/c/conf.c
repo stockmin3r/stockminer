@@ -6,12 +6,13 @@ static struct server *SERVER;
 
 char *alloc_config_file()
 {
-	struct stat sb;
 	const char *path;
 
-	if (stat("etc/config.ini", &sb) != -1)
+	if (fs_file_exists("etc/config.ini"))
 		path = "etc/config.ini";
-	else if (stat("config.ini", &sb) != -1)
+	else if (fs_file_exists("/usr/local/stockminer/etc/config.ini"))
+		path = "/usr/local/stockminer/etc/config.ini";
+	else if (fs_file_exists("config.ini"))
 			path = "config.ini";
 	else
 		return NULL;
@@ -103,6 +104,48 @@ void init_config(struct server *server)
 
 	if (config_get("domain", CONF_TYPE_STR, &domain, NULL))
 		strncpy(server->domain, domain, sizeof(server->domain)-1);
+
+	char *stocks_1D, *stocks_1M, *crypto_1D, *crypto_1M, *stocks_WS, *crypto_WS;
+
+	config_get("stocks-1D", CONF_TYPE_STR, &stocks_1D, NULL); // Historical 1D OHLCv (HTTP GET)
+	config_get("crypto-1D", CONF_TYPE_STR, &crypto_1D, NULL); // Historical 1D OHLCv (HTTP GET)
+	config_get("stocks-1M", CONF_TYPE_STR, &stocks_1M, NULL); // Daily 1M OHLCv      (HTTP GET)
+	config_get("crypto-1M", CONF_TYPE_STR, &crypto_1M, NULL); // Daily 1M OHLCv      (HTTP GET)
+	config_get("crypto-WS", CONF_TYPE_STR, &crypto_WS, NULL); // Websocket crypto data: eg cryptocompare,kucoin(TODO)
+
+	if (!strcmp(stocks_1D, "yahoo"))
+		server->stocks_1D = STOCKDATA_YAHOO;
+	else
+		server->stocks_1D = STOCKDATA_OFF;
+
+	if (!strcmp(crypto_1D, "yahoo"))
+		server->crypto_1D = STOCKDATA_YAHOO;
+	else
+		server->crypto_1D = STOCKDATA_OFF;
+
+	/* Polling (GET requests per ticker) every (x) second(s)
+	 */
+	if (!strcmp(stocks_1M, "WSJ"))
+		server->stocks_1M = STOCKDATA_WSJ;
+	else
+		server->stocks_1M = STOCKDATA_OFF;
+
+	/*
+	 * Crypto (use WSJ only to get last 24 hours of OHLCv data up until this second
+	 * since WSJ only has GET request polling which is costly
+	 * After that use cryptocompare and other datasources for live price streaming
+	 * since they have websockets with live updates for hundreds of coinpairs on only 1 connection
+ 	 */
+
+	// 1M OHLCv ticks - since the last EOD - previous midnight (UTC)
+	if (!strcmp(crypto_1M, "WSJ"))
+		server->crypto_1M = STOCKDATA_WSJ;
+	else
+		server->crypto_1M = STOCKDATA_OFF;
+
+	// websocket stream data
+	if (!strcmp(crypto_WS, "cryptocompare"))
+		server->crypto_WS = STOCKDATA_CRYPTOCOMPARE;
 
 	config_get("http_port",  CONF_TYPE_INT, NULL, (uint64_t *)&server->http_port);
 	config_get("https_port", CONF_TYPE_INT, NULL, (uint64_t *)&server->https_port);

@@ -5,20 +5,24 @@
 
 static void init_stock(struct stock *stock, int stock_id)
 {
-	struct price *price;
+	struct price  *price;
+	int nr_trading_minutes = market_get_nr_minutes(stock);
+
+	if (!nr_trading_minutes)
+		return;
 
 	stock->id               = stock_id;
 	stock->candles          = (struct candle **)zmalloc(sizeof(struct candle *) * (NR_CANDLES));
-	stock->ohlc             = (struct ohlc    *)zmalloc(sizeof(struct ohlc)     * (TRADE_MINUTES+100));
+	stock->ohlc             = (struct ohlc    *)zmalloc(sizeof(struct ohlc)     * (nr_trading_minutes));
 	stock->price            = price = (struct price *)zmalloc(sizeof(struct price));
 	price->price_1m         = (char *)malloc(96 KB);
 	price->price_mini       = (char *)malloc(32 KB);
 	*price->price_1m        = 0;
 	*price->price_mini      = 0;
-	stock->candle_json      = (char *)malloc(28 KB);
-	stock->candle_json_max  = 28 KB;
 	stock->current_tick     = &stock->tickbuf;
 	stock->sparetick        = &stock->tickbuf2;
+	stock->candle_json      = (char *)malloc(28 KB);
+	stock->candle_json_max  = 28 KB;
 	stock->options_url_size = snprintf(stock->options_url, sizeof(stock->options_url)-1, "/api/global/delayed_quotes/options/%s.json", stock->sym);
 	set_index(stock);
 	load_fundamentals(stock);
@@ -76,15 +80,7 @@ void create_stock_threads(struct XLS *XLS)
 
 	// synchronize until all stocks have been loaded from this market
 	while (Server.stock_boot != XLS->nr_stock_threads) os_usleep(100000);
-}
-
-void free_thread_resources(struct thread *thread)
-{
-	for (int x = 0; x<thread->stocks_per_thread; x++) {
-		struct stock *stock = thread->stocks[x];
-		
-	}
-
+	thread_create(cryptocompare_thread, NULL);
 }
 
 void *stock_thread(void *args)
@@ -111,12 +107,13 @@ void *stock_thread(void *args)
 	mutex_lock(&config->stock_lock);
 	config->stock_boot++;
 	mutex_unlock(&config->stock_lock);
-
+	
 	for (int x=0; x<stocks_per_thread; x++) {
 		stock = thread->stocks[x];
-		update_allday_price(XLS, stock);
+		WSJ_update_allday_price(stock);
 	}
 
+	// GET / polling for OHLCv updates (will be removed in the future)
 	while (1) {
 		while (market == NO_MARKET)
 			os_sleep(4);
@@ -127,11 +124,6 @@ void *stock_thread(void *args)
 			/* Current Price */
 			if (config->DEBUG_STOCK && !strcmp(stock->sym, config->DEBUG_STOCK))
 				printf(BOLDBLUE "stock_thread(): [%s] pr_percent: %.2f current_price: %.2f update: %d" RESET "\n", stock->sym, stock->pr_percent, stock->current_price, stock->update);
-			if (!stock->update) {
-				if (stock->nr_data_retries++ < 1)
-					update_allday_price(XLS, stock);
-				continue;
-			}
 			update_current_price(stock);
 		}
 		thread->workload++;
@@ -172,15 +164,13 @@ void stock_data_status(char *ticker, int hour, int failed)
 
 void update_threads(struct thread *threads, int nr_threads, int hour)
 {
-	int x, y;
-
-	for (x=0; x<nr_threads; x++) {
+	for (int x=0; x<nr_threads; x++) {
 		struct thread *thread = &threads[x];
 		int nr_stocks         = thread->stocks_per_thread;
-		for (y=0; y<nr_stocks; y++) {
+		for (int y=0; y<nr_stocks; y++) {
 			struct stock *stock = thread->stocks[y];
 			if (!stock->update) {
-				if (update_allday_price(CURRENT_XLS, stock)) {
+				if (WSJ_update_allday_price(stock)) {
 					stock_data_status(stock->sym, hour, 0); // success
 					printf(BOLDGREEN "new stock update: %s hour: %d" RESET "\n", stock->sym, hour);
 				} else {

@@ -208,7 +208,6 @@ data:
 	tar -czf www/stockdata.tar.gz data/stocks/
 
 linux:
-	mkdir -p data/stocks/stockdb/{csv,wsj,yahoo}
 	sudo apt-get -y install libtool gcc make cmake npm python3-pip zlib1g-dev python3-pbr libssl-dev emscripten libcurl4-openssl-dev libcurl4 libcurl3-gnutls libcurl4-openssl-dev libcap2-bin texinfo python3-venv wkhtmltopdf libsodium23 libsodium-dev
 	sudo npm install -g html-minifier terser
 	sudo pip3 install pandas pandas-datareader parsedatetime pbr yahoo-earnings-calendar yfinance urllib3 certbot xlsxwriter xlwt scipy holidays datedelta ta pandas_market_calendars

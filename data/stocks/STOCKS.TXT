@@ -1,3 +1,5 @@
+BTC-USD,CRYPTO,WW,CCAG,H,Bitcoin/USD,Cryptocurrency,Cryptocurrency
+XMR-USD,STOCK,WW,CCAG,H,Monero/USD,Cryptocurrency,Cryptocurrency
 DCPH,STOCK,US,NASDAQ,L,Deciphera Pharmaceuticals,Healthcare,Biotechnology
 ABUS,STOCK,US,NASDAQ,L,Arbutus Biopharma,Healthcare,Biotechnology
 ADAP,STOCK,US,NASDAQ,L,Adaptimmune Therapeutics,Healthcare,Biotechnology

@@ -67,7 +67,7 @@ void load_weeks()
 	char         buf[64 KB];
 	char        *line, *p;
 	time_t       unix_today = QDATESTAMP[1];
-	int64_t     filesize;
+	int64_t      filesize;
 	int          nr_weeks = 0;
 
 	filesize = fs_readfile_str((char *)STOCKS_WEEKS_PATH, buf, sizeof(buf));
@@ -90,38 +90,86 @@ void load_weeks()
 		line = p;
 	}
 }
-	
-void load_days()
+
+struct calendar {
+	char *trading_days_filename;
+	int   country_id;
+};
+
+struct calendar trading_calendar[] = 
+{
+	{ "US_TRADING_DAYS.TXT", US },
+	{ "WW_TRADING_DAYS.TXT", WW }
+};
+
+void time_load_EOD()
 {
 	char     *date;
 	char      buf[32 KB];
+	char      path[256];
 	char     *p;
-	time_t    unix_today = QDATESTAMP[1];
+	struct tm utc_tm;
+	time_t    current_unix;
 	int64_t   filesize;
 	int       nr_trading_days = 0;
 
-	filesize = fs_readfile_str((char *)STOCKS_DAYS_PATH, buf, sizeof(buf));
-	if (!filesize) {
-		printf(BOLDRED "[-] load_days(): file read error" RESET "\n");
-		exit(-1);
-	}
-	nr_trade_days = cstring_line_count(buf);
-	if (nr_trade_days <= 0 || nr_trade_days > 255) {
-		printf(BOLDRED "[-] load_days(): corrupt stocks/DAYS.TXT file" RESET "\n");
-		exit(-1);
-	}
-	DAYS = (char **)malloc(sizeof(char *) * nr_trade_days);
-	if (!DAYS) {
-		printf(BOLDRED "[-] no memory to alloc DAYS" RESET "\n");
-		exit(-1);
-	}
-	date = buf;
-	while ((p=strchr(date, '\n'))) {
-		*p++  = 0;
-		DAYS[nr_trading_days++] = strdup(date);
-		date = p;
-		if (unix_today == str2unix(date))
-			trading_day = nr_trading_days;
+	/*
+	 * The current date (%Y-%m-%d format) (in UTC) eg: 2023-12-09 also represents the "next EOD"
+	 * since all markets will finish by the end of this UTC date.
+ 	 */
+	time(&current_unix);
+	gmtime_r(&current_unix, &utc_tm);
+	sprintf(current_date, "%d-%d-%d", utc_tm.tm_year+1900, utc_tm.tm_mon+1, utc_tm.tm_mday);
+
+	for (int x = 0; x<sizeof(trading_calendar)/sizeof(struct calendar); x++) {
+		struct calendar *calendar = &trading_calendar[x];
+
+		snprintf(path, sizeof(path)-1, "%s/%s", STOCKS_DIR_PATH, calendar->trading_days_filename);
+		filesize = fs_readfile_str(path, buf, sizeof(buf));
+		if (!filesize) {
+			printf(BOLDRED "[-] time_load_EOD(): file read error" RESET "\n");
+			exit(-1);
+		}
+
+		nr_trading_days = cstring_line_count(buf);
+		if (nr_trading_days <= 0 || nr_trading_days > 365) {
+			printf(BOLDRED "[-] time_load_EOD(): corrupt stocks/DAYS.TXT file" RESET "\n");
+			exit(-1);
+		}
+		DAYS = (char **)malloc(sizeof(char *) * nr_trading_days);
+		if (!DAYS)
+			exit(-1);
+
+		nr_trading_days = 0;
+		date = buf;
+		while ((p=strchr(date, '\n'))) {
+			*p++ = 0;
+//			printf("[%d] %s vs %s %d %d\n", x, date, current_date, strlen(date), strlen(current_date));
+			DAYS[nr_trading_days] = strdup(date);
+			nr_trading_days++;
+			date = p;
+		}
+
+		for (int y = 0; y < nr_trading_days; y++) {
+			if (!strncmp(DAYS[y], current_date, strlen(current_date))) {
+				char *previous_trading_day = DAYS[y-1];
+				char *current_trading_day  = DAYS[y];
+				char *next_trading_day     = DAYS[y+1]; // XXX: must fix for wraparound for next day in the next year
+				market_set_EOD(current_unix, calendar->country_id, previous_trading_day, current_trading_day, next_trading_day);
+				break;
+			}
+
+			/*
+			 * If DAYS[y] has overshot the current_date that means it's been a holiday or it's the weekend
+			 * This is only relavant for non 24-7 markets
+			 */
+			time_t utc_day = str2utc(DAYS[y]);
+//			printf("utc_day: %lu vs: curunix: %lu DAYS[y]: %s\n", utc_day, current_unix, DAYS[y]);
+			if (utc_day > current_unix) {
+				market_set_EOD(current_unix, calendar->country_id, DAYS[y-1], DAYS[y], DAYS[y+1]);
+				break;
+			}
+		}
 	}
 }
 
@@ -542,21 +590,22 @@ int utc_timezone_offset()
 	return (loc_timestamp - gmt_timestamp);
 }
 
-// each "market" will have to have its own EOD UTC timestamp array of [previous UTC EOD timestamp][current UTC timestamp][Next UTC EOD timestamp]
-void load_EOD()
+// each "market" will have to have its own EOD UTC timestamp array of [previous UTC EOD timestamp][Next UTC EOD timestamp]
+void load_EOD2()
 {
 	time_t    epoch;
 	struct tm utc_tm;
-
+char prev_date[32];
 	time(&epoch);
 	gmtime_r(&epoch, &utc_tm);
 
 	// if the current UTC hour
+	sprintf(prev_date, "%d-%d-%d", utc_tm.tm_year+1900, utc_tm.tm_mon+1, utc_tm.tm_mday-1);
+
 	sprintf(current_date, "%d-%d-%d", utc_tm.tm_year+1900, utc_tm.tm_mon+1, utc_tm.tm_mday);
 	QDATE[0]      = current_date;
 	QDATESTAMP[0] = str2utc(current_date)+utc_timezone_offset();
-	printf(BOLDMAGENTA "load_EOD: %s timestamp: %lu hour: %d" RESET "\n", QDATE[0], QDATESTAMP[0], utc_tm.tm_hour);
-
+	printf(BOLDMAGENTA "prev_date: %s current_date: %s timestamp: %lu hour: %d utc: %lu tzoff: %d" RESET "\n", prev_date, QDATE[0], QDATESTAMP[0], utc_tm.tm_hour, str2utc(current_date), utc_timezone_offset());
 }
 
 void init_time(struct server *server)
@@ -567,7 +616,8 @@ void init_time(struct server *server)
 	server->TIMEZONE = utc_timezone_offset();
 
 	/* QDATE[0] will contain the previous calendar trading day */
-	load_EOD();
+	time_load_EOD();
+	load_EOD2();
 
 	QDATE[1]      = strdup(unix2str(get_timestamp(), timestr));
 	QDATESTAMP[1] = str2unix(QDATE[1]);
@@ -575,6 +625,6 @@ void init_time(struct server *server)
 	QDATESTAMP[2] = str2unix(QDATE[2]);
 
 	// load trading calendar
-	load_days();
+	
 	load_weeks();
 }

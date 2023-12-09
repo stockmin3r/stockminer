@@ -1,5 +1,6 @@
 #include <conf.h>
 #include <stocks/stocks.h>
+#include <extern.h>
 
 /*
  * GSPC: INDEX%2FUS%2FS%26P%20US%2FSPX             INDEX/US/S&P US/SPX              SPX
@@ -82,6 +83,65 @@ void wsj_stock_api(struct stock *stock)
 		memcpy(buf+wsj_api_size+ticker_size+sizeof(WSJ_OHLC)-1, WSJ_HDR,  sizeof(WSJ_HDR)-1);
 	}
 }
+
+void wsj_crypto_api(struct stock *stock)
+{
+	struct WSJ  *WSJ;
+	char         cpair[16];
+	char        *wsj_api_src,**wsj_api_dst, *ticker, *buf, *p;
+	int          wsj_api_size, type, exchange, ticker_size = 0, total_size, x = 0;
+
+	ticker = stock->sym;
+	if (strlen(ticker) > 15)
+		return;
+
+	while (*ticker != '\0') {
+		if (*ticker == '-') {
+			ticker++;
+			continue;
+		}
+		cpair[ticker_size++] = *ticker++;
+	}
+	ticker = cpair;
+
+	WSJ         = &stock->API.WSJ;
+	exchange    = stock->market;
+	type        = stock->type;
+
+	for (x=0; x<4; x++) {
+		switch (x) {
+			case WSJ_API_STOCK_CLOSE:
+				wsj_api_src  = WSJ_CLOSE;
+				wsj_api_dst  = &WSJ->CLOSE;
+				wsj_api_size = sizeof(WSJ_CLOSE)-1;
+				break;
+			case WSJ_API_STOCK_CLOSE2:
+				wsj_api_src  = WSJ_CLOSE2;
+				wsj_api_dst  = &WSJ->CLOSE2;
+				wsj_api_size = sizeof(WSJ_CLOSE2)-1;
+				break;
+			case WSJ_API_STOCK_ALLDAY:
+				wsj_api_src  = WSJ_CRYPTO_1M;
+				wsj_api_dst  = &WSJ->ALL;
+				wsj_api_size = sizeof(WSJ_CRYPTO_1M)-1;
+				break;
+			case WSJ_API_STOCK_CURTICK:
+				wsj_api_src  = WSJ_CUR;
+				wsj_api_dst  = &WSJ->CLOSE;
+				wsj_api_size = sizeof(WSJ_CUR)-1;
+				break;
+		}
+		total_size   = wsj_api_size + ticker_size + sizeof(WSJ_OHLC)-1 + sizeof(WSJ_HDR)-1;
+		*wsj_api_dst = buf = (char *)malloc(total_size+1);
+		strcpy(buf,wsj_api_src);
+		strcat(buf+wsj_api_size, ticker);
+		memcpy(buf+wsj_api_size+ticker_size,                    WSJ_OHLC, sizeof(WSJ_OHLC));
+		memcpy(buf+wsj_api_size+ticker_size+sizeof(WSJ_OHLC)-1, WSJ_HDR,  sizeof(WSJ_HDR)-1);
+	}
+}
+/*
+GET /api/michelangelo/timeseries/history?json=%7B%22Step%22%3A%22PT1M%22%2C%22TimeFrame%22%3A%22D1%22%2C%22EntitlementToken%22%3A%2257494d5ed7ad44af85bc59a51dd87c90%22%2C%22IncludeMockTick%22%3Atrue%2C%22FilterNullSlots%22%3Atrue%2C%22FilterClosedPoints%22%3Atrue%2C%22IncludeClosedSlots%22%3Afalse%2C%22IncludeOfficialClose%22%3Atrue%2C%22InjectOpen%22%3Afalse%2C%22ShowPreMarket%22%3Afalse%2C%22ShowAfterHours%22%3Afalse%2C%22UseExtendedTimeFrame%22%3Atrue%2C%22WantPriorClose%22%3Afalse%2C%22IncludeCurrentQuotes%22%3Afalse%2C%22ResetTodaysAfterHoursPercentChange%22%3Afalse%2C%22Series%22%3A%5B%7B%22Key%22%3A%22CRYPTOCURRENCY%2FUS%2FCOINDESK%2FBTCUSD%22%2C%22Dialect%22%3A%22Charting%22%2C%22Kind%22%3A%22Ticker%22%2C%22SeriesId%22%3A%22s1%22%2C%22DataTypes%22%3A%5B%22Open%22%2C%22High%22%2C%22Low%22%2C%22Last%22%5D%2C%22Indicators%22%3A%5B%7B%22Parameters%22%3A%5B%5D%2C%22Kind%22%3A%22Volume%22%2C%22SeriesId%22%3A%22i3%22%7D%5D%7D%5D%7D&ckey=57494d5ed7 HTTP/1.1
+*/
 
 void wsj_index_api(struct stock *stock)
 {
@@ -222,6 +282,528 @@ void load_WSJ(struct XLS *XLS)
 				break;
 			case STOCK_TYPE_FUND:
 				break;
+			case STOCK_TYPE_CRYPTO:
+				wsj_crypto_api(stock);
+				break;
 		}
+	}
+}
+
+/* 
+ * WSJ EXTRACTORS
+ *
+ */
+/* Get Last Timestamp: WSJ_CUR */
+time_t get_last_tick(char *page, char **tptr)
+{
+	char  *ticks = strstr(page, "]},\"S");
+	time_t timestamp;
+
+	if (!ticks) return 0;
+	ticks -= 13;
+	if (*ticks == ']') return 0;
+	timestamp = strtoul(ticks, NULL, 10);
+	*tptr = ticks;
+	return (timestamp);
+}
+
+/* Get Last OHLC: WSJ_CUR */
+char *get_last_OHLC(double *xopen, double *xhigh, double *xlow, double *xclose, char *page)
+{
+	char *p = strstr(page, "FormatHints");
+	if (!p) return NULL;
+	while (*p != '[') p--;
+
+	*xopen = strtod(p+1, NULL);
+	while (*p != ',') p++; p += 1; *xhigh  = strtod(p, NULL);
+	while (*p != ',') p++; p += 1; *xlow   = strtod(p, NULL);
+	while (*p != ',') p++; p += 1; *xclose = strtod(p, NULL);
+	return (p);
+}
+
+/* Get Last Volume: WSJ_CUR */
+uint64_t get_last_volume(char *page)
+{
+	char *p = strstr(page, "Volume");
+	if (!p) return 0;
+	p = strstr(p+64, "FormatHints");
+	if (!p) return 0;
+	while (*p != '[') p--;
+	return strtoul(p+1, NULL, 10);
+}
+
+/* Get Timestamps: WSJ_ALL */
+int get_timestamps(char *page, time_t *timestamps)
+{
+	char *ticks, *p;
+	int nr_timestamps = 0;
+
+	ticks     = strstr(page, "Ticks");
+	if (!ticks)
+		return 0;
+	ticks += 8;
+	if (*ticks == ']')
+		return 0;
+	/* TIMESTAMPS */
+	while ((p=strchr(ticks, ','))) {
+		timestamps[nr_timestamps++] = strtoul(ticks, NULL, 10);
+		if (*(p-1) == '}')
+			break;
+		ticks = p + 1;
+	}
+	return (nr_timestamps);
+}
+
+void wsj_get_EOD(struct stock *stock, char *page)
+{
+	struct stat sb;
+	char        path[256];
+	char       *csv, *p;
+	double      csv_open, csv_high, csv_low, csv_close;
+	uint64_t    csv_volume;
+	int fd,     csv_size;
+
+	p = strstr(page, "Points\":[[");
+	if (!p || !page)
+		return;
+	p += 10;
+	csv_open = strtod(p, NULL);
+	p = strchr(p, ',');
+	if (!p)
+		return;
+	csv_high = strtod(p+1, NULL);
+	p = strchr(p+1, ',');
+	if (!p)
+		return;
+	csv_low = strtod(p+1, NULL);
+	p = strchr(p+1, ',');
+	if (!p)
+		return;
+	csv_close = strtod(p+1, NULL);
+	p = strstr(p+1, ":[[");
+	if (!p)
+		return;
+	csv_volume = strtoul(p+3, NULL, 10);
+
+	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/csv/%s.csv", stock->sym);
+	fd = open(path, O_RDWR);
+	if (fd == -1)
+		return;
+	fstat(fd, &sb);
+	csv = (char *)malloc(sb.st_size+260);
+	if (!csv)
+		return;
+	read(fd, csv, sb.st_size);
+
+	csv_size  = cstring_remove_line(csv, 1, sb.st_size);
+	csv_size += snprintf(csv+csv_size, 256, "%s,%.3f,%.3f,%.3f,%.3f,%llu\n", QDATE[1], csv_open, csv_high, csv_low, csv_close, csv_volume);
+	lseek(fd, 0, SEEK_SET);
+	write(fd, csv, csv_size);
+	ftruncate(fd, csv_size);
+	close(fd);
+}
+
+void apc_update_WSJ(struct connection *connection, char **argv)
+{
+	struct stock *stock, *stocks;
+	struct WSJ   *WSJ;
+	struct XLS   *XLS = CURRENT_XLS;
+	char          page[128 KB];
+	int           nr_stocks;
+
+	stocks    = XLS->STOCKS_ARRAY;
+	nr_stocks = XLS->nr_stocks;
+	for (int x=0; x<nr_stocks; x++) {
+		stock = &stocks[x];
+		WSJ   = &stock->API.WSJ;
+		if (!WSJ || !WSJ->CLOSE)
+			continue;
+		wsj_query(stock, WSJ->CLOSE, strlen(WSJ->CLOSE), page, wsj_get_EOD);
+	}
+}
+
+void wsj_update_stock(char *ticker)
+{
+	struct WSJ *WSJ;
+	char page[128 KB];
+	struct stock *stock = search_stocks(ticker);
+
+	if (!stock)
+		return;
+
+	WSJ = &stock->API.WSJ;
+	wsj_query(stock, WSJ->CLOSE, strlen(WSJ->CLOSE), page, wsj_get_EOD);
+}
+
+/*
+ * Load WSJ's 1m OHLC+volume data for today (partial|complete) (or for the previous day: complete)
+ */
+int wsj_load_1m(struct stock *stock)
+{
+	struct price   *price;
+	struct stat     sb;
+	struct filemap  filemap;
+	char           *line, *map, *p;
+	char            path[256];
+	int             nr_ohlc = 0, mini_len = 0, nbytes, filesize;
+
+	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/wsj/%s", stock->sym);
+	if (stock->dead || !fs_file_exists(path) || !(map=MAP_FILE_RO(path, &filemap)))
+		return 0;
+
+	price               = stock->price;
+	filesize            = filemap.filesize;
+	price->price_1m_len = filesize;
+	price->price_1m     = (char *)malloc(filesize+1);
+	memcpy(price->price_1m, map, filesize);
+	price->price_1m[filesize] = 0;
+	UNMAP_FILE(map, &filemap);
+
+	line = price->price_1m+1;
+	do {
+		stock->ohlc[nr_ohlc].timestamp = strtoul(line+1, NULL, 10);
+		p = strchr(line, ',');
+		if (!p) break;
+		stock->ohlc[nr_ohlc].open   = strtod(p+1, NULL);
+		p = strchr(p+1, ',');
+		if (!p) break;
+		stock->ohlc[nr_ohlc].high   = strtod(p+1, NULL);
+		p = strchr(p+1, ',');
+		if (!p) break;
+		stock->ohlc[nr_ohlc].low    = strtod(p+1, NULL);
+		p = strchr(p+1, ',');
+		if (!p) break;
+		stock->ohlc[nr_ohlc].close  = strtod(p+1, NULL);
+		p = strchr(p+1, ',');
+		if (!p) break;
+		stock->ohlc[nr_ohlc].volume = strtoul(p+1, NULL, 10);
+
+		if (nr_ohlc == 0)
+			nbytes    = sprintf(price->price_mini+mini_len, "[[%lu,%.2f],", stock->ohlc[nr_ohlc].timestamp, stock->ohlc[nr_ohlc].close);
+		else
+			nbytes    = sprintf(price->price_mini+mini_len, "[%lu,%.2f],",  stock->ohlc[nr_ohlc].timestamp, stock->ohlc[nr_ohlc].close);
+		mini_len += nbytes;
+		p = strchr(p+1, ']');
+		if (!p) break;
+		line = p + 2;
+		nr_ohlc += 1;
+	} while (*(p-1) != ']');
+	if (nr_ohlc)
+		*(price->price_mini+mini_len-1) = ']';
+	price->price_mini_len = mini_len;
+	stock->nr_ohlc = nr_ohlc;
+
+	/* Append the 1m data after the 1d data */
+	memcpy(price->price_1d+price->price_1d_len, price->price_1m+1, price->price_1m_len-1);
+	price->price_1d_len = price->price_1m_len+price->price_1d_len-1;
+	*(price->price_1d+price->price_1d_len) = ']';
+	if (price->price_1d_len >= 256 KB) {printf(BOLDRED "CRITICAL ERROR PRICE: %d" RESET "\n", price->price_1d_len);exit(-1);}
+	return 1;
+}
+
+/*
+ * Fill in stock->ohlc struct array with today's trading ticks - 1M OHLCvs since the trading period began
+ *  - set the "current" OHLCv into stock->current_open|current_high|current_low|current_close|current_volume
+ */
+void update_allday(struct stock *stock, char *page)
+{
+	struct ohlc  *ohlc;
+	struct price *price;
+	char         *jptr, *mptr, *p;
+	char          path[64];
+	int           json_size = 0, mini_size = 0, nr_timestamps = 0, nr_ohlc = 0, nr_volume = 0;
+	int           nr_trading_minutes, nbytes, fd, x;
+	double        o,h,l,c = 0.0;
+	time_t        timestamp, vol;
+
+	if ((nr_trading_minutes=market_get_nr_minutes(stock)) <= 0 || (nr_trading_minutes > 1440))
+		return;
+
+	uint64_t      volume    [nr_trading_minutes];
+	time_t        timestamps[nr_trading_minutes];
+
+	price     = stock->price;
+	jptr      = price->price_1m;   *jptr++   = '[';
+	mptr      = price->price_mini; *mptr++   = '[';
+	mini_size = 1; json_size = 1;
+
+	/* TIMESTAMPS */
+	if (!(nr_timestamps=get_timestamps(page, timestamps)))
+		return;
+
+	/* VOLUME */
+	p = strstr(page, "Volume");
+	if (!p) return;
+	p    = strstr(p, "DataPoints\":[[");
+	if (!p) return;
+	for (x=0; x<nr_timestamps; x++) {
+		if (*p == '0') {
+			volume[nr_volume++] = 0;
+			p += 6;
+			continue;
+		}
+		vol = strtoul(p, NULL, 10);
+		if (market == DAY_MARKET || market == AFH_MARKET)
+			stock->day_volume += vol;
+		volume[nr_volume++] = vol;
+		p = strchr(p, ']');
+		if (!p || *(p+1) == ']')
+			break;
+		p += 3;
+	}
+
+	/* OHLC PRICES */
+	p = strstr(page, "DataPoints\":[[");
+	if (!p) return;
+	p += 14;
+	ohlc = &stock->ohlc[0];
+	for (x=0; x<nr_timestamps; x++) {
+		o = strtod(p, NULL);
+		while (*p != ',') p++; p += 1; h = strtod(p, NULL);
+		while (*p != ',') p++; p += 1; l = strtod(p, NULL);
+		while (*p != ',') p++; p += 1; c = strtod(p, NULL);
+		timestamp   = timestamps[x];
+		nbytes      = sprintf(jptr, "[%lu,%.2f,%.2f,%.2f,%.2f,%llu],", timestamp, o, h, l, c, volume[x]);
+		jptr       += nbytes;
+		json_size  += nbytes;
+		nbytes      = sprintf(price->price_mini+mini_size, "[%lu,%.2f],", timestamp, c);
+		mini_size  += nbytes;
+		/* Intraday Low & Intraday High */
+		if (l < stock->intraday_low)  stock->intraday_low  = l;
+		if (h > stock->intraday_high) stock->intraday_high = h;
+		ohlc->open = o; ohlc->high = h; ohlc->low = l;ohlc->close = c; ohlc->timestamp = timestamp;
+		nr_ohlc++; ohlc++; p++;
+		printf("[%d] p: %.10s timestamp: %d open: %.2f high: %.2f low: %.2f close: %.2f\n", stock->nr_ohlc, p,  timestamp, o,h,l,c);
+		while (*p != ',') p++;
+		if (*p == ']' && *(p+1) == ']') break;
+		p += 2;
+	}
+	stock->nr_ohlc = nr_ohlc;
+
+	if (nr_volume != nr_timestamps || stock->nr_ohlc != nr_timestamps) {
+		printf("corrupt WSJ data: nr_timestmaps: %d nr_ohlc: %d page: %s\n", nr_timestamps, stock->nr_ohlc, page);
+		return;
+	}
+
+	ohlc = &stock->ohlc[nr_ohlc-1];
+	stock->current_timestamp = timestamps[nr_timestamps-1];
+	stock->price_open        = stock->ohlc[0].open;
+	stock->current_volume    = ohlc->volume;
+	stock->current_open      = ohlc->open;
+	stock->current_high      = ohlc->high;
+	stock->current_low       = ohlc->low;
+	stock->current_close     = ohlc->close;
+	stock->current_price     = ohlc->close;
+
+	price->price_1m_len      = json_size;
+	price->price_mini_len    = mini_size;
+	*(price->price_1m+json_size-1)   = ']';
+	*(price->price_mini+mini_size-1) = ']';
+
+	snprintf(path, sizeof(path)-1, "data/stocks/wsj/%s", stock->sym);
+	fs_newfile(path, price->price_1m, price->price_1m_len);
+}
+
+/* Called once on INIT */
+int WSJ_update_allday_price(struct stock *stock)
+{
+	struct WSJ   *WSJ = &stock->API.WSJ;
+	struct price *price;
+	char          page[96 KB];
+
+	price = stock->price;
+	printf("update_allday_price: %s\n", stock->sym);
+	if (stock->dead)
+		return 0;
+	if (market == NO_MARKET) {
+		if (!wsj_load_1m(stock) && price->price_1d_len)
+			*(price->price_1d+price->price_1d_len-1) = ']';
+		price->stale = 1;
+		return 0;
+	}
+
+	/*
+	 * - Loaded During NO_MARKET
+	 *    + wsj_load_1m() of previous day's 1m OHLCvs
+	 *    + set price->stale = 1
+	 * - Market ENDS after AFH
+ 	 */
+	if (price->stale) {
+		struct price *newprice   = (struct price *)zmalloc(sizeof(struct price));
+		newprice->price_1d       = (char *)malloc(256 KB);
+		newprice->price_1m       = (char *)malloc(96 KB);
+		newprice->price_mini     = (char *)malloc(32 KB);
+		newprice->price_1d_close = (char *)malloc(96 KB);
+		memcpy(newprice->price_1d, price->price_1d, (price->price_1d_len-price->price_1m_len));
+		newprice->price_1d[price->price_1d_len++] = ',';
+		newprice->price_1d_len   = (price->price_1d_len-price->price_1m_len);
+		newprice->price_1m_len   = 0;
+		newprice->nr_points_1d   = price->nr_points_1d;
+		newprice->stale          = 0;
+		stock->price             = newprice;
+		price                    = newprice;
+		printf("setting stock to stale: %s [%d %d] mini: %d\n", stock->sym, Server.nr_working_stocks, Server.nr_failed_stocks, price->price_mini_len);
+		Server.nr_working_stocks = 0;
+		Server.nr_failed_stocks  = 0;
+	}
+	wsj_query(stock, WSJ->ALL, strlen(WSJ->ALL), page, update_allday);
+	if (price->price_1m_len) {
+		memcpy(price->price_1d+price->price_1d_len, price->price_1m+1, price->price_1m_len-1);
+		price->price_1d_len = price->price_1m_len+price->price_1d_len-1;
+		*(price->price_1d+price->price_1d_len) = ']';
+		Server.nr_working_stocks++;
+		stock->update = 1;
+		return 1;
+	} else {
+		Server.nr_failed_stocks++;
+		stock->update = 0;
+		if (price->price_1d_len)
+			*(price->price_1d+price->price_1d_len-1) = ']';
+		return 0;
+	}
+}
+
+/* 
+ * Called every second to extract latest OHLC + Volume + Timestamp
+ * 2) IF the latest Timestamp is the same as the previous tick AND it's still in the same minute, then update otherwise it's stale.
+ */
+void WSJ_update_current_tick(struct stock *stock, char *page)
+{
+	struct ohlc   *ohlc = &stock->ohlc[stock->nr_ohlc-1];
+	char          *p    = page;
+	double         current_open, current_high, current_low, current_close;
+	uint64_t       current_volume;
+	time_t         current_tick;
+	unsigned short nr_ohlc = stock->nr_ohlc;
+
+	if (Server.DEBUG_STOCK && !strcmp(stock->sym, Server.DEBUG_STOCK))
+		printf(BOLDMAGENTA "[%s] update_current_tick: %s" RESET "\n", stock->sym, page);
+	/* Current Timestamp */
+	if (!(current_tick = get_last_tick(page, &p)))
+		return;
+
+	/* Current OHLC */
+	if (!(p=get_last_OHLC(&current_open, &current_high, &current_low, &current_close, p)))
+		return;
+
+	/* Current Volume */
+	current_volume = get_last_volume(p);
+
+	/* If the latest Timestamp is newer than the previous tick then this is a new candle, store data in ohlc++ */
+	if (current_tick > ohlc->timestamp) {
+		ohlc++;
+		addPoint(stock, current_tick, current_open, current_high, current_low, current_close, current_volume);
+		nr_ohlc++;
+	} else if (current_tick == ohlc->timestamp) {
+ 		if (ohlc->open != current_open || ohlc->high != current_high || ohlc->low != current_low || ohlc->close != current_close || ohlc->volume != current_volume) {
+			stock->nr_updates += 1;
+			if (!strcmp(stock->sym, "ZUO"))
+				printf("stock added update open:[%.2f %.2f],high:[%.2f %.2f],low:[%.2f %.2f],close:[%.2f %.2f],volume:[%llu %llu]\n",
+				ohlc->open, current_open, ohlc->high, current_high, ohlc->low, current_low, ohlc->close, current_close,ohlc->volume, current_volume);
+		}
+	}
+	ohlc->open            = current_open;
+	ohlc->high            = current_high;
+	ohlc->low             = current_low;
+	ohlc->close           = current_close;
+	ohlc->timestamp       = current_tick;
+	ohlc->volume          = current_volume;
+	stock->nr_ohlc        = nr_ohlc;
+	stock->current_volume = current_volume;
+	stock->current_price  = current_close;
+	/* intraday_low & intraday_high */
+	if (stock->current_price < stock->intraday_low)  stock->intraday_low  = stock->current_price;
+	if (stock->current_price > stock->intraday_high) stock->intraday_high = stock->current_price;
+	return;
+}
+
+/*
+ * Called by price.c::update_current_price() for live data via WSJ (when WSJ is enabled as a 1M data source for this instrument)
+ */
+void WSJ_update_current_price(struct stock *stock)
+{
+	char  page[96 KB];
+	struct WSJ *WSJ = &stock->API.WSJ;	
+
+	/*
+	 * If we haven't got the OHLCv ticks for today's trading day
+	 * then there is no use in fetching the "current" OHLCv tick
+	 * Try to fetch the 1M Daily data up until now a few more times
+ 	 */
+	if (!stock->update) {
+		if (stock->nr_data_retries++ < 2)
+			WSJ_update_allday_price(stock);
+		return;
+	}
+
+	wsj_query(stock, WSJ->CUR, strlen(WSJ->CUR), page, WSJ_update_current_tick);
+}
+
+int wsj_query(struct stock *stock, char *url, int url_size, char *uncompressed, void (*query)(struct stock *stock, char *page))
+{
+	struct connection connection;
+	char              gzpage[128 KB];
+	char             *compressed;
+	uint64_t          compressed_size;
+	packet_size_t     zbytes;
+	int               ret = 0, uncompressed_size;
+
+	if (!openssl_connect_sync(&connection, Server.WSJ_ADDR, 443))
+		return 0;
+	SSL_write(connection.ssl, url, url_size);
+	zbytes = openssl_read_http(&connection, gzpage, 64 KB);
+	if (zbytes > 64 KB) {
+		if (strstr(gzpage, "Unknown instrument")) {
+			stock->update = 0;
+			stock->dead   = 1;
+			printf(BOLDRED "Unknown Instrument: %s" RESET "\n", stock->sym);
+		}
+		goto out;
+	}
+	if (strstr(gzpage, "Unknown instrument")) {
+		stock->update = 0;
+		stock->dead   = 1;
+		printf("Unknown Instrument: %s\n", stock->sym);
+		goto out;
+	}
+
+	compressed         = strstr(gzpage, "\r\n\r\n");
+	compressed        += 4;
+	compressed_size    = zbytes-(compressed-gzpage);
+	uncompressed_size  = *(int *)(gzpage+zbytes-4);
+	if (uncompressed_size > 96 KB || uncompressed_size <= 0)
+		goto out;
+	uncompressed_size  = zip_decompress2((unsigned char *)compressed, (unsigned char *)uncompressed, compressed_size, uncompressed_size);
+	if (uncompressed_size <= 0)
+		goto out;
+	uncompressed[uncompressed_size] = 0;
+	query(stock, uncompressed);
+	printf("%s\n", uncompressed);
+	if (Server.DEBUG_STOCK && !strcmp(stock->sym, Server.DEBUG_STOCK))
+		printf(BOLDYELLOW "[stock: %s]\n%s" RESET "\n", stock->sym, uncompressed);
+	ret = 1;
+out:
+	openssl_destroy(&connection);
+	return ret;
+}
+
+void argv_wsj_allday(char *ticker)
+{
+	holiday = 0;
+	market  = DAY_MARKET;
+	init_ip();
+
+	CURRENT_XLS = load_stocks();
+	for (int x=0; x<CURRENT_XLS->nr_stocks; x++) {
+		struct stock *stock = &CURRENT_XLS->STOCKS_ARRAY[x];
+		if (ticker && strcmp(stock->sym, ticker))
+			continue;
+		stock->ohlc                  = (struct ohlc  *)zmalloc(sizeof(struct ohlc) * TRADE_MINUTES);
+		stock->price                 = (struct price *)zmalloc(sizeof(struct price));
+		stock->price->price_1d       = (char *)malloc(256 KB);
+		stock->price->price_1d_close = (char *)malloc(168 KB);
+		stock->price->price_1m       = (char *)malloc(28 KB);
+		stock->price->price_mini     = (char *)malloc(32 KB);
+		WSJ_update_allday_price(stock);
 	}
 }

@@ -1,3 +1,29 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2012-2014 Marcin Kelar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+- original: https://github.com/OrionExplorer/c-websocket/blob/master/cWebSockets.c
+- with modifications
+*/
+
 #include <conf.h>
 #include <sha1.h>
 
@@ -58,6 +84,7 @@ void websocket_connect_sync(char *host, unsigned int ip_address, char *api, webs
 	snprintf(request, sizeof(request)-1, WEBSOCKET_CLIENT, api, host);
 	openssl_write_sync(connection, request, strlen(request));
 	openssl_read_sync2(connection, response, sizeof(response)-1);
+	printf(BOLDWHITE "%s" RESET "\n", response);
 	handler(connection);
 }
 
@@ -71,7 +98,7 @@ extract_frames(char *packet, struct frame *frames, int packet_length)
 	frame = frames;
 	for (x=0; x<5; x++) {
 		data_length = ((unsigned char) packet[1]) & 127;
-//		printf("%x %x %x data len: %d\n", (unsigned char)packet[0], (unsigned char)packet[1], (unsigned char)packet[2], data_length);
+		printf("%x %x %x data len: %d\n", (unsigned char)packet[0], (unsigned char)packet[1], (unsigned char)packet[2], data_length);
 		if (data_length <= 125) {
 			mask_offset = 2;
 			lensize     = 1;
@@ -93,7 +120,7 @@ extract_frames(char *packet, struct frame *frames, int packet_length)
 		frame->data_length = data_length;
 		frame_length       = data_length + 5 + lensize;
 		*(unsigned int *)frame->mask = *(unsigned int *)(packet+mask_offset);
-		//printf("data_off: %d mask_off: %d frame_len: %d packet_length: %d\n", data_offset, mask_offset, frame_length, packet_length);
+		printf("data_off: %d mask_off: %d frame_len: %d packet_length: %d\n", data_offset, mask_offset, frame_length, packet_length);
 
 		nr_frames++;
 		if (frame_length == packet_length)
@@ -124,6 +151,7 @@ int websocket_recv(char *packet, uint64_t packet_length, struct frame *frames, c
 	int           nr_frames, x, y;
 
 	opcode = packet[0];
+	printf("opcode: %x\n", opcode);
 	if (opcode != 129 ) {
 		if (opcode == 136) {
 			printf("WEBSOCKET: CLIENT DISCONNECTED\n");
@@ -159,27 +187,37 @@ int websocket_recv(char *packet, uint64_t packet_length, struct frame *frames, c
 
 int websocket_send(struct connection *connection, char *data, uint64_t data_length)
 {
-	unsigned char message[(4096+1024) KB];
-	unsigned char *msg = message;
-	int data_start_index;
+	unsigned char message[1024 KB];
+	unsigned char *msg     = message;
+	char           mask[4] = { 0xaa,0xaa,0xaa,0xaa };
+	int            data_start_index, boff = 0;
 
 	if ((int)data_length <= 0)
 		return 0;
 
-	if (data_length > sizeof(message))
+	if (data_length >= sizeof(message))
 		msg = (unsigned char *)malloc(data_length+256);
 
 	msg[0] = (unsigned char)129;
 	if(data_length <= 125) {
-		msg[1] = (unsigned char)data_length;
+		if (connection->protocol == TLS_CLIENT)
+			msg[1] = (unsigned char)data_length|(1<<7);
+		else
+			msg[1] = (unsigned char)data_length;
 		data_start_index = 2;
 	} else if( data_length > 125 && data_length <= 65535) {
-		msg[1] = 126;
+		if (connection->protocol == TLS_CLIENT)
+			msg[1] = 0xfe; // 126|(1<<7) (mask bit is 1<<7)
+		else
+			msg[1] = 126;
 		msg[2] = (unsigned char)((data_length >> 8) & 255);
 		msg[3] = (unsigned char)((data_length) & 255);
 		data_start_index = 4;
 	} else {
-		msg[1] = 127;
+		if (connection->protocol == TLS_CLIENT)
+			msg[1] = 0xff;
+		else
+			msg[1] = 127;
 		msg[2] = (unsigned char)((data_length >> 56) & 255);
 		msg[3] = (unsigned char)((data_length >> 48) & 255);
 		msg[4] = (unsigned char)((data_length >> 40) & 255);
@@ -190,7 +228,18 @@ int websocket_send(struct connection *connection, char *data, uint64_t data_leng
 		msg[9] = (unsigned char)((data_length)       & 255);
 		data_start_index = 10;
 	}
-	memcpy(&msg[data_start_index], data, data_length);
+
+	if (connection->protocol == TLS_CLIENT) {
+		*(unsigned int *)(msg+data_start_index) = *(unsigned int *)mask;
+		data_start_index += 4;
+
+		for (int x = 0; x<data_length; x++) {
+			msg[boff+data_start_index] = (unsigned char)data[boff] ^ mask[x%4];
+			boff++;
+		}
+	} else {
+		memcpy(&msg[data_start_index], data, data_length);
+	}
 	openssl_write_sync(connection, (char *)msg, data_length + data_start_index);
 	if (msg != message)
 		free(msg);
@@ -209,9 +258,7 @@ void websocket_sendx(struct connection *connection, char *packet, int packet_len
 // used to work but after the rewrite there have been segfaults, switch off for now until i have more time to look into it
 void websockets_sendall(struct session *session, char *packet, int packet_len)
 {
-	int x;
-
-	for (x=0; x<session->nr_websockets; x++) {
+	for (int x=0; x<session->nr_websockets; x++) {
 		struct connection *connection = session->websockets[x];
 		if (!connection || connection->fd == -1)
 			continue;
@@ -225,9 +272,7 @@ void websockets_sendall(struct session *session, char *packet, int packet_len)
 
 void websockets_sendall_except(struct session *session, struct connection *this_connection, char *packet, int packet_len)
 {
-	int x;
-
-	for (x=0; x<session->nr_websockets; x++) {
+	for (int x=0; x<session->nr_websockets; x++) {
 		struct connection *connection = session->websockets[x];
 		if (!connection || !connection->ssl || connection->fd == -1)
 			continue;

@@ -15,10 +15,13 @@ struct market {
 	int         afh_end_min;
 	int         trading_period;
 	int         nr_trading_hours;
-	time_t      market_eod_prev_ts;  // the last calendar EOD timestamp for this market: eg 2023-11-30 14:30 UTC
-	time_t      market_eod_next_ts;  // + 24 hours from the previous EOD (market_eod_timestamp) calendar trading day 
+	int         nr_trading_minutes;
 	char       *market_eod_prev_str; // %Y%M%D
 	char       *market_eod_next_str; // %Y%M%D
+	char       *prev_eod;
+	char       *next_eod;
+	time_t      prev_eod_timestamp;  // the last calendar EOD timestamp for this market
+	time_t      next_eod_timestamp;  // next calendar trading day
 	int         status;              // NO_MARKET|PRE_MARKET|DAY_MARKET|AFH_MARKET
 };
 
@@ -39,10 +42,91 @@ struct market {
  */
 struct market markets[] =
 {
-	{ US, STOCK_TYPE_STOCK,  MARKET_NASDAQ,  9,  0, 14, 30, 21, 0, 1, 0, MARKET_WEEKDAYS, 5, 7  },
-	{ US, STOCK_TYPE_STOCK,  MARKET_NYSE,   11, 30, 14, 30, 21, 0, 1, 0, MARKET_WEEKDAYS, 3, 7  },
-	{ WW, STOCK_TYPE_CRYPTO, MARKET_CRYPTO,  0,  0,  0,  0,  0, 0, 0, 0, MARKET_24_7,    24, 24 }
+	{ US, STOCK_TYPE_STOCK,  MARKET_NASDAQ,  9,  0, 14, 30, 21, 0, 1, 0, MARKET_WEEKDAYS, 12,  720 },
+	{ US, STOCK_TYPE_STOCK,  MARKET_NYSE,   12,  0, 14, 30, 21, 0, 1, 0, MARKET_WEEKDAYS,  9,  540 },
+	{ WW, STOCK_TYPE_CRYPTO, MARKET_CRYPTO,  0,  0,  0,  0,  0, 0, 0, 0, MARKET_24_7,     24, 1440 }
 };
+
+void market_set_EOD(time_t current_utc_timestamp, int country_id, char *prev_day, char *curr_day, char *next_day)
+{
+	for (int x=0; x<sizeof(markets)/sizeof(struct market); x++) {
+		struct market *market = &markets[x];
+		if (market->country_id == country_id) {
+			time_t prev_eod_timestamp  = str2utc(prev_day) + ((market->afh_start_hour*3600)+(market->afh_start_min*60));
+			time_t curr_eod_timestamp  = str2utc(curr_day) + ((market->afh_start_hour*3600)+(market->afh_start_min*60));
+			time_t next_eod_timestamp  = str2utc(next_day) + ((market->afh_start_hour*3600)+(market->afh_start_min*60));
+
+			printf("market trading period: %d vs %d\n", market->trading_period, MARKET_24_7);	
+			if (market->trading_period != MARKET_24_7) {
+				// If the current time has passed today's EOD for this market then adjust the prev and curr EOD timestamps
+				printf("curutc: %lu next_eod: %lu\n", current_utc_timestamp, next_eod_timestamp);
+				if (current_utc_timestamp >= next_eod_timestamp) {
+					market->prev_eod = strdup(curr_day);
+					market->next_eod = strdup(next_day);
+					market->prev_eod_timestamp = curr_eod_timestamp;
+					market->next_eod_timestamp = next_eod_timestamp;
+					printf(BOLDGREEN "current: %lu prev_day timestamp: %lu next_day_timestamp: %lu" RESET "\n", current_utc_timestamp, prev_eod_timestamp, next_eod_timestamp);
+				} else {
+					market->prev_eod = strdup(prev_day);
+					market->next_eod = strdup(curr_day);
+					market->prev_eod_timestamp = prev_eod_timestamp;
+					market->next_eod_timestamp = curr_eod_timestamp;
+				}
+			} else {
+				market->prev_eod = strdup(prev_day);
+				market->next_eod = strdup(curr_day);
+				market->prev_eod_timestamp = prev_eod_timestamp;
+				market->next_eod_timestamp = curr_eod_timestamp;
+			}
+		}
+	}
+}
+
+struct market *search_market(struct stock *stock)
+{
+	for (int x=0; x<sizeof(markets)/sizeof(struct market); x++) {
+		struct market *market = &markets[x];
+		if (market->country_id == stock->country_id)
+			return (market);
+	}
+	return (NULL);
+}
+
+time_t market_prev_eod_unix(struct stock *stock)
+{
+	struct market *market = search_market(stock);
+
+	if (!market)
+		return 0;
+	return market->prev_eod_timestamp;
+}
+
+char *market_prev_eod_str(struct stock *stock)
+{
+	struct market *market = search_market(stock);
+
+	if (!market)
+		return NULL;
+	return market->prev_eod;
+}
+
+int market_get_nr_minutes(struct stock *stock)
+{
+	struct market *market = search_market(stock);
+
+	if (!market)
+		return 0;
+	return market->nr_trading_minutes;
+}
+
+int market_get_nr_hours(struct stock *stock)
+{
+	struct market *market = search_market(stock);
+
+	if (!market)
+		return 0;
+	return market->nr_trading_hours;
+}
 
 void market_update_status(struct market *market)
 {
@@ -124,25 +208,15 @@ int market_update(void)
 	return markets[0].status; // for a while yet still rely on global static market variable until removal
 }
 
-struct market *search_market(struct stock *stock)
-{
-	for (int x=0; x<sizeof(markets)/sizeof(struct market); x++) {
-		struct market *market = &markets[x];
-		if (market->country_id == stock->country_id)
-			return (market);
-	}
-	return (NULL);
-}
-
 // this will be moved to LMDB with a (country-exchange-ticker):(last_update_eod_timestamp) key/pair
 time_t ticker_last_EOD(char *path)
-{       
+{
 	struct stat sb;
 	char buf[256];
 	char *p;
 	int fd, nbytes;
 
-	fd = open(path, O_RDONLY);       
+	fd = open(path, O_RDONLY);
 	if (fd < 0)
 		return 0;
 
@@ -153,32 +227,30 @@ time_t ticker_last_EOD(char *path)
 	p           = buf+nbytes;
 	while (*p != '-')
 		p--;
-       
+
 	*(p+3) = 0;
 	p     -= 7;
-	printf("ticker last EOD: %s\n", p);
-	return str2utc(p) + 24*3600;
+//	printf("p: %s utc: %lu\n", p, str2utc(p));
+	return str2utc(p);
 }
 
-bool ticker_needs_update(struct stock *stock, time_t *update_timestamp, int *nr_trading_hours)
+bool ticker_needs_update(struct stock *stock, time_t *start_timestamp, time_t *end_timestamp)
 {
 	struct stat    sb;
 	struct tm      current_utc_tm;
 	struct tm      last_update_tm;
 	time_t         epoch;
 	struct market *market = search_market(stock);
-	time_t         last_update_timestamp;
+	time_t         last_update_timestamp, market_prev_eod;
 	char           path[256];
 
 	market = search_market(stock);
-	*nr_trading_hours = market->nr_trading_hours;
 
 	snprintf(path, sizeof(path)-1, "%s/%s.csv", STOCKDB_CSV_PATH , stock->sym);
-//	printf("path: %s\n", path);
 
 	// fetch data for ticker if it doesn't exist
 	if (stat(path, &sb) == -1) {
-		*update_timestamp = 0;
+		*start_timestamp = 0;
 		return true;
 	}
 
@@ -188,30 +260,44 @@ bool ticker_needs_update(struct stock *stock, time_t *update_timestamp, int *nr_
 	// get the current utc tm - Current UTC time in broken down time format
 	time(&epoch);
 	gmtime_r(&epoch, &current_utc_tm);
-//	printf("file_modified_time: %lu curday: %d lastday: %d\n", last_update_timestamp, current_utc_tm.tm_mday, last_update_tm.tm_mday);
+//	printf("[%s] file_modified_time: %lu curday: %d lastday: %d\n", stock->sym, last_update_timestamp, current_utc_tm.tm_mday, last_update_tm.tm_mday);
 
+	*start_timestamp = ticker_last_EOD(path);
+	*end_timestamp   = market_prev_eod_unix(stock);
+
+//	printf(BOLDWHITE "start timestamp: %lu" RESET "\n", *start_timestamp);
+//	printf(BOLDWHITE "end   timestamp: %lu" RESET "\n", *end_timestamp);
 	if (current_utc_tm.tm_year > last_update_tm.tm_year || current_utc_tm.tm_mon > last_update_tm.tm_mon) {
-		*update_timestamp = ticker_last_EOD(path);
-		printf("[%s] month stale: %lu QDATE[0]: %lu\n", stock->sym, *update_timestamp, QDATESTAMP[0]);
+		printf("[%s] month(s) old: %lu EOD: %lu\n", stock->sym, *start_timestamp, QDATESTAMP[0]);
 		return true;
 	}
 
-	// update the ticker if it has been more than one day (unless it's sunday & market is weekdays)
-	if ((current_utc_tm.tm_mday - last_update_tm.tm_mday) > 1) {
-		*update_timestamp = ticker_last_EOD(path);
-		printf("[%s] day stale: %lu QDATE[0]: %lu\n", stock->sym, *update_timestamp, QDATESTAMP[0]);
+	// update the ticker if its last modification was more than 3 days ago
+	if ((current_utc_tm.tm_mday - last_update_tm.tm_mday) > 3) {
+		printf("[%s] day(s) old: %lu EOD: %lu\n", stock->sym, *start_timestamp, QDATESTAMP[0]);
 		return true;
 	}
 
+	/*
+	 * If the market is only open on weekdays AND the ticker's last update timestamp
+	 * is within the last 24 hours since EOD then don't fetch any new data
+	 */
 	if (market->trading_period != MARKET_24_7) {
-		if (current_utc_tm.tm_wday == 0 || current_utc_tm.tm_wday == 6)
-			return false;
+		return true;
+//		market_prev_eod =  market_prev_eod_unix(stock);
+//		printf("market prev eod: %lu start_timestamp: %lu +24: %lu\n", market_prev_eod, *start_timestamp, (*start_timestamp+(24*3600)));
+//		if ((market_prev_eod-(*start_timestamp+(24*3600))) >= 1)
+//			return true;
+	}
+
+	if (market->trading_period == MARKET_24_7) {
+		printf("[%s] day(s) old: %lu EOD: %lu\n", stock->sym, *start_timestamp, QDATESTAMP[0]);
+		return true;
 	}
 
 //	printf("last_update_tm day: %d utc_tm_day: %d\n", last_update_tm.tm_mday, current_utc_tm.tm_mday);
 	if (current_utc_tm.tm_hour >= market->afh_start_hour) {
-		printf("curren_utc hour: %d EOD hour: %d\n", current_utc_tm.tm_hour, market->afh_start_hour);
-		*update_timestamp = ticker_last_EOD(path);
+//		printf("current_utc hour: %d EOD hour: %d start_timestamp: %lu\n", current_utc_tm.tm_hour, market->afh_start_hour, *start_timestamp);
 		return true;
 	}
 	return false;

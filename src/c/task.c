@@ -286,7 +286,6 @@ void tasklet_schedule(void)
 		if (!tasklet->repeat && tasklet->completed)
 			continue;
 		if (curtime-tasklet->timestamp >= tasklet->seconds) {
-			printf("tasklet func: %p\n", tasklet->handler);
 			tasklet->handler(tasklet->args);
 			tasklet->completed = true;
 		}

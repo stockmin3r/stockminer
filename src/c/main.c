@@ -7,6 +7,7 @@ const char *DB_USERS_PATH;
 const char *DB_REPO_PATH;
 const char *DB_LOG_PATH;
 const char *STOCKDB_PATH;
+const char *STOCKS_DIR_PATH;
 const char *STOCKDB_MAG2_PATH;
 const char *STOCKDB_MAG3_PATH;
 const char *STOCKDB_MAG4_PATH;
@@ -18,7 +19,7 @@ const char *GSPC_PATH;
 const char *OPTIONS_PATH;
 
 int             verbose;
-int             market = NO_MARKET;
+int             market;
 int             do_resume;
 struct server   Server;
 
@@ -55,6 +56,7 @@ struct option main_options[] =
 int main(int argc, char *argv[])
 {
 	long op;
+
 	init_main(&Server);
 
 	while ((op=getopt_long(argc, argv, "W:H:mw:D:b:a3evrd", &main_options[0], NULL)) != -1) {
@@ -103,8 +105,6 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	thread_create(cryptocompare_thread, NULL);
-
 	init_modules(&Server);
 
 	/* 
@@ -117,9 +117,10 @@ int main(int argc, char *argv[])
 	thread_create(init_www, NULL);
 
 	init_tasks();
-	fs_log("init_tasks");
+
 	while (stockdata_checkpoint < SD_CHECKPOINT_COMPLETE)
 		sleep(1);
+
 	fs_log("checkpoint");
 	module_hook(&Server, MODULE_MAIN_PRE_LOOP);
 //	create_stock_threads(Server.XLS);
