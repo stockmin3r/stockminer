@@ -101,6 +101,15 @@ time_t market_prev_eod_unix(struct stock *stock)
 	return market->prev_eod_timestamp;
 }
 
+time_t market_next_eod_unix(struct stock *stock)
+{
+	struct market *market = search_market(stock);
+
+	if (!market)
+		return 0;
+	return market->next_eod_timestamp;
+}
+
 char *market_prev_eod_str(struct stock *stock)
 {
 	struct market *market = search_market(stock);
@@ -247,10 +256,19 @@ bool ticker_needs_update(struct stock *stock, time_t *start_timestamp, time_t *e
 	market = search_market(stock);
 
 	snprintf(path, sizeof(path)-1, "%s/%s.csv", STOCKDB_CSV_PATH , stock->sym);
+	*start_timestamp = ticker_last_EOD(path)+(3600*24);
+	*end_timestamp   = market_next_eod_unix(stock);
 
-	// fetch data for ticker if it doesn't exist
+//	printf(BOLDWHITE "start timestamp: %lu" RESET "\n", *start_timestamp);
+//	printf(BOLDWHITE "end   timestamp: %lu" RESET "\n", *end_timestamp);
+
+	/*
+	 * If the file does not exist then fetch several years worth of data and store it
+	 * into a csv which will be updated automatically as time passes
+	 */
 	if (stat(path, &sb) == -1) {
-		*start_timestamp = 0;
+		printf("path: %s\n", path);
+		*start_timestamp = UNIX_TIMESTAMP_1990;
 		return true;
 	}
 
@@ -262,11 +280,6 @@ bool ticker_needs_update(struct stock *stock, time_t *start_timestamp, time_t *e
 	gmtime_r(&epoch, &current_utc_tm);
 //	printf("[%s] file_modified_time: %lu curday: %d lastday: %d\n", stock->sym, last_update_timestamp, current_utc_tm.tm_mday, last_update_tm.tm_mday);
 
-	*start_timestamp = ticker_last_EOD(path);
-	*end_timestamp   = market_prev_eod_unix(stock);
-
-//	printf(BOLDWHITE "start timestamp: %lu" RESET "\n", *start_timestamp);
-//	printf(BOLDWHITE "end   timestamp: %lu" RESET "\n", *end_timestamp);
 	if (current_utc_tm.tm_year > last_update_tm.tm_year || current_utc_tm.tm_mon > last_update_tm.tm_mon) {
 		printf("[%s] month(s) old: %lu EOD: %lu\n", stock->sym, *start_timestamp, QDATESTAMP[0]);
 		return true;
@@ -283,8 +296,8 @@ bool ticker_needs_update(struct stock *stock, time_t *start_timestamp, time_t *e
 	 * is within the last 24 hours since EOD then don't fetch any new data
 	 */
 	if (market->trading_period != MARKET_24_7) {
+		market_prev_eod =  market_prev_eod_unix(stock);
 		return true;
-//		market_prev_eod =  market_prev_eod_unix(stock);
 //		printf("market prev eod: %lu start_timestamp: %lu +24: %lu\n", market_prev_eod, *start_timestamp, (*start_timestamp+(24*3600)));
 //		if ((market_prev_eod-(*start_timestamp+(24*3600))) >= 1)
 //			return true;
@@ -295,7 +308,7 @@ bool ticker_needs_update(struct stock *stock, time_t *start_timestamp, time_t *e
 		return true;
 	}
 
-//	printf("last_update_tm day: %d utc_tm_day: %d\n", last_update_tm.tm_mday, current_utc_tm.tm_mday);
+	printf("last_update_tm day: %d utc_tm_day: %d\n", last_update_tm.tm_mday, current_utc_tm.tm_mday);
 	if (current_utc_tm.tm_hour >= market->afh_start_hour) {
 //		printf("current_utc hour: %d EOD hour: %d start_timestamp: %lu\n", current_utc_tm.tm_hour, market->afh_start_hour, *start_timestamp);
 		return true;

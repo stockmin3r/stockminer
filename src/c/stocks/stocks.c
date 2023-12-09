@@ -417,7 +417,7 @@ void *stocks_update_checkpoint(void *args)
 	char               response[2048 KB];
 	char               path[256];
 	char              *p;
-	int                nr_stocks = 0, nr_trading_hours, stockdata_pending_init = 0;
+	int                nr_stocks = 0, stockdata_pending_init = 0;
 	time_t             start_timestamp, end_timestamp;
 
 	/*
@@ -438,12 +438,6 @@ void *stocks_update_checkpoint(void *args)
 				stockdata_completion = (double)((double)nr_stocks/(double)XLS->nr_stocks)*100.0;
 				continue;
 			}
-			/*
-			 * If the file does not exist then fetch several years worth of data and store it
-			 * into a csv which will be updated automatically as time passes
-			 */
-			if (!start_timestamp)
-				start_timestamp = UNIX_TIMESTAMP_1990;
 
 			if (start_timestamp >= end_timestamp) {
 				printf(BOLDWHITE "skipping: %s" RESET "\n", stock->sym);

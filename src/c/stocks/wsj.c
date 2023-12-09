@@ -612,7 +612,6 @@ int WSJ_update_allday_price(struct stock *stock)
 	char          page[96 KB];
 
 	price = stock->price;
-	printf("update_allday_price: %s\n", stock->sym);
 	if (stock->dead)
 		return 0;
 	if (market == NO_MARKET) {
@@ -646,6 +645,7 @@ int WSJ_update_allday_price(struct stock *stock)
 		Server.nr_working_stocks = 0;
 		Server.nr_failed_stocks  = 0;
 	}
+	printf("update_allday_price: %s\n", stock->sym);
 	wsj_query(stock, WSJ->ALL, strlen(WSJ->ALL), page, update_allday);
 	if (price->price_1m_len) {
 		memcpy(price->price_1d+price->price_1d_len, price->price_1m+1, price->price_1m_len-1);
