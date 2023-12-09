@@ -619,6 +619,8 @@ void init_time(struct server *server)
 	time_load_EOD();
 	load_EOD2();
 
+	market_update();
+
 	QDATE[1]      = strdup(unix2str(get_timestamp(), timestr));
 	QDATESTAMP[1] = str2unix(QDATE[1]);
 	QDATE[2]      = strdup(unix2str(QDATESTAMP[1]+(24*3600), timestr));
