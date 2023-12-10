@@ -842,6 +842,7 @@ void load_stock_csv(struct XLS *XLS, struct stock *stock, struct mag *mag, unsig
 	}
 	price->price_1d_len                 = ohlc_len;
 	price->price_1d_close_len           = close_len;
+	price->price_1d[price->price_1d_len-1] = ']';
 
 	*(price->price_1d_close+close_len-1) = ']';
 	if (count_months) {

@@ -26,7 +26,7 @@ void update_crypto_data(char *buf)
 	if (argc <= 12)
 		return;
 	snprintf(ticker, sizeof(ticker)-1, "%s-%s", argv[CCCAGG_CRYPTO_IDX], argv[CCCAGG_CURRENCY_IDX]);
-	printf("price; %s\n", argv[CCCAGG_PRICE_IDX]);
+
 	stock = search_stocks(ticker);
 	if (!stock) {
 		printf(BOLDRED "ticker error: %s" RESET "\n", ticker);
@@ -126,6 +126,8 @@ void cryptocompare_handler(struct connection *connection)
 
 void *cryptocompare_thread(void *args)
 {
+	if (Server.crypto_1M == STOCKDATA_OFF)
+		return NULL;
 	websocket_connect_sync("streamer.cryptocompare.com", Server.CC_ADDR, "/v2?format=streamer", cryptocompare_handler);
-	printf(BOLDGREEN "cryptocompare connected" RESET "\n");	
+	return NULL;
 }

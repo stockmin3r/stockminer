@@ -98,7 +98,7 @@ extract_frames(char *packet, struct frame *frames, int packet_length)
 	frame = frames;
 	for (x=0; x<5; x++) {
 		data_length = ((unsigned char) packet[1]) & 127;
-		printf("%x %x %x data len: %d\n", (unsigned char)packet[0], (unsigned char)packet[1], (unsigned char)packet[2], data_length);
+//		printf("%x %x %x data len: %d\n", (unsigned char)packet[0], (unsigned char)packet[1], (unsigned char)packet[2], data_length);
 		if (data_length <= 125) {
 			mask_offset = 2;
 			lensize     = 1;
@@ -151,7 +151,6 @@ int websocket_recv(char *packet, uint64_t packet_length, struct frame *frames, c
 	int           nr_frames, x, y;
 
 	opcode = packet[0];
-	printf("opcode: %x\n", opcode);
 	if (opcode != 129 ) {
 		if (opcode == 136) {
 			printf("WEBSOCKET: CLIENT DISCONNECTED\n");

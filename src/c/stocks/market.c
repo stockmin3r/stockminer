@@ -287,7 +287,9 @@ bool ticker_needs_update(struct stock *stock, time_t *start_timestamp, time_t *e
  	 */
 
 	if ((epoch-last_csv_eod_date)/3600/24 > 1) {
-//		printf("update: %d\n", (epoch-last_csv_eod_date)/3600, epoch, last_csv_eod_date );
+		if (epoch < market_next_eod)
+			return false;
+		printf("update: %s %d epoch: %lu last_csv_eod: %lu\n", stock->sym, (epoch-last_csv_eod_date)/3600, epoch, last_csv_eod_date );
 		return true;
 	}
 	return false;

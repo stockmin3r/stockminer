@@ -2,10 +2,6 @@
 #include <extern.h>
 #include <stocks/stocks.h>
 
-struct board *lowcaps_gainer_board;
-struct board *lowcaps_loser_board;
-struct board *highcaps_gainer_board;
-struct board *highcaps_loser_board;
 int NR_DELTA_STOCKS  = 19;
 
 /* Price Lowcaps */

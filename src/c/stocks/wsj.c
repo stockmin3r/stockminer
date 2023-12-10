@@ -573,7 +573,7 @@ void update_allday(struct stock *stock, char *page)
 		if (h > stock->intraday_high) stock->intraday_high = h;
 		ohlc->open = o; ohlc->high = h; ohlc->low = l;ohlc->close = c; ohlc->timestamp = timestamp;
 		nr_ohlc++; ohlc++; p++;
-		printf("[%d] p: %.10s timestamp: %d open: %.2f high: %.2f low: %.2f close: %.2f\n", stock->nr_ohlc, p,  timestamp, o,h,l,c);
+//		printf("[%d] p: %.10s timestamp: %d open: %.2f high: %.2f low: %.2f close: %.2f\n", stock->nr_ohlc, p,  timestamp, o,h,l,c);
 		while (*p != ',') p++;
 		if (*p == ']' && *(p+1) == ']') break;
 		p += 2;
@@ -610,6 +610,9 @@ int WSJ_update_allday_price(struct stock *stock)
 	struct WSJ   *WSJ = &stock->API.WSJ;
 	struct price *price;
 	char          page[96 KB];
+
+	if (Server.stocks_1M == STOCKDATA_OFF)
+		return 0;
 
 	price = stock->price;
 	if (stock->dead)
@@ -725,6 +728,16 @@ void WSJ_update_current_price(struct stock *stock)
 	char  page[96 KB];
 	struct WSJ *WSJ = &stock->API.WSJ;	
 
+	/*
+	 * WSJ is only used for live stock prices (also some indexes and funds)
+	 *  - it provides both 1D OHLC and 1Minute OHLC where polling every few
+	 * seconds or even every second will provide an adjusted current OHLCv
+	 * This is not optimal because thousands of GET requests are being made
+	 * to WSJ and this is unsustainable and will have to be removed in the
+	 * future. Right now it is only used for development purposes.
+	 */
+	if (Server.stocks_1M == STOCKDATA_OFF)
+		return;
 	/*
 	 * If we haven't got the OHLCv ticks for today's trading day
 	 * then there is no use in fetching the "current" OHLCv tick
