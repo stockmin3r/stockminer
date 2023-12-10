@@ -4,11 +4,13 @@
  ************************************************/
 var prOFF = '<label class=cbx><input type=checkbox class=checkbox_input><span class=checkbox_ctrl><span class="check untick" onclick=pract()>&check;</span></span></label>';
 var prON  = '<label class=cbx><input type=checkbox class=checkbox_input checked><span class=checkbox_ctrl><span class="check tick" onclick=pract()>&check;</span></span></label>';
-
+var WARGS;
 function Watchtable(args) {
 	var tab, columns = args.dict, menu = args.menu, TID = args.TID, QGID = args.QGID, edit = args.edit, order = args.order, type = args.type,c,
 	t   = 'class="MTAB dataTable"><caption></caption><thead><tr>',
 	spn = '<span class="tlink link-cyan" title="Menu">⚙</span>';
+
+	WARGS=args;
 
 	console.log("watchtable TID: "+ TID);
 	if (!TID)
@@ -165,11 +167,11 @@ function init_stock_screener(){
 /*
  * Return a JSON array of dicts
  *  - constructs an array of "data":"Column Name" dicts
- */var THIS;
+ */
 function screener_to_json(screener)
 {
 	var d = '[{"data":null,"orderable":false,"defaultContent":""},';
-	$(".wdst li", screener).each(function(){THIS=this;d += '{"data":"'+$(this).attr('v') + '"},';});
+	$(".wdst li", screener).each(function(){d += '{"data":"'+$(this).attr('v') + '"},';});
 	d  = d.slice(0, -1);
 	d += "]";
 	return d;

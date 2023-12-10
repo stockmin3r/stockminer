@@ -590,24 +590,6 @@ int utc_timezone_offset()
 	return (loc_timestamp - gmt_timestamp);
 }
 
-// each "market" will have to have its own EOD UTC timestamp array of [previous UTC EOD timestamp][Next UTC EOD timestamp]
-void load_EOD2()
-{
-	time_t    epoch;
-	struct tm utc_tm;
-char prev_date[32];
-	time(&epoch);
-	gmtime_r(&epoch, &utc_tm);
-
-	// if the current UTC hour
-	sprintf(prev_date, "%d-%d-%d", utc_tm.tm_year+1900, utc_tm.tm_mon+1, utc_tm.tm_mday-1);
-
-	sprintf(current_date, "%d-%d-%d", utc_tm.tm_year+1900, utc_tm.tm_mon+1, utc_tm.tm_mday);
-	QDATE[0]      = current_date;
-	QDATESTAMP[0] = str2utc(current_date)+utc_timezone_offset();
-	printf(BOLDMAGENTA "prev_date: %s current_date: %s timestamp: %lu hour: %d utc: %lu tzoff: %d" RESET "\n", prev_date, QDATE[0], QDATESTAMP[0], utc_tm.tm_hour, str2utc(current_date), utc_timezone_offset());
-}
-
 void init_time(struct server *server)
 {
     char timestr[64];
@@ -615,10 +597,7 @@ void init_time(struct server *server)
 	SERVER = server;
 	server->TIMEZONE = utc_timezone_offset();
 
-	/* QDATE[0] will contain the previous calendar trading day */
 	time_load_EOD();
-	load_EOD2();
-
 	market_update();
 
 	QDATE[1]      = strdup(unix2str(get_timestamp(), timestr));
@@ -626,7 +605,5 @@ void init_time(struct server *server)
 	QDATE[2]      = strdup(unix2str(QDATESTAMP[1]+(24*3600), timestr));
 	QDATESTAMP[2] = str2unix(QDATE[2]);
 
-	// load trading calendar
-	
 	load_weeks();
 }

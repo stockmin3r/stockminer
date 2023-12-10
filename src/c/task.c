@@ -11,7 +11,6 @@
 #define MAX_TASKS 100
 
 void *task_yahoo_fin_update     (void *args);
-void *task_yahoo_eod_update     (void *args);
 void *task_quant_colgen_update  (void *args);
 void *task_backtest_forks_update(void *args);
 
@@ -44,7 +43,6 @@ mutex_t                             tasklet_lock;
 char *TASKS[] = {
 		"STOCKS_QUANT_COLGEN_UPDATE",
 		"STOCKS_BACKTEST_FORKS_UPDATE",
-		"STOCKS_YAHOO_EOD_UPDATE",
 		"STOCKS_YAHOO_FIN_UPDATE"
 };
 
@@ -52,7 +50,6 @@ task_handler_t task_handlers[] =
 {
 	task_quant_colgen_update,
 	task_backtest_forks_update,
-	task_yahoo_eod_update,
 	task_yahoo_fin_update,
 };
 
@@ -133,8 +130,10 @@ void task_schedule(void)
 		struct task *task = tasks[x];
 		if (!task)
 			continue;
-		if ((task->start_hour == (utc_tm.tm_hour%24)) && (task->start_min == utc_tm.tm_min))
+		if ((task->start_hour == (utc_tm.tm_hour%24)) && (task->start_min == utc_tm.tm_min)) {
+			printf("task_schedule: %s %d %ds\n", task->name, task->start_hour, utc_tm.tm_hour%24);
 			thread_create(task->handler, NULL);
+		}
 	}
 }
 

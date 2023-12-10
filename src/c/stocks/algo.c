@@ -916,8 +916,10 @@ void init_algo(struct XLS *XLS, struct stock *stock)
 			case YEAR_2014: if (mag->year_2014 == -1) mag->year_2014 = entry; break;
 		}
 		p = strchr(line, ',');
-		if (!p)
+		if (!p) {
+			asm("int3");
 			break;
+		}
 		*p++ = 0;
 		// Open
 		mag->date[entry] = strdup(line);

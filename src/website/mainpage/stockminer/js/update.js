@@ -19,6 +19,7 @@ function checkpoint_progress(progress)
 
 function rpc_checkpoint(av)
 {
+	console.log("rpc_checkpoint: " + av[1] + " " + av[2]);
 	if (!checkpoint_init) {
 		var id   = $("#installer-div")[0].parentNode.id, q_idx = id.indexOf("q")+1, ws_idx = id.indexOf("ws");
 		var QID  = id.substr(q_idx, ws_idx-q_idx);
@@ -36,7 +37,7 @@ function rpc_checkpoint(av)
 
 	$("#checkpoint").val(av[2]);
 	checkpoint_progress(av[2]);
-	if (av[1] == 100.0) {
+	if (av[2] == 100.0) {
 		clearInterval(checkpoint_timer);
 		return;
 	}

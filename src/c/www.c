@@ -76,9 +76,9 @@ struct request rpc_requests[] = {
 	{ "watchtable_sort",     rpc_watchtable_sort,        2, 2, ARGS_TYPE_ARGV},
 
 	/* Columns */
-	{ "TPLoad",              rpc_watchtable_load,        2, 2, ARGS_TYPE_ARGV},
-	{ "wbomb",               rpc_watchtable_bomb,        2, 2, ARGS_TYPE_ARGV},
-	{ "xls",                 rpc_xls,                    8, 8, ARGS_TYPE_ARGV},
+	{ "TPLoad",              rpc_watchtable_load,        3, 3, ARGS_TYPE_ARGV},
+	{ "wbomb",               rpc_watchtable_bomb,        3, 3, ARGS_TYPE_ARGV},
+	{ "XLS",                 rpc_xls,                    7, 7, ARGS_TYPE_ARGV},
 
 	/* Alerts */
 	{ "alerts",              rpc_watchlist_alert,        2, 2, ARGS_TYPE_ARGV},
@@ -105,7 +105,8 @@ struct request rpc_requests[] = {
 	{ "boot",                rpc_boot,                   2, 2, ARGS_TYPE_ARGV},
 	{ "fini",                rpc_session_finish,         1, 1, ARGS_TYPE_ARGV},
 	{ "login",               rpc_user_login,             3, 3, ARGS_TYPE_ARGV},
-	{ "register",            rpc_user_register,          3, 3, ARGS_TYPE_ARGV}
+	{ "register",            rpc_user_register,          3, 3, ARGS_TYPE_ARGV},
+	{ "checkpoint",          rpc_checkpoint,             1, 2, ARGS_TYPE_ARGV}
 };
 
 int NR_RPC_REQUESTS  = sizeof(rpc_requests)/sizeof(struct request);
@@ -650,26 +651,14 @@ int www_websocket_sync(char *req, struct connection *connection)
 				printf(BOLDCYAN "CRITICAL: nr_frames: %d" RESET "\n", nr_frames);
 				break;
 			}
-			if (stockdata_checkpoint == SD_CHECKPOINT_EMPTY) {
-				packet_size = sprintf(packet, "checkpoint 0 %.2f", stockdata_completion);
-				websocket_send(connection, packet, packet_size);
-				continue;
-			} else if (stockdata_checkpoint == SD_CHECKPOINT_PARTIAL) {
-				if (STOCKDATA_PENDING == 30 || !session->rpc_boot) {
-					printf(BOLDGREEN "STOCKDATA PENDING" RESET "\n");
-					packet_size = snprintf(packet, 32, "checkpoint 3 %.2f", stockdata_completion);
-					if (session->rpc_boot)
-						STOCKDATA_PENDING = false;
-					session->rpc_boot = true;
-				} else
-					packet_size = snprintf(packet, 32, "checkpoint 1 %.2f", stockdata_completion);
-				websocket_send(connection, packet, packet_size);
-			}
+			rpc.connection = connection;
+			rpc.session    = session;
+			rpc_checkpoint(&rpc);
 			mutex_lock(&session->session_lock);
 			for (int x=0; x<nr_frames; x++) {
 				frame = &frames[x];
 				msg   = (char *)frame->data;
-				printf(BOLDCYAN "%s [%d] {%d}" RESET "\n", msg, http_fd, nr_frames);
+				printf(BOLDCYAN "%s {%d}" RESET "\n", msg, nr_frames);
 
 				if ((request=www_request_hash(msg))) {
 					rpc.session      = session;

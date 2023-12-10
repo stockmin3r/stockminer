@@ -471,6 +471,7 @@ struct request {
 
 /* RPC */
 bool              rpc_boot                (struct rpc *rpc); // workspace.c
+void              rpc_checkpoint          (struct rpc *rpc); // stocks.c
 void              rpc_chart               (struct rpc *rpc); // workspace.c
 void              rpc_mini_charts         (struct rpc *rpc); // workspace.c
 void              rpc_stockpage           (struct rpc *rpc); // workspace.c

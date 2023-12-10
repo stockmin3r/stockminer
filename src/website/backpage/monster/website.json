@@ -11,22 +11,22 @@
 			"grid":"grid100",
 			"click":"quadspace_load",
 			"quads":[{
-				"workspace":[{"mod": "addDIV", "title": "Airport",  "args":{"id":"#AIRPORT"}},
-							 {"mod": "addDIV", "title": "Overview", "args":{"id":"#QL_PAGE"}},
-							 {"mod": "addDIV", "title": "Boarding", "args":{"id":"#PW_PAGE"}},
-							 {"mod": "addDIV", "title": "Flights",  "args":{"id":"#FDT_PAGE"}},
-							 {"mod": "addDIV", "title": "Fleet",    "args":{"id":"#FORKS"},"click":"fleet_click()"},
-							 {"mod": "addDIV", "title": "Saftey",   "args":{"id":"#QF_PAGE"}}]
+				"workspace":[{"mod": "addDIV", "title": "Airport",  "args":{"id":"AIRPORT"}},
+							 {"mod": "addDIV", "title": "Overview", "args":{"id":"QL_PAGE"}},
+							 {"mod": "addDIV", "title": "Boarding", "args":{"id":"PW_PAGE"}},
+							 {"mod": "addDIV", "title": "Flights",  "args":{"id":"FDT_PAGE"}},
+							 {"mod": "addDIV", "title": "Fleet",    "args":{"id":"FORKS"},"click":"fleet_click()"},
+							 {"mod": "addDIV", "title": "Saftey",   "args":{"id":"QF_PAGE"}}]
 			}]
 		},{
 			"title":"Investing",
 			"grid": "grid100",
 			"click":"quadspace_load",
 			"quads":[{
-				"workspace": [{"mod": "addDIV", "title": "Radar",     "args":{"id":"#ESP_PAGE"}},
-							  {"mod": "addDIV", "title": "Monster",   "args":{"id":"#MSR_PAGE"}},
-							  {"mod": "addDIV", "title": "Monster 2", "args":{"id":"#MSR2_PAGE"}},
-							  {"mod": "addDIV", "title": "SB150",     "args":{"id":"#SB_PAGE"}}]
+				"workspace": [{"mod": "addDIV", "title": "Radar",     "args":{"id":"ESP_PAGE"}},
+							  {"mod": "addDIV", "title": "Monster",   "args":{"id":"MSR_PAGE"}},
+							  {"mod": "addDIV", "title": "Monster 2", "args":{"id":"MSR2_PAGE"}},
+							  {"mod": "addDIV", "title": "SB150",     "args":{"id":"SB_PAGE"}}]
 			}]
 		}]
 	}]

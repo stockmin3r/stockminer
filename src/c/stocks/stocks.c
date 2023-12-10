@@ -77,6 +77,33 @@ int stocks_get_indexes(char *ibuf)
 	return (isize);
 }
 
+void rpc_checkpoint(struct rpc *rpc)
+{
+	char          packet[64];
+	packet_size_t packet_size;
+
+	switch (stockdata_checkpoint) {
+		case SD_CHECKPOINT_EMPTY:
+			packet_size = sprintf(packet, "checkpoint 0 %.2f", stockdata_completion);
+			break;
+		case SD_CHECKPOINT_PARTIAL:
+			if (STOCKDATA_PENDING == 30 || !rpc->session->rpc_boot) {
+				printf(BOLDGREEN "STOCKDATA PENDING" RESET "\n");
+				packet_size = snprintf(packet, 32, "checkpoint 3 %.2f", stockdata_completion); // call rpc_boot again
+				if (rpc->session->rpc_boot)
+					STOCKDATA_PENDING = false;
+				rpc->session->rpc_boot = true;
+			} else {
+				packet_size = snprintf(packet, 32, "checkpoint 1 %.2f", stockdata_completion);
+			}
+			break;
+		case SD_CHECKPOINT_COMPLETE:
+			packet_size     = snprintf(packet, 32, "checkpoint 2 %.2f", stockdata_completion); // completed
+			break;
+	}
+	websocket_send(rpc->connection, packet, packet_size);
+}
+
 void cmd_delisted(void)
 {
 	struct filemap filemap;
@@ -301,7 +328,7 @@ int websocket_presets(struct session *session, char *packet)
 		preset = session->presets[x];
 		if (!preset)
 			continue;
-		nbytes = sprintf(packet+packet_len, "preset %s %s@", preset->name, preset->indicators);
+		nbytes = sprintf(packet+packet_len, "preset %s %s@", preset->name, preset->indicators); /// XXX
 		packet_len += nbytes;
 	}
 	return (packet_len);

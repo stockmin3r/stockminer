@@ -712,7 +712,7 @@ int websocket_watchtable_presets(struct session *session, char *packet)
 		wtab = session->watchtable_presets[x];
 		if (!wtab || wtab->table_type == WATCHTABLE_ROOT)
 			continue;
-		nbytes = snprintf(packet+packet_len, 64, "TPset %s-%s@", wtab->name, wtab->dict);
+		nbytes = snprintf(packet+packet_len, 4096, "TPset %s-%s@", wtab->name, wtab->dict); // XXX: REALLOC
 		packet_len += nbytes;
 	}
 out:
