@@ -139,6 +139,10 @@ hydro_sign_keygen_deterministic(hydro_sign_keypair *kp, const uint8_t seed[hydro
     hydro_random_buf_deterministic(kp->sk, hydro_x25519_SECRETKEYBYTES, seed);
     hydro_x25519_scalarmult_base_uniform(kp->pk, kp->sk);
     memcpy(pk_copy, kp->pk, hydro_x25519_PUBLICKEYBYTES);
+	printf("-----keygen_deterministic------\n");
+	for (int x = 0; x<32; x++)
+		printf("%x ", kp->pk[x]);
+	printf("\n");
 }
 
 int
@@ -189,6 +193,14 @@ hydro_sign_create(uint8_t csig[hydro_sign_BYTES], const void *m_, size_t mlen,
         hydro_sign_final_create(&st, csig, sk) != 0) {
         return -1;
     }
+	printf("---secretkey---\n");
+	for (int x = 0; x<hydro_sign_SECRETKEYBYTES; x++)
+		printf("%x ", sk[x]);
+	printf("\n");
+	printf("---signature---\n");
+	for (int x = 0; x<hydro_sign_BYTES; x++)
+		printf("%x ", csig[x]);
+	printf("\n");
     return 0;
 }
 

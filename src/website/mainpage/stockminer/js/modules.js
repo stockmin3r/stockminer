@@ -481,10 +481,24 @@ function boarding(){
 
 
 /* xterm.js */
+function xterm_prompt(term)
+{
+	term.write('\r\n$ ');
+}
+
 function new_xterm(workspace)
 {
-	var xterm = new Terminal({cols:80,rows:24}), xdiv = document.createElement("div"),QGID = "#"+workspace['ws'+workspace.current_workspace].id;
+	var xterm = new Terminal({cursorBlink:true,cols:80,rows:24}), xdiv = document.createElement("div"),QGID = "#"+workspace['ws'+workspace.current_workspace].id;
+	bshide(QGID);
+	xdiv.id = QGID + "-xterm";
+	xterm.open(xdiv);
 	$(QGID).append(xdiv);
+	xterm._initialized = true;
+
+	xterm.prompt = () => {
+		term.write('\r\n$ ');
+	};
+	xterm_prompt(xterm);
 }
 
 /* JQueryTerm.js */

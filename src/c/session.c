@@ -7,6 +7,26 @@ struct ihash *UID_HASHTABLE;
 struct chash *COOKIE_HASHTABLE;
 DLIST_HEAD   (session_list);
 
+int www_new_websocket(struct session *session, struct connection *connection)
+{
+	int websocket_id = 0, found_empty = 0;
+
+	if (session->nr_websockets >= MAX_WEBSOCKETS) {
+		for (int x=0; x<session->nr_websockets; x++) {
+			if (session->websockets[x] && session->websockets[x]->fd == -1) {
+				websocket_id = x;
+				found_empty  = 1;
+				break;
+			}
+		}
+		if (!found_empty)
+			close(session->websockets[0]->fd);
+	} else
+		websocket_id = session->nr_websockets++;
+	session->websockets[websocket_id] = connection;
+	return (websocket_id);
+}
+
 struct session *session_alloc(struct connection *connection)
 {
 	struct session *session;
@@ -18,6 +38,9 @@ struct session *session_alloc(struct connection *connection)
 	session->user->uid     = -1;
 	session->user->session = session;
 	connection->session    = session;
+
+	/* Allocate new websocket in a bounded circular array buffer of type socket_t (int) */
+	connection->websocket_id = www_new_websocket(session, connection);
 
 	mutex_lock(&session_lock);
 	NR_SESSIONS++;
@@ -31,10 +54,15 @@ struct session *session_alloc(struct connection *connection)
 	chash->cookie  = cookie_ptr;
 	mutex_lock(&cookie_lock);
 	HASH_ADD_STR(COOKIE_HASHTABLE, cookie, chash);
+	if (*session->filecookie == '\0') {
+		strncpy(session->filecookie, cookie_ptr, 15);
+		cstring_strchr_replace(session->filecookie, '/', '-');
+	}
 	mutex_unlock(&cookie_lock);
 
 	// calls stock_session_alloc_hook() && workspace_session_alloc_hook() (if enabled)
 	module_hook(session, MODULE_SESSION_ALLOC);
+
 	printf(BOLDRED "SESSION_ALLOC: %s" RESET "\n", chash->cookie);
 	return (session);
 }
@@ -65,7 +93,9 @@ struct session *session_get(struct connection *connection, char *request)
 		if (!session)
 			return NULL;
 	} else {
-		connection->has_cookie = 1;
+		/* Allocate new websocket in a bounded circular array buffer of type socket_t (int) */
+		connection->websocket_id = www_new_websocket(session, connection);
+		connection->has_cookie   = 1;
 	}
 	if (connection->session)
 		printf(BOLDGREEN "session_get(): %s" RESET "\n", connection->session->user->cookies[connection->websocket_id]);
@@ -153,19 +183,6 @@ void apc_sessions(struct connection *connection, char **argv)
 	mutex_unlock(&session_lock);
 
 	apc_send_result(connection, buf);
-}
-
-void sessions_checkpoint(void)
-{
-	struct session *session;
-	char            msg[256];
-
-	mutex_lock(&session_lock);
-	printf("checkpoint session reload\n");
-	DLIST_FOR_EACH_ENTRY(session, &session_list, list) {
-		websockets_sendall(session, "qreload", 7);
-	}
-	mutex_unlock(&session_lock);
 }
 
 void sessions_update_XLS(struct XLS *XLS)

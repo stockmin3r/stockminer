@@ -113,6 +113,51 @@ void rpc_user_login(struct rpc *rpc)
 {
 	struct connection *connection = rpc->connection;
 	struct session    *session    = connection->session;
+	char              *username   = rpc->argv[1], *signature;
+	char               challenge[1024];
+	char               signature64[256];
+	int                chsize     = strlen(challenge), username_size;
+
+	printf("rpc_user_login: challenge: %s\n", challenge);
+	session = session_by_username(username);
+	if (!session)
+		goto out_error;
+
+	username  = rpc->argv[1];
+	signature = strchr(username, '|');
+	if (!signature)
+		goto out_error;
+	signature++;
+
+	base64_decode(signature, strlen(signature), signature64);
+
+	username_size = strlen(session->user->uname);
+	memcpy(challenge, username, username_size);
+	challenge[username_size] = '|';
+	memcpy(challenge+username_size+1, connection->nonce, sizeof(connection->nonce));
+
+	if (hydro_sign_verify(signature64, challenge, username_size+1+sizeof(connection->nonce), "context0", session->user->pubkey) != 0)
+		goto out_error;
+
+	session->user->logged_in = 1;
+
+	// enqueue task for the db loop to update the user, at some point in the future
+	db_user_update(session->user);
+
+	// send the backpage which requires a login
+	www_send_backpage(session, connection, 1);
+	printf(BOLDGREEN "user_login success: %s" RESET "\n", session->user->uname);
+	return;
+out_error:
+	printf("fail\n");
+	websocket_send(connection, "err 0 fail", 10);
+}
+
+/*
+void rpc_user_login(struct rpc *rpc)
+{
+	struct connection *connection = rpc->connection;
+	struct session    *session    = connection->session;
 	char              *username   = rpc->argv[1];
 	char              *password   = rpc->argv[2];
 	int                pwdlen     = strlen(password);
@@ -140,7 +185,7 @@ void rpc_user_login(struct rpc *rpc)
 out_error:
 	websocket_send(connection, "err 0 fail", 10);
 }
-
+*/
 unsigned int uid_by_username(char *username)
 {
 	struct user *user = search_user(username);
@@ -197,7 +242,7 @@ void init_users()
 	char           *map, *username;
 	int             username_len;
 
-	if (!(map=MAP_FILE_RO(DB_USERS_PATH, &filemap)))
+	if (!(map=MAP_FILE_RO((char *)DB_USERS_PATH, &filemap)))
 		return;
 
 	NR_USERS  = filemap.filesize/sizeof(struct user);
@@ -236,6 +281,10 @@ void init_users()
 			strncpy(cookie, &user->cookies[y][0], COOKIE_SIZE);
 			chash->cookie = &user->cookies[y][0];
 			HASH_ADD_STR(COOKIE_HASHTABLE, cookie, chash);
+			if (*session->filecookie == '\0') {
+				strncpy(session->filecookie, &user->cookies[y][0], 15);
+				cstring_strchr_replace(session->filecookie, '/', '-');
+			}
 			printf("adding cookie: [%s] to chash: [%p] session: [%p]\n", cookie, chash, session);
 		}
 		// Add user to UID_HASHTABLE (INT)

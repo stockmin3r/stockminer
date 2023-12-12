@@ -867,7 +867,7 @@ bool readfile_csv(char *ticker, char *csvbuf, int64_t max)
 		if (p)
 			*p = '-';
 	}
-	if (fs_stat(path, &sb) < 0 || sb.st_size < 200 || (sb.st_size >= 256 KB))
+	if (fs_stat(path, &sb) < 0 || sb.st_size < 200 || (sb.st_size >= 1024 KB))
 		return 0;
 	fs_readfile_str(path, csvbuf, max);
 	if (p && *p == '-')
@@ -884,6 +884,7 @@ void init_algo(struct XLS *XLS, struct stock *stock)
 
 	if (!readfile_csv(stock->sym, csvbuf, sizeof(csvbuf))) {
 		stock->dead = 1;
+		printf(BOLDRED "dead stock: %s" RESET "\n", stock->sym);
 		return;
 	}
 
@@ -916,10 +917,8 @@ void init_algo(struct XLS *XLS, struct stock *stock)
 			case YEAR_2014: if (mag->year_2014 == -1) mag->year_2014 = entry; break;
 		}
 		p = strchr(line, ',');
-		if (!p) {
-			asm("int3");
+		if (!p)
 			break;
-		}
 		*p++ = 0;
 		// Open
 		mag->date[entry] = strdup(line);

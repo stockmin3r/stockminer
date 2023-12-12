@@ -27,6 +27,22 @@ static void init_stock(struct stock *stock, int stock_id)
 	set_index(stock);
 	load_fundamentals(stock);
 }
+/*
+bool alloc_threads(void *dataset, int nr_items, int job_type)
+{
+	struct thread *thread, *threads;
+	struct XLS    *XLS;
+	int            nr_threads, items_per_thread;
+	int            rem, x, y, ridx = 0;
+	
+	nr_stocks         = XLS->nr_stocks;
+	nr_threads        = XLS->config.nr_vcpu;
+	items_per_thread  = nr_stocks/nr_threads;
+	rem               = nr_stocks%items_per_thread;
+	threads           = (struct thread *)zmalloc(sizeof(struct thread) * (nr_stocks+(rem?1:0)));
+	
+}
+*/
 
 void alloc_stock_threads(struct XLS *XLS)
 {
@@ -80,6 +96,7 @@ void create_stock_threads(struct XLS *XLS)
 
 	// synchronize until all stocks have been loaded from this market
 	while (Server.stock_boot != XLS->nr_stock_threads) os_usleep(100000);
+	printf(BOLDGREEN "finished" RESET "\n");
 	thread_create(cryptocompare_thread, NULL);
 }
 

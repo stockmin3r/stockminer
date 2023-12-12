@@ -81,11 +81,15 @@ hydro_pwhash_deterministic(uint8_t *h, int h_len, const char *passwd, int passwd
     COMPILER_ASSERT(sizeof zero >= hydro_pwhash_MASTERKEYBYTES);
 
     (void) memlimit;
-    if (_hydro_pwhash_hash(seed, h_len, zero, passwd, passwd_len, ctx, master_key, opslimit,
-                           memlimit, threads) != 0) {
+	printf("passwd: %s len: %d strlen: %d\n", passwd, passwd_len, strlen(passwd));
+    if (_hydro_pwhash_hash(seed, h_len, zero, passwd, passwd_len, "context0", NULL, 1000,
+                           0, 1) != 0) {
         return -1;
     }
     hydro_random_buf_deterministic(h, h_len, seed);
+	for (int x = 0; x<h_len; x++)
+		printf("%x ", h[x]);
+	printf("\n");
     hydro_memzero(seed, sizeof seed);
     return 0;
 }
@@ -281,9 +285,8 @@ hydro_pwhash_upgrade(uint8_t       stored[hydro_pwhash_STOREDBYTES],
 
 int hydro_test(uint8_t buf[8])
 {
-	printf("%c\n", buf[0]);
-	buf[0] = 'a';
-	buf[1] = 'b';
-	buf[2] = 0;
+	printf("%c %c\n", buf[0], buf[1]);
+	for (int x = 0; x<8; x++)
+		buf[x] = 'z';
 	return 1;
 }

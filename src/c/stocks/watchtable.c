@@ -133,6 +133,14 @@ void init_watchtable()
 	watchtable_initialized = true;
 }
 
+static __inline__ void watchtable_path(struct session *session, char *path)
+{
+	if (session->user->uid == -1)
+		snprintf(path, 32, "db/uid/%s.wtab", session->filecookie);
+	else
+		snprintf(path, 32, "db/uid/%d.wtab", session->user->uid);
+}
+
 int column_sprintf(struct session *session, struct watchlist *watchlist, struct stock *stock, struct wtab *wtab, char *packet, int packet_len, int entry)
 {
 	struct mag         *mag   = stock->mag;
@@ -243,11 +251,6 @@ int watchtable_packet(struct session *session, struct watchlist *watchlist, char
 	return (packet_len);
 }
 
-static __inline__ void wtab_path(struct session *session, char *path)
-{
-	snprintf(path, 32, "db/uid/%d.wtab", session->user->uid);
-}
-
 int map_dict(struct wtab *wtab, char *dict, int nr_columns)
 {
 	char *key;
@@ -323,7 +326,7 @@ void rpc_watchtable_columns(struct rpc *rpc)
 		printf("!strcmp: %s\n", wtab->name);
 		goto out;
 	}
-	wtab_path(session, path);
+	watchtable_path(session, path);
 	printf("writing to path: %s\n", path);
 	fd = open(path, O_RDWR|O_CREAT, 0644);
 	if (!new_preset)
@@ -630,7 +633,7 @@ void rpc_watchtable_bomb(struct rpc *rpc)
 	char           *map;
 	int             position = 0, nr_presets;
 
-	wtab_path(session, path);
+	watchtable_path(session, path);
 //	mutex_lock(&session->watchlist_lock);
 	wtab = search_watchtable_preset(session, preset_name, &position);
 	if (!wtab || position < 0)
@@ -738,7 +741,7 @@ void session_load_watchtable_presets(struct session *session)
 	strcpy(wtab->name, "New^Preset");
 	session->morphtab->wtab = wtab;
 
-	wtab_path(session, path);
+	watchtable_path(session, path);
 	map = MAP_FILE_RO(path, &filemap);
 	if (!map)
 		return;

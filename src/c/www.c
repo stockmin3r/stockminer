@@ -104,7 +104,7 @@ struct request rpc_requests[] = {
 	/* Session */
 	{ "boot",                rpc_boot,                   2, 2, ARGS_TYPE_ARGV},
 	{ "fini",                rpc_session_finish,         1, 1, ARGS_TYPE_ARGV},
-	{ "login",               rpc_user_login,             3, 3, ARGS_TYPE_ARGV},
+	{ "login",               rpc_user_login,             2, 2, ARGS_TYPE_ARGV},
 	{ "register",            rpc_user_register,          3, 3, ARGS_TYPE_ARGV},
 	{ "checkpoint",          rpc_checkpoint,             1, 2, ARGS_TYPE_ARGV}
 };
@@ -362,9 +362,6 @@ int www_websocket_async(char *request, struct connection *connection)
 	if (!(session=session_get(connection, request)))
 		return 0;
 
-	/* Allocate new websocket in a bounded circular array buffer of type socket_t (int) */
-	connection->websocket_id = www_new_websocket(session, connection);
-
 	/* extract the URL segments */
 	if (!www_get_route(request+8, &url))
 		return 0;
@@ -611,9 +608,6 @@ int www_websocket_sync(char *req, struct connection *connection)
 			return 0;
 	}
 
-	/* Allocate new websocket in a bounded circular array buffer of type socket_t */
-	connection->websocket_id = www_new_websocket(session, connection);
-
 	/* pack the user's saved website customization confs into connection->packet */
 	session_set_config(connection);
 
@@ -710,26 +704,6 @@ void www_api(struct connection *connection, char *api)
 	if (!strcmp(argv[0], "stock")) {
 		http_stock_api(connection, argv[1], argv[2], &argv[3]);
 	}
-}
-
-int www_new_websocket(struct session *session, struct connection *connection)
-{
-	int websocket_id = 0, found_empty = 0;
-
-	if (session->nr_websockets >= MAX_WEBSOCKETS) {
-		for (int x=0; x<session->nr_websockets; x++) {
-			if (session->websockets[x] && session->websockets[x]->fd == -1) {
-				websocket_id = x;
-				found_empty  = 1;
-				break;
-			}
-		}
-		if (!found_empty)
-			close(session->websockets[0]->fd);
-	} else
-		websocket_id = session->nr_websockets++;
-	session->websockets[websocket_id] = connection;
-	return (websocket_id);
 }
 
 static __inline__ int www_reload(struct connection *connection)

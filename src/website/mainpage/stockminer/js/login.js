@@ -27,9 +27,7 @@ function rpc_nonce(av)
  *   - The Server will verify the signature of "username|NONCE"
  *     - The NONCE will be kept server-side in struct connection and in mainpage.js::var NONCE; client-side
  */
-//var keypair     = new Uint8Array(hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES);
-//var kp_seed     = new Uint8Array(hydro_sign_SEEDBYTES);
-var keypair,kp_seed;
+var KP,SEED,SIG;
 function login_onclick()
 {
 	var rc; // return value for libhydrogen function calls
@@ -42,36 +40,45 @@ function login_onclick()
 		...Uint8Array.from(atob(NONCE), c => c.charCodeAt(0))
 	]);
 
-	var signature   = "";
-	var private_key = "";
-	var password    = + $("#LBOX .pwd").val();
+	var password    = $("#LBOX .pwd").val();
 	var auth        = USER + "|" + password;
 
-/*	var mem_offset  = hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES
+	var mem_offset  = hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES
 	var keypair     = Module._malloc(mem_offset);
-	var kp_seed     = Module._malloc(offset+=hydro_sign_SEEDBYTES);*/
-
-	var keypair     = new Uint8Array(wasmExports.memory, 0, hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES);
-	var kp_seed     = new Uint8Array(wasmExports.memory,    hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES, hydro_sign_SEEDBYTES);
+	var kp_seed     = Module._malloc(mem_offset+=hydro_sign_SEEDBYTES);
+	var signature   = Module._malloc(mem_offset+=hydro_sign_BYTES);
 
 	// 1) Regenerate the seed from username|password
 	rc = Module.ccall("hydro_pwhash_deterministic",      // function name
 					  "number",                          // return type of this function (int): 0 for success -1 for failure
-					 ["number","number",                  // uint8_t[]: kp_seed, int: sizeof(kp_seed[])
+					 ["number","number",                 // uint8_t[]: kp_seed, int: sizeof(kp_seed[])
 					  "string","number",                 // char *: auth,       int: strlen(username|password)
 					  "string", "number",                // char *: context,    int: OPSLIMIT
 					  "number","number"],                // size_t: memlimit,   uint8_t: nr_threads
 					 [kp_seed, 32,                       // keypair seed, sizeof(kp_seed)
 					  auth, auth.length,                 // username|password, strlen(username|password)
 					  "context0", 1000, 0, 1]);
-	console.log("rc pwhash: " + rc);
 
+	var seed = new Uint8Array(wasmMemory.buffer, kp_seed, hydro_sign_SEEDBYTES)
+	SEED=seed;
+
+	var str = "";
+	for (var x = 0; x<hydro_sign_SEEDBYTES; x++)
+		str += seed[x] + " ";
+	console.log(str);
 	// 2) Recreate the private/public keypair from the seed
 	Module.ccall("hydro_sign_keygen_deterministic",      // function name
 					  null,                              // return type of this function (int): 0 for success -1 for failure
 					 ["number","number"],                // argument types to hydro_sign_keygen_deterministic (two uint8arrays)
 					 [keypair, kp_seed]);                // arguments to hydro_sign_keygen_deterministic()
-	
+
+	var private_key = new Uint8Array(wasmMemory.buffer, keypair+hydro_sign_PUBLICKEYBYTES, hydro_sign_SECRETKEYBYTES)
+	KP      = keypair;
+	str     = "";
+	console.log("*****secretkey*****:");
+	for (var x = 0; x<32; x++)
+		str += KP[x] + " ";
+	console.log(str);
 
 	var chsize = challenge.length;
 	rc = Module.ccall("hydro_sign_create",               // function name
@@ -80,8 +87,15 @@ function login_onclick()
 					  "string","array"],                 // [4] char *: context,    [5] uint8_t[]: user's private key
 					 [signature, challenge, chsize,      // signature, challenge, challenge_size
 					  "context0", private_key]);         // "context0", keypair.sk (user's private key)
-	console.log("hydro_sign_create: " + rc);
-	WS.send("login " );
+
+	signature = new Uint8Array(wasmMemory.buffer, signature, hydro_sign_BYTES);
+	SIG = signature;
+	console.log("****signature*****:");
+	for (var x = 0; x<32; x++)
+		str += SIG[x] + " ";
+	console.log(str);
+
+	WS.send("login " + USER + "|" + btoa(signature));
 }
 
 

@@ -447,6 +447,13 @@ void *stocks_update_checkpoint(void *args)
 	int                nr_stocks = 0, stockdata_pending_init = 0;
 	time_t             start_timestamp, end_timestamp;
 
+	if (Server.stocks_1D == STOCKDATA_OFF) {
+		stockdata_reload(XLS);
+		stockdata_completion = 100.0;
+		stockdata_checkpoint = SD_CHECKPOINT_COMPLETE;
+		return (NULL);
+	}
+
 	/*
 	 * Fetch stockdata
 	 */

@@ -247,6 +247,7 @@ struct user {
 struct session {
 	struct list_head     list;
 	struct user         *user;
+	char                 filecookie[16]; // the first cookie of a connection, for anonymous sessions with no user id, component of a path for various DBs
 	struct profile      *profile;
 	struct squeak      **sqdb;
 	struct quadverse    *quadverse[MAX_QUADVERSES];
@@ -803,6 +804,7 @@ int64_t        cstring_count_chars     (char *str, char c);
 int64_t        cstring_line_count      (char *);
 int            cstring_split           (char *msg, char *argv[], int max, char c);
 void           cstring_strip_char      (char *ptr, char c);
+void           cstring_strchr_replace  (char *str, char replace_char, char to_char);
 char          *memdup                  (char *mem, int64_t size);
 void          *zmalloc                 (int64_t size);
 unsigned short random_short            (void);

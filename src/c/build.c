@@ -39,13 +39,14 @@ struct external_api {
 {"https://code.highcharts.com/stock/indicators/indicators-all",           "jLpemzsfcRDYsAbWw/hErdwRLuVk6AGjCCocwf3okb6JjF4JBuhMv0W7gDk+NPhP", LICENSE_HIGHCHARTS, !PERMISSIVE, !DEFER, },
 {"https://code.jquery.com/ui/1.13.2/jquery-ui",                           "4D3G3GikQs6hLlLZGdz5wLFzuqE9v4yVGAcOH86y23JqBDPzj9viv0EqyfIa6YUL", LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://unpkg.com/draggabilly@2.2.0/dist/draggabilly.pkgd",             "JvmwKtrs1CjFC41kayyey74PQsYWrxToeXr0tsEyeYgZwi2aT4XZccR8SFqcobPC", LICENSE_MIT,         PERMISSIVE, !DEFER, },
-{"https://cdn.plot.ly/plotly-2.26.0",                                     NULL,                                                               LICENSE_MIT,         PERMISSIVE, !DEFER, },
+//{"https://cdn.plot.ly/plotly-2.26.0",                                   NULL,                                                               LICENSE_MIT,         PERMISSIVE, !DEFER, },
 /* CSS */
 {"https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css",                  NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.min.css",                           NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.34.0/css/jquery.terminal.min.css", NULL,                                           LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css",         NULL,                                           LICENSE_BSD,         PERMISSIVE, !DEFER  },
 {"https://vjs.zencdn.net/7.19.2/video-js.css",                                                NULL,                                           LICENSE_APACHE2,     PERMISSIVE,  DEFER, },
+{"https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.min.css",                                   NULL,                                           LICENSE_MIT,         PERMISSIVE,  DEFER, },
 /* TAIL SCRIPTS */
 {"https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify",         "cwS6YdhLI7XS60eoDiC+egV0qHp8zI+Cms46R0nbn8JrmoAzV9uFL60etMZhAnSu", LICENSE_APACHE2_MPL,!PERMISSIVE,  DEFER  },
 {"https://code.highcharts.com/modules/data",                              "TqGyq0XPLLamTC1+4jrFsi0mxHPTg8JDL4JXACaMTsh2cMMzmloKZjU9vkjYhZA+", LICENSE_HIGHCHARTS, !PERMISSIVE,  DEFER, },
@@ -60,8 +61,9 @@ struct external_api {
 {"https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.489/build/pdf",             NULL,                                                               LICENSE_APACHE2,     PERMISSIVE,  DEFER, },
 {"https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip",              NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://cdnjs.cloudflare.com/ajax/libs/ace/1.6.0/ace",                  NULL,                                                               LICENSE_BSD,         PERMISSIVE,  DEFER, },
-{"https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.34.0/js/jquery.terminal", NULL,                                                    LICENSE_MIT,         PERMISSIVE,  DEFER, },
-{"https://cdn.jsdelivr.net/gh/jedisct1/libsodium.js@master/dist/browsers-sumo/sodium", "zH4lZRYinll6mtnzkRxsShOLz/cM4UQWrD3TQLMXSoOxTJqj3w+SBr1WzijDAdfS", LICENSE_MIT, PERMISSIVE, DEFER}
+{"https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm",                   NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
+//{"https://cdn.jsdelivr.net/gh/jedisct1/libsodium.js@master/dist/browsers-sumo/sodium", "zH4lZRYinll6mtnzkRxsShOLz/cM4UQWrD3TQLMXSoOxTJqj3w+SBr1WzijDAdfS", LICENSE_MIT, PERMISSIVE, DEFER},
+{"https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.34.0/js/jquery.terminal", NULL,                                                    LICENSE_MIT,         PERMISSIVE,  DEFER, }
 };
 
 const char *mainpage_template =
