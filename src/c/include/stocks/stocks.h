@@ -286,6 +286,7 @@ struct stock {
 	struct mag3     *mag3;
 	struct mag4     *mag4;
 	struct XLS      *XLS;
+	struct market   *market;
 	struct sig     **signals;
 	struct API       API;
 	int              type;

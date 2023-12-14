@@ -105,9 +105,59 @@ char *base64_encode_malloc(unsigned char *src, size_t *len)
 	return NULL;
 }
 
-char *base64_decode_malloc(unsigned char *src, size_t *len)
+unsigned char *base64_decode_malloc(const unsigned char *src, size_t len, size_t *out_len)
 {
-	return NULL;
+    unsigned char *out, *pos, block[4];
+    size_t i, count, olen;
+    int pad = 0;
+
+    count = 0;
+    for (i = 0; i < len; i++) {
+        if (base64_decode_table[src[i]] != 0x80)
+            count++;
+    }
+
+    if (count == 0 || count % 4)
+        return NULL;
+
+    olen = (count / 4 * 3) + 1;
+    pos = out = malloc(olen);
+    if (out == NULL)
+        return NULL;
+
+    count = 0;
+    for (i = 0; i < len; i++) {
+        unsigned char tmp = base64_decode_table[src[i]];
+        if (tmp == 0x80)
+            continue;
+
+        if (src[i] == '=')
+            pad++;
+        block[count] = tmp;
+        count++;
+        if (count == 4) {
+            *pos++ = (unsigned char)((block[0] << 2) | (block[1] >> 4));
+            *pos++ = (unsigned char)((block[1] << 4) | (block[2] >> 2));
+            *pos++ = (unsigned char)((block[2] << 6) | block[3]);
+            count = 0;
+            if (pad) {
+                if (pad == 1)
+                    pos--;
+                else if (pad == 2)
+                    pos -= 2;
+                else {
+                    /* Invalid padding */
+                    free(out);
+                    return NULL;
+                }
+                break;
+            }
+        }
+    }
+    *pos = '\0';
+
+    *out_len = (size_t)(pos - out);
+    return out;
 }
 
 size_t
@@ -124,8 +174,8 @@ base64_decode(unsigned char *src, size_t len, unsigned char *out)
     if (count == 0 || count % 4)
         return 0;
 
-    olen = (count / 4 * 3) + 1;
-
+    olen  = (count / 4 * 3) + 1;
+	pos   = out;
     count = 0;
     for (int i = 0; i < len; i++) {
         unsigned char tmp = base64_decode_table[src[i]];

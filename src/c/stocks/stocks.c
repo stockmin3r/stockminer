@@ -489,6 +489,7 @@ void *stocks_update_checkpoint(void *args)
 				if (packet_size + 32 KB >= sizeof(packet_size)-1)
 					continue;
 			}
+			openssl_destroy(&yahoo_connection);
 
 			if (strstr(response, "Bad Request")) {
 				printf(BOLDRED "bad request: %s" RESET "\n", response);

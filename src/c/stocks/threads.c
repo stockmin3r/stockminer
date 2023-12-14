@@ -12,6 +12,7 @@ static void init_stock(struct stock *stock, int stock_id)
 		return;
 
 	stock->id               = stock_id;
+	stock->market           = search_market(stock);
 	stock->candles          = (struct candle **)zmalloc(sizeof(struct candle *) * (NR_CANDLES));
 	stock->ohlc             = (struct ohlc    *)zmalloc(sizeof(struct ohlc)     * (nr_trading_minutes));
 	stock->price            = price = (struct price *)zmalloc(sizeof(struct price));

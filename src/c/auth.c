@@ -46,8 +46,8 @@ void apc_server_auth(struct connection *connection, char **argv)
 	bool         verified = false;
 	size_t       sig_size, username_size, nbytes;
 
-	hydro_random_buf(nonce, sizeof(nonce));
-
+//	hydro_random_buf(nonce, sizeof(nonce));
+	memset(nonce, 0x41, 32);
 	openssl_write_sync(connection, nonce, sizeof(nonce));
 	nbytes    = openssl_read_sync2(connection, auth, sizeof(auth)-1);
 	signature = strchr(auth, '|');

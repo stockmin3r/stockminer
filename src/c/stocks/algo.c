@@ -159,7 +159,7 @@ void init_BIX(struct XLS *XLS)
 			continue;
 		nr_entries = stock->nr_mag2_entries;
 		if (nr_entries != stock->mag->nr_entries) {
-			printf(BOLDRED "init_BIX mismatch: [%s] %d vs %d" RESET "\n", stock->sym, stock->mag->nr_entries, stock->nr_mag2_entries);
+//			printf(BOLDRED "init_BIX mismatch: [%s] %d vs %d" RESET "\n", stock->sym, stock->mag->nr_entries, stock->nr_mag2_entries);
 			continue;
 		}
 		for (y=0; y<nr_entries; y++) {

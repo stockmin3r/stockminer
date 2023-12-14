@@ -27,7 +27,7 @@ function rpc_nonce(av)
  *   - The Server will verify the signature of "username|NONCE"
  *     - The NONCE will be kept server-side in struct connection and in mainpage.js::var NONCE; client-side
  */
-var KP,SEED,SIG;
+var KP,SEED,SIG,CH;
 function login_onclick()
 {
 	var rc; // return value for libhydrogen function calls
@@ -35,9 +35,9 @@ function login_onclick()
 	$(".error").remove();
 	localStorage.user = USER=$("#LBOX .usr").val();
 
-	var challenge = new Uint8Array([
+	var challenge = CH = new Uint8Array([
 		...new TextEncoder().encode(USER + "|"),
-		...Uint8Array.from(atob(NONCE), c => c.charCodeAt(0))
+		...Uint8Array.from(btoa(NONCE), c => c.charCodeAt(0))
 	]);
 
 	var password    = $("#LBOX .pwd").val();
@@ -62,7 +62,7 @@ function login_onclick()
 	var seed = new Uint8Array(wasmMemory.buffer, kp_seed, hydro_sign_SEEDBYTES)
 	SEED=seed;
 
-	var str = "";
+	var str = "----seed----\n";
 	for (var x = 0; x<hydro_sign_SEEDBYTES; x++)
 		str += seed[x] + " ";
 	console.log(str);
@@ -83,19 +83,19 @@ function login_onclick()
 	var chsize = challenge.length;
 	rc = Module.ccall("hydro_sign_create",               // function name
 					  "number",                          // return type of this function (int): 0 for success -1 for failure
-					 ["string","array","number",         // [1] char *: signature,  [2] uint8_t[]: challenge, [3] size_t: challenge_size
+					 ["number","number","number",         // [1] char *: signature,  [2] uint8_t[]: challenge, [3] size_t: challenge_size
 					  "string","array"],                 // [4] char *: context,    [5] uint8_t[]: user's private key
 					 [signature, challenge, chsize,      // signature, challenge, challenge_size
 					  "context0", private_key]);         // "context0", keypair.sk (user's private key)
 
-	signature = new Uint8Array(wasmMemory.buffer, signature, hydro_sign_BYTES);
-	SIG = signature;
+	SIG = new Uint8Array(wasmMemory.buffer, signature, hydro_sign_BYTES);
+//	SIG = signature;
 	console.log("****signature*****:");
 	for (var x = 0; x<32; x++)
 		str += SIG[x] + " ";
 	console.log(str);
 
-	WS.send("login " + USER + "|" + btoa(signature));
+	WS.send("login " + USER + "|" + btoa(String.fromCharCode.apply(null, SIG)));
 }
 
 

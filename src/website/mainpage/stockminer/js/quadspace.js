@@ -1004,6 +1004,7 @@ function QUADVERSE_SWITCH(name,c,QVID)
 /* ***********************************
  *        LOAD SCREENER UI
  ************************************/
+var SC;
 function loadScreener(screener,watchtable_id){
 	var self = this;
 	$(screener).css("display", "block");
@@ -1026,14 +1027,15 @@ function loadScreener(screener,watchtable_id){
 		}
 		dict = screener_to_json(screener);
 		TP[preset_name] = dict;
-		var set  = $(".watchmgr-screener option:selected", screener).text();
+		SC = screener;
+		var set  = $(".screener-select option:selected", screener).text();
 		if (set !== preset_name) {
 			TPMenu['Load'+(Object.keys(TPMenu).length+1)]={"name":preset_name,callback:function(itemKey,opt,e){TPLoad(preset_name)}};
 			var opt = document.createElement("option");
 			opt.appendChild(document.createTextNode(preset_name));
 			opt.value = Object.keys(TP).length;
-			$(".watchmgr-screener", screener).append(opt);
-			$(".watchmgr-screener", screener).val(Object.keys(TP).length);
+			$(".screener-select", screener).append(opt);
+			$(".screener-select", screener).val(Object.keys(TP).length);
 		}
 		colmod(screener, 0, preset_name, null, 2); // XLS_reload() because save==2
 	});

@@ -111,32 +111,32 @@ out_error:
  */
 void rpc_user_login(struct rpc *rpc)
 {
-	struct connection *connection = rpc->connection;
-	struct session    *session    = connection->session;
-	char              *username   = rpc->argv[1], *signature;
+	struct connection *connection   = rpc->connection;
+	struct session    *prev_session = connection->session, *session;
+	char              *username     = rpc->argv[1], *signature64;
 	char               challenge[1024];
-	char               signature64[256];
-	int                chsize     = strlen(challenge), username_size;
+	char               signature[256];
+	int                username_size;
 
-	printf("rpc_user_login: challenge: %s\n", challenge);
+	printf("rpc_user_login: %s\n", rpc->argv[1]);
+
+	username    = rpc->argv[1];
+	signature64 = strchr(username, '|');
+	if (!signature64)
+		goto out_error;
+	*signature64++ = 0;
+
 	session = session_by_username(username);
 	if (!session)
 		goto out_error;
 
-	username  = rpc->argv[1];
-	signature = strchr(username, '|');
-	if (!signature)
-		goto out_error;
-	signature++;
-
-	base64_decode(signature, strlen(signature), signature64);
-
+	base64_decode(signature64, strlen(signature64), signature);
 	username_size = strlen(session->user->uname);
 	memcpy(challenge, username, username_size);
 	challenge[username_size] = '|';
 	memcpy(challenge+username_size+1, connection->nonce, sizeof(connection->nonce));
-
-	if (hydro_sign_verify(signature64, challenge, username_size+1+sizeof(connection->nonce), "context0", session->user->pubkey) != 0)
+	printf("challenge: %s signature: %s\n", challenge, signature);
+	if (hydro_sign_verify(signature, challenge, username_size+1+sizeof(connection->nonce), "context0", session->user->pubkey) != 0)
 		goto out_error;
 
 	session->user->logged_in = 1;
@@ -153,39 +153,6 @@ out_error:
 	websocket_send(connection, "err 0 fail", 10);
 }
 
-/*
-void rpc_user_login(struct rpc *rpc)
-{
-	struct connection *connection = rpc->connection;
-	struct session    *session    = connection->session;
-	char              *username   = rpc->argv[1];
-	char              *password   = rpc->argv[2];
-	int                pwdlen     = strlen(password);
-
-	printf("rpc_user_login username: %s pwd: %s\n", username, password);
-	session = session_by_username(username);
-	if (!session)
-		goto out_error;
-	if (crypto_pwhash_str_verify(session->user->pwhash, password, pwdlen) < 0) {
-		printf(BOLDRED "user_login failed: %s:%s" RESET "\n", session->user->uname, password);
-		goto out_error;
-	}
-
-	memset(password, '\0', pwdlen);
-	connection->websocket_id = www_new_websocket(session, connection);
-	session->user->logged_in = 1;
-
-	// enqueue task for the db loop to update the user, at some point in the future
-	db_user_update(session->user);
-
-	// send the backpage which requires a login
-	www_send_backpage(session, connection, 1);
-	printf(BOLDGREEN "user_login success: %s:%s" RESET "\n", session->user->uname, password);
-	return;
-out_error:
-	websocket_send(connection, "err 0 fail", 10);
-}
-*/
 unsigned int uid_by_username(char *username)
 {
 	struct user *user = search_user(username);

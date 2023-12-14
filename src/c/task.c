@@ -1,4 +1,5 @@
 #include <conf.h>
+#include <extern.h>
 
 #define TASK_COLGEN_UPDATE         0
 #define TASK_BACKTEST_FORKS_UPDATE 1
@@ -11,6 +12,7 @@
 #define MAX_TASKS 100
 
 void *task_yahoo_fin_update     (void *args);
+void *task_yahoo_eod_update     (void *args);
 void *task_quant_colgen_update  (void *args);
 void *task_backtest_forks_update(void *args);
 
@@ -43,6 +45,7 @@ mutex_t                             tasklet_lock;
 char *TASKS[] = {
 		"STOCKS_QUANT_COLGEN_UPDATE",
 		"STOCKS_BACKTEST_FORKS_UPDATE",
+		"STOCKS_YAHOO_EOD_UPDATE",
 		"STOCKS_YAHOO_FIN_UPDATE"
 };
 
@@ -50,6 +53,7 @@ task_handler_t task_handlers[] =
 {
 	task_quant_colgen_update,
 	task_backtest_forks_update,
+	task_yahoo_eod_update,
 	task_yahoo_fin_update,
 };
 
@@ -72,9 +76,7 @@ void *task_yahoo_earnings_update(void *args)
 
 void *task_yahoo_eod_update(void *args)
 {
-	char *argv[] = { "/bin/sh", "-c", "/usr/bin/python3 /stockminer/src/python/stockminer/src/stockminer/stockminer.py yahoo 1>/dev/null", NULL };
-	os_exec_argv(argv);
-	return (NULL);
+	stocks_update_checkpoint(CURRENT_XLS);
 }
 
 void *task_quant_colgen_update(void *args)
