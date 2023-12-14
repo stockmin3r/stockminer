@@ -33,7 +33,7 @@ void wsj_stock_api(struct stock *stock)
 
 	WSJ         = &stock->API.WSJ;
 	ticker      = stock->sym;
-	exchange    = stock->market;
+	exchange    = stock->exchange;
 	ticker_size = strlen(ticker);
 	type        = stock->type;
 	if (ticker_size > 7)
@@ -105,7 +105,7 @@ void wsj_crypto_api(struct stock *stock)
 	ticker = cpair;
 
 	WSJ         = &stock->API.WSJ;
-	exchange    = stock->market;
+	exchange    = stock->exchange;
 	type        = stock->type;
 
 	for (x=0; x<4; x++) {

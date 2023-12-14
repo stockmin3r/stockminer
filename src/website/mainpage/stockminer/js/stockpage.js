@@ -112,7 +112,7 @@ function stockpage(ticker,QVID,rpc)
 	DQ['ws3'].style.display='none';
 
 	if (!rpc)
-		WS.send("stock " + ticker + " " + QVID + " " + QSID);
+		WS.send("chart " + MQ.qdiv.substr(1) + "ws0 " + ticker);
 	$(MQ.qdiv)[0].className += " MQ";
 	$(quadspace.quad[0].qdiv)[0].className += " LQ";
 	$(quadspace.quad[1].qdiv)[0].className += " RQ";

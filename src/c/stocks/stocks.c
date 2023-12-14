@@ -713,13 +713,13 @@ struct XLS *load_stocks(void)
 		stock->industry     = line_argv[STOCKS_INDUSTRY_IDX];
 		stock->name         = line_argv[STOCKS_NAME_IDX];
 		if (!strcmp(stock->exchange_str, "NASDAQ"))
-			stock->market   = MARKET_NASDAQ;
+			stock->exchange = MARKET_NASDAQ;
 		else if (!strcmp(stock->exchange_str, "NYSE"))
-			stock->market   = MARKET_NYSE;
+			stock->exchange = MARKET_NYSE;
 		else if (!strcmp(stock->exchange_str, "ASE"))
-			stock->market   = MARKET_ASE;
+			stock->exchange = MARKET_ASE;
 		else
-			stock->market   = MARKET_OTC;
+			stock->exchange = MARKET_OTC;
 	}
 
 	XLS->HIGHCAPS = (struct stock **)malloc(XLS->nr_highcaps * sizeof(struct stock *));

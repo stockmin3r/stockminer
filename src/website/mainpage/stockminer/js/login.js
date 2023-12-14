@@ -83,15 +83,15 @@ function login_onclick()
 	var chsize = challenge.length;
 	rc = Module.ccall("hydro_sign_create",               // function name
 					  "number",                          // return type of this function (int): 0 for success -1 for failure
-					 ["number","number","number",         // [1] char *: signature,  [2] uint8_t[]: challenge, [3] size_t: challenge_size
+					 ["number","number","number",        // [1] char *: signature,  [2] uint8_t[]: challenge, [3] size_t: challenge_size
 					  "string","array"],                 // [4] char *: context,    [5] uint8_t[]: user's private key
 					 [signature, challenge, chsize,      // signature, challenge, challenge_size
 					  "context0", private_key]);         // "context0", keypair.sk (user's private key)
 
 	SIG = new Uint8Array(wasmMemory.buffer, signature, hydro_sign_BYTES);
-//	SIG = signature;
 	console.log("****signature*****:");
-	for (var x = 0; x<32; x++)
+	str = "";
+	for (var x = 0; x<hydro_sign_BYTES; x++)
 		str += SIG[x] + " ";
 	console.log(str);
 

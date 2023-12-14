@@ -61,6 +61,30 @@ struct connection;
 
 extern int     market;
 
+struct market {
+	int         country_id;
+	int         instrument;
+	int         exchange;
+	int         pre_start_hour;
+	int         pre_start_min;
+	int         day_start_hour;
+	int         day_start_min;
+	int         afh_start_hour;
+	int         afh_start_min;
+	int         afh_end_hour;
+	int         afh_end_min;
+	int         trading_period;
+	int         nr_trading_hours;
+	int         nr_trading_minutes;
+	char       *market_eod_prev_str; // %Y%M%D
+	char       *market_eod_next_str; // %Y%M%D
+	char       *prev_eod;
+	char       *next_eod;
+	time_t      prev_eod_timestamp;  // the last calendar EOD timestamp for this market
+	time_t      next_eod_timestamp;  // next calendar trading day
+	int         status;              // NO_MARKET|PRE_MARKET|DAY_MARKET|AFH_MARKET
+};
+
 struct WSJ {
 	char           *CUR;
 	char           *ALL;
@@ -387,7 +411,7 @@ struct stock {
 	int              rank;
 	int              prev_rank;
 	unsigned short   nr_ranks;
-	unsigned short   market;
+	unsigned short   exchange;
 	unsigned short   id;
 	unsigned short   thread_id;
 	unsigned short   airfork_stock_class;
@@ -497,6 +521,7 @@ int               market_get_nr_hours     (struct stock *stock);
 void              market_set_EOD          (time_t current_utc_time, int country_id, char *prev_day, char *curr_day, char *next_day);
 time_t            market_prev_eod_unix    (struct stock *stock);
 char             *market_prev_eod_str     (struct stock *stock);
+struct market    *search_market           (struct stock *stock);
 
 /* price.c */
 void              init_ip                 (void);

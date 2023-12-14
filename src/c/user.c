@@ -136,7 +136,7 @@ void rpc_user_login(struct rpc *rpc)
 	challenge[username_size] = '|';
 	memcpy(challenge+username_size+1, connection->nonce, sizeof(connection->nonce));
 	printf("challenge: %s signature: %s\n", challenge, signature);
-	if (hydro_sign_verify(signature, challenge, username_size+1+sizeof(connection->nonce), "context0", session->user->pubkey) != 0)
+	if (hydro_sign_verify(signature, challenge, username_size+1+sizeof(connection->nonce), "context0", session->user->pubkey) == -1)
 		goto out_error;
 
 	session->user->logged_in = 1;

@@ -1,30 +1,6 @@
 #include <conf.h>
 #include <extern.h>
 
-struct market {
-	int         country_id;
-	int         instrument;
-	int         exchange;
-	int         pre_start_hour;
-	int         pre_start_min;
-	int         day_start_hour;
-	int         day_start_min;
-	int         afh_start_hour;
-	int         afh_start_min;
-	int         afh_end_hour;
-	int         afh_end_min;
-	int         trading_period;
-	int         nr_trading_hours;
-	int         nr_trading_minutes;
-	char       *market_eod_prev_str; // %Y%M%D
-	char       *market_eod_next_str; // %Y%M%D
-	char       *prev_eod;
-	char       *next_eod;
-	time_t      prev_eod_timestamp;  // the last calendar EOD timestamp for this market
-	time_t      next_eod_timestamp;  // next calendar trading day
-	int         status;              // NO_MARKET|PRE_MARKET|DAY_MARKET|AFH_MARKET
-};
-
 #define MARKET_WEEKDAYS 1
 #define MARKET_24_7     2
 
@@ -252,6 +228,7 @@ bool ticker_needs_update(struct stock *stock, time_t *start_timestamp, time_t *e
 	time_t         epoch           = time(NULL);
 	time_t         last_csv_eod_date; // the last date string in the CSV file (converted to a UTC time_t) (midnight UTC of the current day)
 	char           path[256];
+	int            nr_days;
 
 	if (market->status == NO_MARKET)
 		*end_timestamp  = market_next_eod;
@@ -285,9 +262,9 @@ bool ticker_needs_update(struct stock *stock, time_t *start_timestamp, time_t *e
 	 * If the last date OHLC we have is from BEFORE the EOD of the current UTC calendar day
 	 * and the current day is before the start of the NEXT trading day then we are in a holiday or weekend
  	 */
-
-	if ((epoch-last_csv_eod_date)/3600/24 > 1) {
-		if (epoch < market_next_eod)
+	nr_days = (epoch-last_csv_eod_date)/3600/24;
+	if (nr_days >= 1) {
+		if (nr_days == 1 && epoch < market_next_eod)
 			return false;
 		printf("update: %s %d epoch: %lu last_csv_eod: %lu\n", stock->sym, (epoch-last_csv_eod_date)/3600, epoch, last_csv_eod_date );
 		return true;

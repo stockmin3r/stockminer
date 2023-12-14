@@ -120,7 +120,7 @@ void admin_client_auth(char *command)
                 printf(BOLDGREEN "%x " RESET, (unsigned char)kp_seed[x]);
         printf("\n");
 
-        for (int x = 0; x<sizeof(kp.sk); x++)
+        for (int x = 0; x<sizeof(kp.pk); x++)
                 printf(BOLDRED "%x " RESET, (unsigned char)kp.pk[x]);
         printf("\n");
 
