@@ -128,18 +128,15 @@
 		"image":"chartspace.png",
 		"QuadSpace":[{
 			"title":"CryptoVerse",
-			"grid":"grid100",
-			"click":"cryptoverse_main",
+			"grid":"gridmain",
 			"quads":[{
-				"workspace": [{"mod": "addTable", "title": "Crypto",  "args": {"id": "#crypto"}}]
-
 				workspace: [{mod:"addTable",  title:"Crypto",  args:{id:"CG,CL", params:{
 																							columns:[["T","P","D","V"],["T","P","D","V"]],
 																							order:[2,2],
 																							slope:["desc","asc"]
 																							}}}]
 			},{
-				"workspace": [{"mod": "empty", "title": "Chart"}]
+				"workspace": [{"mod": "empty", "title": "Heatmap"}]
 			}]
 		}]
 	},{

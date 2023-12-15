@@ -98,7 +98,7 @@ void ufo_scan(struct XLS *XLS)
 		stock->price_1min  = ((stock->current_price  / stock->ohlc[stock->nr_ohlc-2].close) -1)*100.0;
 		stock->price_5m    = ((stock->current_price  / stock->ohlc[stock->nr_ohlc-6].close) -1)*100.0;
 		stock->price_15m   = ((stock->current_price  / stock->ohlc[stock->nr_ohlc-16].close)-1)*100.0;
-		if (Server.DEBUG_STOCK && !strcmp(stock->sym, Server.DEBUG_STOCK))
+//		if (Server.DEBUG_STOCK && !strcmp(stock->sym, Server.DEBUG_STOCK))
 			printf(BOLDBLUE "ufo_scan(): [%s] current_price: %.2f prior_close: %.2f 15m: %.2f 5m: %.2f 1m: %.2f" RESET "\n", stock->sym, stock->current_price, stock->ohlc[stock->nr_ohlc-15].close, stock->price_15m, stock->price_5m, stock->price_1min);
 		current_volume     = stock->current_volume;
 		if (current_volume) {
@@ -746,17 +746,8 @@ void init_ufo(struct XLS *XLS)
 	nr_stocks = XLS->nr_stocks;
 	for (x=0; x<nr_stocks; x++) {
 		stock = stocks[x];
-		for (y=0; y<nr_boards; y++) {
-			if (stock->type == STOCK_TYPE_STOCK           && board_table[y].btype & BTYPE_LOWCAPS) {
-				boards[y]->add(stock, boards[y]);
-			} else if (stock->subtype == STOCK_TYPE_STOCK && board_table[y].btype & BTYPE_HIGHCAPS) {
-				boards[y]->add(stock, boards[y]);
-			} else if (board_table[y].btype == BULLCAPS   || board_table[y].btype == BEARCAPS) {
-				boards[y]->add(stock, boards[y]);
-			} else if (stock->type == STOCK_TYPE_CRYPTO   && board_table[y].btype & BTYPE_CRYPTO) {
-				boards[y]->add(stock, boards[y]);
-			}
-		}
+		for (y=0; y<nr_boards; y++)
+			boards[y]->add(stock, boards[y]);
 	}
 
 	/* The market may or may not be open when ufo_scan() is run:
