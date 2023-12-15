@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
 	}
 
 	init_modules(&Server);
+	init_users();
 
 	/* 
 	 * Start the www server BEFORE stocks we attempt to load the tickers

@@ -287,17 +287,14 @@ www_get_request(char *request, struct connection *connection)
 	char            *p        = strstr(request, "If-None");
 	uint64_t         etag;
 
-	if (unlikely(!p)) {
-		printf(BOLDCYAN "NO etag (%s)\n", (char *)&mainpage->etag);
+	if (unlikely(!p))
 		goto out;
-	}
+
 	etag = *(uint64_t *)(p+16);
 	if (etag == mainpage->etag) {
-		printf(BOLDGREEN "same etag: %.8s vs %.8s" RESET "\n", (char *)&etag, (char *)&mainpage->etag);
 		openssl_write_sync(connection, HTTP_304, sizeof(HTTP_304)-1);
 		return;
 	}
-	printf(BOLDRED "stale etag: %.8s vs %.8s" RESET "\n", (char *)&etag, (char *)&mainpage->etag);
 out:
 	www_send_mainpage(connection);
 }
@@ -885,13 +882,12 @@ int www_process_async(struct connection *connection)
 {
 	int nbytes;
 
-	if ((!(connection->state & NETWORK_STATE_TLS_HANDSHAKE_DONE)) && ((connection_ssl_handshake(connection)<0))) {
+	if ((!(connection->state & NETWORK_STATE_TLS_HANDSHAKE_DONE)) && ((connection_ssl_handshake(connection))<0)) {
 		printf("www_process_requests: error\n");
 		return -1;
 	}
 
 	if (connection->state & NETWORK_STATE_WEBSOCKET) {
-		printf("www_process_async(): NETWOK_STATE_WEBSOCKET\n");
 		return websocket_process_request(connection);
 	}
 	if (!(connection->packet = zmalloc(MAX_PACKET_SIZE)))
@@ -899,7 +895,7 @@ int www_process_async(struct connection *connection)
 	connection->packet_size_max = MAX_PACKET_SIZE;
 
 	/* now that the SSL handshake is complete, connection->recv() points to connection_ssl_recv() */
-	printf("www_process_async(): calling recv(): %p max_size: %lld\n", connection->recv, connection->packet_size_max);
+//	printf("calling recv(): %p max_size: %lld\n", connection->recv, connection->packet_size_max);
 	nbytes = connection->recv(connection);
 	if (nbytes <= -1) {
 		return -1;

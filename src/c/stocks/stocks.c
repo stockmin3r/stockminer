@@ -651,7 +651,7 @@ struct XLS *load_stocks(void)
 
 	XLS->nr_stocks = nr_stocks = cstring_line_count(XLS->tickers);
 	if (!nr_stocks || nr_stocks >= 8191) {
-		printf(BOLDRED "load_stocks() nr_stocks (%d) too large - increase size and recompile" RESET "\n", nr_stocks);
+		printf(BOLDRED "nr_stocks (%d) too large - increase size and recompile" RESET "\n", nr_stocks);
 		return NULL;
 	}
 
@@ -661,7 +661,7 @@ struct XLS *load_stocks(void)
 	struct stock *LOWCAPS [nr_stocks];
 
 	if (cstring_split(XLS->tickers, lines, 8191, '\n') != nr_stocks) {
-		printf(BOLDRED "load_stocks(): stocks.txt error: nr_stocks: %d" RESET "\n", nr_stocks);
+		printf(BOLDRED "stocks.txt error: nr_stocks: %d" RESET "\n", nr_stocks);
 		return NULL;
 	}
 
@@ -675,8 +675,8 @@ struct XLS *load_stocks(void)
 		if (argc <= 0 || argc > 8)
 			continue;
 
-		stock                   = &XLS->STOCKS_ARRAY[x];
-		XLS->STOCKS_PTR[x]      = stock;
+		stock              = &XLS->STOCKS_ARRAY[x];
+		XLS->STOCKS_PTR[x] = stock;
 
 		// "AAPL,STOCK,US,NASDAQ,H|L,Apple,Tech,InfoTech", stock->sym, security_type, stock->exchange_str, Highcaps/Lowcaps, stock->name, stock->sector, stock->industry);
 		//   0    1    2    3    4   5     6    7

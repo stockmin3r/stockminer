@@ -1,5 +1,23 @@
 BTC-USD,CRYPTO,WW,CCAG,H,Bitcoin/USD,Cryptocurrency,Cryptocurrency
-XMR-USD,STOCK,WW,CCAG,H,Monero/USD,Cryptocurrency,Cryptocurrency
+ETH-USD,CRYPTO,WW,CCAG,H,Etherum/USD,Cryptocurrency,Cryptocurrency
+XMR-USD,CRYPTO,WW,CCAG,H,Monero/USD,Cryptocurrency,Cryptocurrency
+SOL-USD,CRYPTO,WW,CCAG,H,Solana/USD,Cryptocurrency,Cryptocurrency
+AVAX-USD,CRYPTO,WW,CCAG,H,Avalanche/USD,Cryptocurrency,Cryptocurrency
+ARRR-USD,CRYPTO,WW,CCAG,H,PirateChain/USD,Cryptocurrency,Cryptocurrency
+ZEC-USD,CRYPTO,WW,CCAG,H,ZeroCash/USD,Cryptocurrency,Cryptocurrency
+XNO-USD,CRYPTO,WW,CCAG,H,Nano/USD,Cryptocurrency,Cryptocurrency
+IOTA-USD,CRYPTO,WW,CCAG,H,Iota/USD,Cryptocurrency,Cryptocurrency
+WBTC-USD,CRYPTO,WW,CCAG,H,WrappedBitcoin/USD,Cryptocurrency,Cryptocurrency
+LTC-USD,CRYPTO,WW,CCAG,H,Litecoin/USD,Cryptocurrency,Cryptocurrency
+BCH-USD,CRYPTO,WW,CCAG,H,BitcoinCash/USD,Cryptocurrency,Cryptocurrency
+BLUR-USD,CRYPTO,WW,CCAG,H,Blur/USD,Cryptocurrency,Cryptocurrency
+ADA-USD,CRYPTO,WW,CCAG,H,Cardano/USD,Cryptocurrency,Cryptocurrency
+JTO-USD,CRYPTO,WW,CCAG,H,Jito/USD,Cryptocurrency,Cryptocurrency
+STEEM-USD,CRYPTO,WW,CCAG,H,Steem/USD,Cryptocurrency,Cryptocurrency
+XRP-USD,CRYPTO,WW,CCAG,H,Ripple/USD,Cryptocurrency,Cryptocurrency
+FIL-USD,CRYPTO,WW,CCAG,H,FileCoin/USD,Cryptocurrency,Cryptocurrency
+WLD-USD,CRYPTO,WW,CCAG,H,WorldCoin/USD,Cryptocurrency,Cryptocurrency
+DOGE-USD,CRYPTO,WW,CCAG,H,DogeCoin/USD,Cryptocurrency,Cryptocurrency
 DCPH,STOCK,US,NASDAQ,L,Deciphera Pharmaceuticals,Healthcare,Biotechnology
 ABUS,STOCK,US,NASDAQ,L,Arbutus Biopharma,Healthcare,Biotechnology
 ADAP,STOCK,US,NASDAQ,L,Adaptimmune Therapeutics,Healthcare,Biotechnology

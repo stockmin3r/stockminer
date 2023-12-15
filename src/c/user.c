@@ -103,6 +103,41 @@ out_error:
 
 }
 
+void rpc_register(struct rpc *rpc)
+{
+	struct session    *session    = rpc->session;
+	struct connection *connection = rpc->connection;
+	char              *username   = rpc->argv[1];
+	char              *pubkey64   = rpc->argv[2];
+	char              *p          = username;
+	int                usrlen     = strlen(username);
+	int                keylen     = strlen(pubkey64);
+	char               pubkey[hydro_sign_PUBLICKEYBYTES];
+	struct user       *user;
+
+	if (unlikely(!username || !usrlen || usrlen >= MAX_USERNAME_SIZE || keylen > hydro_sign_PUBLICKEYBYTES))
+		goto out_error;
+
+	for (int x=0; x<usrlen; x++)
+		if (!isalnum(*p++))
+			goto out_error;
+
+	user = session->user;
+	strcpy(user->uname, username);
+	user->join_date = time(NULL);
+	base64_decode(pubkey, strlen(pubkey), pubkey);
+	memcpy(user->pubkey, pubkey, hydro_sign_PUBLICKEYBYTES);
+	strcpy(user->uname, username);
+	
+
+	// enqueue db task for the db deathloop to add the user
+	db_user_add(user, connection);
+	return;
+out_error:
+	if (connection)
+		websocket_send(connection, ILLEGAL_USERNAME, 12);
+}
+
 /* To be replaced by a modular auth system, potentially:
  * 1) client side hash calculation via libsodium-sumo
  * 2) pubkey libhydrogen auth
@@ -135,7 +170,14 @@ void rpc_user_login(struct rpc *rpc)
 	memcpy(challenge, username, username_size);
 	challenge[username_size] = '|';
 	memcpy(challenge+username_size+1, connection->nonce, sizeof(connection->nonce));
-	printf("challenge: %s signature: %s\n", challenge, signature);
+	printf("challenge: %s\n", challenge);
+	for (int x = 0; x<hydro_sign_BYTES; x++)
+		printf(BOLDMAGENTA "%x ", (unsigned char)signature[x]);
+	printf(RESET "\n");
+	for (int x = 0; x<hydro_sign_PUBLICKEYBYTES; x++)
+		printf(BOLDRED "%x ", (unsigned char)session->user->pubkey[x]);
+	printf(RESET "\n");
+
 	if (hydro_sign_verify(signature, challenge, username_size+1+sizeof(connection->nonce), "context0", session->user->pubkey) == -1)
 		goto out_error;
 
@@ -226,6 +268,8 @@ void init_users()
 		// init session of user
 		user->session = session = (struct session *)zmalloc(sizeof(struct session));
 		session->user = user;
+
+		printf(BOLDCYAN "creating session for username: %s user: %p session: %p" RESET "\n", username, user, session);
 
 		// load user's objects
 //		load_objects(session, user->uid);

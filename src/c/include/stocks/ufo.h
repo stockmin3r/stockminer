@@ -1,7 +1,6 @@
 #ifndef __BOARD_H
 #define __BOARD_H
 
-#define NR_BOARDS            24
 #define NR_PRICE_BOARDS      12
 #define NR_VOLUME_BOARDS      6
 #define NR_LOWCAP_BOARDS      6
@@ -36,6 +35,12 @@
 #define HIGHCAP_V1_BOARD     21
 #define BULL_BOARD           22
 #define BEAR_BOARD           23
+#define CRYPTO_R15_BOARD     24
+#define CRYPTO_R5_BOARD      24
+#define CRYPTO_R1_BOARD      24
+#define CRYPTO_R15L_BOARD    24
+#define CRYPTO_R5L_BOARD     24
+#define CRYPTO_R1L_BOARD     24
 
 #define LOWCAP_BOARD_IDX     4
 #define HIGHCAP_BOARD_IDX   10
@@ -45,6 +50,7 @@
 #define INDI_BOARD_IDX      22
 #define BULL_BOARD_IDX      22
 #define BEAR_BOARD_IDX      23
+#define CRYPTO_BOARD_IDX    24
 
 #define BLOWCAPS_DELTA     1
 #define BHIGHCAPS_DELTA    2
@@ -56,6 +62,7 @@
 #define BEARCAPS         128
 #define BTYPE_LOWCAPS    256
 #define BTYPE_HIGHCAPS   512
+#define BTYPE_CRYPTO    1024
 
 /* wtab->table_type | session->table */
 #define WATCHTABLE_RAPID15_LOWCAPS        (1<<0)

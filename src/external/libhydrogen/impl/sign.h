@@ -143,6 +143,9 @@ hydro_sign_keygen_deterministic(hydro_sign_keypair *kp, const uint8_t seed[hydro
 	for (int x = 0; x<32; x++)
 		printf("%x ", kp->pk[x]);
 	printf("\n");
+	for (int x = 0; x<64; x++)
+		printf("%x ", kp->sk[x]);
+	printf("\n");
 }
 
 int
@@ -188,7 +191,6 @@ hydro_sign_create(uint8_t csig[hydro_sign_BYTES], const void *m_, size_t mlen,
                   const uint8_t sk[hydro_sign_SECRETKEYBYTES])
 {
     hydro_sign_state st;
-
     if (hydro_sign_init(&st, ctx) != 0 || hydro_sign_update(&st, m_, mlen) != 0 ||
         hydro_sign_final_create(&st, csig, sk) != 0) {
         return -1;

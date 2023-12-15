@@ -19,7 +19,7 @@ void update_crypto_data(char *buf)
 	struct ohlc  *ohlc;
 	char         *argv[64];
 	char          ticker[32];
-	time_t        last_update_timestamp;
+	time_t        new_timestamp;
 	int           argc;
 
 	argc = cstring_split(buf, argv, 63, '~');
@@ -33,36 +33,42 @@ void update_crypto_data(char *buf)
 		return;
 	}
 	// December 8 2023, timestamp should always be higher than this date
-	last_update_timestamp = strtoull(argv[CCCAGG_TIMESTAMP_IDX], NULL, 10);
-	if (last_update_timestamp < 1702038335)
+	new_timestamp = strtoull(argv[CCCAGG_TIMESTAMP_IDX], NULL, 10);
+	if (new_timestamp < 1702038335)
 		return;
 
 	stock->current_price  = strtod  (argv[CCCAGG_PRICE_IDX], NULL);
 	stock->current_volume = strtoull(argv[CCCAGG_VOLUME_IDX], NULL, 10);
-	printf("price: %.3f vol: %lu curtimestamp: %lu laststamp: %lu\n", stock->current_price, stock->current_volume, stock->current_timestamp, last_update_timestamp);
+	printf("price: %.3f vol: %lu curtimestamp: %lu laststamp: %lu\n", stock->current_price, stock->current_volume, stock->current_timestamp, new_timestamp);
 
+	if (stock->current_price > stock->current_high)
+		stock->current_high = stock->current_price;
+	else if (stock->current_price < stock->current_low)
+		stock->current_low  = stock->current_price;
+
+	stock->current_close    = stock->current_price;
 	if (!stock->current_timestamp)
-		stock->current_timestamp = last_update_timestamp;
+		stock->current_timestamp = new_timestamp;
 
-	if (stock->current_timestamp < last_update_timestamp) {
+	if ((stock->current_timestamp-new_timestamp) >= 60) {
 		// a new tick has passed
 		ohlc = &stock->ohlc[stock->nr_ohlc++];
-		stock->current_timestamp = last_update_timestamp;
+		stock->current_timestamp = new_timestamp;
 		stock->current_open      = stock->current_price;
+		addPoint(stock, stock->current_timestamp, stock->current_open, stock->current_high, stock->current_low, stock->current_close, stock->current_volume);
 		printf(BOLDRED "ohlc: %p\n", ohlc);
 	} else {
-		ohlc = &stock->ohlc[stock->nr_ohlc==0?0:(stock->nr_ohlc-1)];
+		// update the current tick's OHLCv's
+		ohlc = &stock->ohlc[stock->nr_ohlc];
 		printf(BOLDGREEN "ohlc: %p\n", ohlc);
 	}
 
-	if (stock->current_price > stock->current_high)
-		stock->current_high = ohlc->high  = stock->current_price;
-	else if (stock->current_price < stock->current_low)
-		stock->current_low  = ohlc->low   = stock->current_price;
-
-	stock->current_close    = ohlc->close = stock->current_price;
-	ohlc->volume            = stock->current_volume;
-
+	ohlc->open   = stock->current_open;
+	ohlc->high   = stock->current_high;
+	ohlc->low    = stock->current_low;
+	ohlc->close  = stock->current_close;
+	ohlc->volume = stock->current_volume;
+	
 	if (stock->current_price < stock->prior_close)
 		stock->pr_percent = -((stock->prior_close-stock->current_price)/stock->prior_close)*100;
 	else
@@ -116,8 +122,7 @@ void cryptocompare_handler(struct connection *connection)
 	openssl_read_sync2(connection, sslbuf, sizeof(sslbuf));
 
 	websocket_send(connection, subactions, subaction_size);
-	while ((nbytes=openssl_read_sync2(connection, sslbuf+packet_size, sizeof(sslbuf)-packet_size-64))) {
-		packet_size += nbytes;
+	while ((nbytes=openssl_read_sync2(connection, sslbuf, sizeof(sslbuf)))) {
 		nr_frames = websocket_recv(sslbuf, nbytes, &frames[0], wsbuf, 0);
 		printf("nr_frames: %d packet: %s\n", nr_frames, wsbuf);
 		update_crypto_data(wsbuf);
@@ -126,7 +131,7 @@ void cryptocompare_handler(struct connection *connection)
 
 void *cryptocompare_thread(void *args)
 {
-	if (Server.crypto_1M == STOCKDATA_OFF)
+	if (Server.crypto_WS == STOCKDATA_OFF)
 		return NULL;
 	websocket_connect_sync("streamer.cryptocompare.com", Server.CC_ADDR, "/v2?format=streamer", cryptocompare_handler);
 	return NULL;

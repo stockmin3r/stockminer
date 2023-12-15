@@ -38,6 +38,7 @@ https://build-your-own.org/blog/20230110_alt_ssh/
 https://stackoverflow.com/questions/65314524/openssl-generate-ed25519-keypair-c
 https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/congruence-modulo
 https://blog.pinterjann.is/ed25519-certificates.html
+https://cryptologie.net/article/497/eddsa-ed25519-ed25519-ietf-ed25519ph-ed25519ctx-hasheddsa-pureeddsa-wtf/
 
 [ZKP]
 https://github.com/LeastAuthority/moonmath-manual/releases/latest/download/main-moonmath.pdf # math prereqs for ZKP
@@ -49,6 +50,7 @@ https://dotnettutorials.net/lesson/chaining-tasks-by-using-continuation-tasks/
 https://topic.alibabacloud.com/a/implementation-of-nginx-timer-and-usage-of-scheduled-events_8_8_31813369.html # Implementation of nginx timer and usage of Scheduled Events
 https://blog.insiderattack.net/event-loop-and-the-big-picture-nodejs-event-loop-part-1-1cb67a182810 # Event Loop and the Big Picture — NodeJS Event Loop Part 1
 https://www.dynatrace.com/news/blog/all-you-need-to-know-to-really-understand-the-node-js-event-loop-and-its-metrics/
+https://leezhenghui.github.io/io-strategy/2018/12/01/io-strategy-dive-into-libev-libeio.html
 
 [atomic]
 https://geidav.wordpress.com/2016/03/12/important-properties-of-spinlocks/

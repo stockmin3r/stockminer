@@ -83,6 +83,7 @@ struct market {
 	time_t      prev_eod_timestamp;  // the last calendar EOD timestamp for this market
 	time_t      next_eod_timestamp;  // next calendar trading day
 	int         status;              // NO_MARKET|PRE_MARKET|DAY_MARKET|AFH_MARKET
+	bool        holiday;             // is the market open today?
 };
 
 struct WSJ {

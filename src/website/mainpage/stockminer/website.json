@@ -14,7 +14,6 @@
 	QuadVerse:[{
 		title:"Screener",
 		image:"screener.png",
-		paid:"",
 		class:" Screener",
 		QuadSpace:[{
 			title:"Stocks",
@@ -68,7 +67,6 @@
 		init: "options",
 		class:" OpVerse",
 		image:"opverse.png",
-		paid: "",
 		QuadSpace: [{
 			title:"Options",
 			grid: "opgrid",
@@ -125,16 +123,21 @@
 		}]
 	},{
 		"title":"Crypto",
-		"paid":"",
 		"class":" crypto",
-		"init":"chartspace",
+		"init":"cryptoverse",
 		"image":"chartspace.png",
 		"QuadSpace":[{
-			"title":"Backtest",
+			"title":"CryptoVerse",
 			"grid":"grid100",
-			"click":"backtest",
+			"click":"cryptoverse_main",
 			"quads":[{
 				"workspace": [{"mod": "addTable", "title": "Crypto",  "args": {"id": "#crypto"}}]
+
+				workspace: [{mod:"addTable",  title:"Crypto",  args:{id:"CG,CL", params:{
+																							columns:[["T","P","D","V"],["T","P","D","V"]],
+																							order:[2,2],
+																							slope:["desc","asc"]
+																							}}}]
 			},{
 				"workspace": [{"mod": "empty", "title": "Chart"}]
 			}]
@@ -142,7 +145,6 @@
 	},{
 		"title":"ChartSpace",
 		"image":"chartspace.png",
-		"paid":"",
 		"class":" cspace",
 		"init":"chartspace",
 		"QuadSpace":[{
@@ -157,7 +159,6 @@
 	},{
 		"title":"Profile",
 		"squeakpage":1,
-		"paid":"",
 		"class":" profile",
 		"init":"profile",
 		"QuadSpace": [{

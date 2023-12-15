@@ -78,7 +78,6 @@ void addPoint(struct stock *stock, time_t new_tick, double new_open, double new_
 		strcpy(price->price_1d+price->price_1d_len, tick->current_ohlc);
 		*(price->price_1d+price->price_1d_len+tick->current_ohlc_size) = ']';
 		*(price->price_1d+price->price_1d_len-1) = ',';
-		*(price->price_1d+price->price_1d_len-1) = ',';
 		price->price_1d_len += tick->current_ohlc_size+1;
 	}
 
@@ -97,12 +96,16 @@ void update_current_price(struct stock *stock)
 	int *data_source;
 
 	switch (stock->type) {
+		case STOCK_TYPE_INDEX:
+		case STOCK_TYPE_FUND:
 		case STOCK_TYPE_STOCK:
 			data_source = &Server.stocks_1M;
 			break;
 		case STOCK_TYPE_CRYPTO:
 			data_source = &Server.crypto_1M;
 			break;
+		default:
+			return;
 	}
 
 	switch (*data_source) {

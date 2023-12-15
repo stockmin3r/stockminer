@@ -677,7 +677,14 @@ struct btab board_table[] = {
 		{ "table V1H ",   "V1H",   BLOWCAPS_VOL|BTYPE_HIGHCAPS,    update_highcaps_volume, add_double_gainer, NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, volume_1m)  },
 		/* IndiBoard */
 		{ "table bulls ", "CBULL", BULLCAPS,                       update_indicators,      add_double_gainer, NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, nr_bullish_indicators) },
-		{ "table bears ", "CBEAR", BEARCAPS,                       update_indicators,      add_double_loser,  NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, nr_bearish_indicators) }
+		{ "table bears ", "CBEAR", BEARCAPS,                       update_indicators,      add_double_loser,  NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, nr_bearish_indicators) },
+		/* UFO Crypto Price */
+		{ "table R15 ",   "C15",   BTYPE_CRYPTO,                   update_lowcaps_double,  add_double_gainer, NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, price_15m)  },
+		{ "table R5 ",    "C5",    BTYPE_CRYPTO,                   update_lowcaps_double,  add_double_gainer, NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, price_5m)   },
+		{ "table R1 ",    "C1",    BTYPE_CRYPTO,                   update_lowcaps_double,  add_double_gainer, NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, price_1min) },
+		{ "table R15mL ", "C15mL", BTYPE_CRYPTO,                   update_lowcaps_double,  add_double_loser,  NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, price_15m)  },
+		{ "table R5mL ",  "C5mL",  BTYPE_CRYPTO,                   update_lowcaps_double,  add_double_loser,  NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, price_5m)   },
+		{ "table R1mL ",  "C1mL",  BTYPE_CRYPTO,                   update_lowcaps_double,  add_double_loser,  NR_DEF_STOCKS, MAX_DELTA_STOCKS, 4 KB, OFF(stock, price_1min) }
 };
 
 int ufo_stock_tables(char *packet, int table_type)
@@ -711,11 +718,11 @@ void init_ufo(struct XLS *XLS)
 {
 	struct stock **bstocks, *stock, **stocks;
 	struct board *board, **boards;
-	int x, y, bufsize, nr_stocks;
+	int x, y, bufsize, nr_stocks, nr_boards = sizeof(board_table)/sizeof(struct btab);
 
 	stocks = XLS->LOWCAPS;
-	XLS->boards = boards = (struct board **)zmalloc(sizeof(struct board *) * NR_BOARDS);
-	for (x=0; x<sizeof(board_table)/sizeof(struct btab); x++) {
+	XLS->boards = boards = (struct board **)zmalloc(sizeof(struct board *) * nr_boards);
+	for (x=0; x<nr_boards; x++) {
 		board             = (struct board *)zmalloc(sizeof(*board));
 		bstocks           = (struct stock **)malloc((MAX_DELTA_STOCKS+1) * sizeof(struct stock *));
 		memcpy(bstocks, stocks,    (MAX_DELTA_STOCKS+1) * sizeof(struct stock *));
@@ -739,12 +746,14 @@ void init_ufo(struct XLS *XLS)
 	nr_stocks = XLS->nr_stocks;
 	for (x=0; x<nr_stocks; x++) {
 		stock = stocks[x];
-		for (y=0; y<NR_BOARDS; y++) {
-			if (stock->type == STOCK_SUBTYPE_LOWCAPS            && board_table[y].btype & BTYPE_LOWCAPS) {
+		for (y=0; y<nr_boards; y++) {
+			if (stock->type == STOCK_TYPE_STOCK           && board_table[y].btype & BTYPE_LOWCAPS) {
 				boards[y]->add(stock, boards[y]);
-			} else if (stock->subtype == STOCK_SUBTYPE_HIGHCAPS && board_table[y].btype & BTYPE_HIGHCAPS) {
+			} else if (stock->subtype == STOCK_TYPE_STOCK && board_table[y].btype & BTYPE_HIGHCAPS) {
 				boards[y]->add(stock, boards[y]);
-			} else if (board_table[y].btype == BULLCAPS         || board_table[y].btype == BEARCAPS) {
+			} else if (board_table[y].btype == BULLCAPS   || board_table[y].btype == BEARCAPS) {
+				boards[y]->add(stock, boards[y]);
+			} else if (stock->type == STOCK_TYPE_CRYPTO   && board_table[y].btype & BTYPE_CRYPTO) {
 				boards[y]->add(stock, boards[y]);
 			}
 		}

@@ -259,7 +259,7 @@ int connection_ssl_recv(struct connection *connection)
 	}
 	int err = SSL_get_error(connection->ssl, err);
 	if (err == SSL_ERROR_SSL || err == SSL_ERROR_ZERO_RETURN || errno != EWOULDBLOCK) {
-		printf("ssl error: %d\n", err);
+		printf(BOLDRED "ssl_recv error: %s " RESET "\n", ERR_error_string(ERR_get_error(), NULL));
 		return 0;
 	}
 	errno = EWOULDBLOCK;
@@ -301,6 +301,7 @@ int connection_ssl_handshake(struct connection *connection)
 			event_mod(connection);
 			break;
 		default:
+			printf(BOLDRED "err: %s " RESET "\n", ERR_error_string(ERR_get_error(), NULL));
 			event_del(connection);
 			return 0; // EDEAD
 	}

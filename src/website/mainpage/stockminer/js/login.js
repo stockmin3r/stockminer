@@ -37,13 +37,13 @@ function login_onclick()
 
 	var challenge = CH = new Uint8Array([
 		...new TextEncoder().encode(USER + "|"),
-		...Uint8Array.from(btoa(NONCE), c => c.charCodeAt(0))
+		...Uint8Array.from(atob(NONCE), c => c.charCodeAt(0))
 	]);
 
 	var password    = $("#LBOX .pwd").val();
 	var auth        = USER + "|" + password;
 
-	var mem_offset  = hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES
+	var mem_offset  = hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES;
 	var keypair     = Module._malloc(mem_offset);
 	var kp_seed     = Module._malloc(mem_offset+=hydro_sign_SEEDBYTES);
 	var signature   = Module._malloc(mem_offset+=hydro_sign_BYTES);
@@ -73,10 +73,10 @@ function login_onclick()
 					 [keypair, kp_seed]);                // arguments to hydro_sign_keygen_deterministic()
 
 	var private_key = new Uint8Array(wasmMemory.buffer, keypair+hydro_sign_PUBLICKEYBYTES, hydro_sign_SECRETKEYBYTES)
-	KP      = keypair;
+	KP      = private_key;
 	str     = "";
 	console.log("*****secretkey*****:");
-	for (var x = 0; x<32; x++)
+	for (var x = 0; x<64; x++)
 		str += KP[x] + " ";
 	console.log(str);
 
@@ -84,9 +84,9 @@ function login_onclick()
 	rc = Module.ccall("hydro_sign_create",               // function name
 					  "number",                          // return type of this function (int): 0 for success -1 for failure
 					 ["number","number","number",        // [1] char *: signature,  [2] uint8_t[]: challenge, [3] size_t: challenge_size
-					  "string","array"],                 // [4] char *: context,    [5] uint8_t[]: user's private key
+					  "string","number"],                // [4] char *: context,    [5] uint8_t[]: user's private key
 					 [signature, challenge, chsize,      // signature, challenge, challenge_size
-					  "context0", private_key]);         // "context0", keypair.sk (user's private key)
+					  "context0", keypair+32]);          // "context0", keypair.sk (user's private key)
 
 	SIG = new Uint8Array(wasmMemory.buffer, signature, hydro_sign_BYTES);
 	console.log("****signature*****:");
@@ -98,6 +98,38 @@ function login_onclick()
 	WS.send("login " + USER + "|" + btoa(String.fromCharCode.apply(null, SIG)));
 }
 
+function register_onclick()
+{
+	var user        = $("#LBOX .usr").val();
+	var password    = $("#LBOX .pwd").val();
+	var auth        = user + "|" + password;
+	var mem_offset  = hydro_sign_PUBLICKEYBYTES + hydro_sign_SECRETKEYBYTES;
+	var keypair     = Module._malloc(mem_offset);
+	var kp_seed     = Module._malloc(mem_offset+=hydro_sign_SEEDBYTES);
+
+	// 1) Regenerate the seed from username|password
+	rc = Module.ccall("hydro_pwhash_deterministic",      // function name
+					  "number",                          // return type of this function (int): 0 for success -1 for failure
+					 ["number","number",                 // uint8_t[]: kp_seed, int: sizeof(kp_seed[])
+					  "string","number",                 // char *: auth,       int: strlen(username|password)
+					  "string", "number",                // char *: context,    int: OPSLIMIT
+					  "number","number"],                // size_t: memlimit,   uint8_t: nr_threads
+					 [kp_seed, 32,                       // keypair seed, sizeof(kp_seed)
+					  auth, auth.length,                 // username|password, strlen(username|password)
+					  "context0", 1000, 0, 1]);
+
+	var seed = new Uint8Array(wasmMemory.buffer, kp_seed, hydro_sign_SEEDBYTES)
+
+	// 2) Recreate the private/public keypair from the seed
+	Module.ccall("hydro_sign_keygen_deterministic",      // function name
+					  null,                              // return type of this function (int): 0 for success -1 for failure
+					 ["number","number"],                // argument types to hydro_sign_keygen_deterministic (two uint8arrays)
+					 [keypair, kp_seed]);                // arguments to hydro_sign_keygen_deterministic()
+
+	var public_key = new Uint8Array(wasmMemory.buffer, keypair, hydro_sign_PUBLICKEYBYTES);
+
+	WS.send("register " + user + "|" + btoa(String.fromCharCode.apply(null, public_key)));
+}
 
 /*
  * Called by the init_websocket() msg loop after a successful login

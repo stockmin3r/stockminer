@@ -1172,3 +1172,6 @@ function candles()     {WS.send("candle AAPL")}
 function chartspace()  {
 	quadspace_load(W.PID,0,WEBSITE.QuadVerse[W.PID].QuadSpace[0].quads)
 }
+function cryptoverse() {
+	quadspace_load(W.PID,0,WEBSITE.QuadVerse[W.PID].QuadSpace[0].quads)
+}

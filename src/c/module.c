@@ -29,7 +29,6 @@ __MODULE_HOOK quadverse_session_alloc(struct session *session)
 // quadverse::main.c::post_loop
 __MODULE_HOOK quadverse_main_post_loop(struct server *server)
 {
-	init_users();
 	load_quadverse_pages();
 }
 
