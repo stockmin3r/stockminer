@@ -954,7 +954,7 @@ void init_algo(struct XLS *XLS, struct stock *stock)
 		entry += 1;
 		line   = p2 + 1;
 	}
-	load_stock_csv(XLS, stock, mag, YEAR_2021);
+	load_stock_csv(XLS, stock, mag, YEAR_2022);
 	algorithm_mag1(stock, mag);
 }
 

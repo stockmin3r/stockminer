@@ -526,3 +526,7 @@ table.dataTable td       {box-sizing:content-box}
 	width:48px;
 }
 .links-menu div {cursor:pointer}
+
+.dt-buttons {
+	display:none;
+}

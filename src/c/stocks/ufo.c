@@ -731,8 +731,8 @@ void init_ufo(struct XLS *XLS)
 		board->add        = board_table[x].add;
 		board->nr_stocks  = board_table[x].nr_stocks;
 		board->max_stocks = board_table[x].max_stocks;
-		board->buf1       = (char *)malloc(board_table[x].bufsize);
-		board->buf2       = (char *)malloc(board_table[x].bufsize);
+		board->buf1       = (char *)zmalloc(board_table[x].bufsize);
+		board->buf2       = (char *)zmalloc(board_table[x].bufsize);
 		board->offset     = board_table[x].offset;
 		board->table      = board_table[x].table;
 		board->buffer     = 1;
@@ -746,8 +746,17 @@ void init_ufo(struct XLS *XLS)
 	nr_stocks = XLS->nr_stocks;
 	for (x=0; x<nr_stocks; x++) {
 		stock = stocks[x];
-		for (y=0; y<nr_boards; y++)
-			boards[y]->add(stock, boards[y]);
+		for (y=0; y<nr_boards; y++) {
+			if (stock->subtype == STOCK_SUBTYPE_LOWCAPS         && (board_table[y].btype & BTYPE_LOWCAPS)) {
+				boards[y]->add(stock, boards[y]);
+			} else if (stock->subtype == STOCK_SUBTYPE_HIGHCAPS && (board_table[y].btype & BTYPE_HIGHCAPS)) {
+				boards[y]->add(stock, boards[y]);
+			} else if (board_table[y].btype == BULLCAPS         || (board_table[y].btype == BEARCAPS)) {
+				boards[y]->add(stock, boards[y]);
+			} else if (stock->type == STOCK_TYPE_CRYPTO         && (board_table[y].btype & BTYPE_CRYPTO)) {
+				boards[y]->add(stock, boards[y]);
+			}
+		}
 	}
 
 	/* The market may or may not be open when ufo_scan() is run:
@@ -755,4 +764,24 @@ void init_ufo(struct XLS *XLS)
 	 *   - if the market is open then ufo_scan() fills the tables based on the current prices and volumes
 	 */
 	ufo_scan(XLS);
+}
+
+void *json_thread(void *args)
+{
+	struct board *board;
+	int x;
+
+	while (1) {
+		struct XLS *XLS = CURRENT_XLS;
+		if (!XLS || !XLS->boards) {
+			os_sleep(100000);
+			continue;
+		}
+		for (x=0; x<sizeof(board_table)/sizeof(struct btab); x++) {
+			board = XLS->boards[x];
+			if (board->dirty)
+				board->update(board);
+		}
+		os_usleep(100000);
+	}
 }

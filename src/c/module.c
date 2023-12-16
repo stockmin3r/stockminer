@@ -78,14 +78,6 @@ __MODULE_HOOK stocks_session_alloc(struct session *session)
 	session->morphtab->wtab = wtab;
 }
 
-__MODULE_HOOK stocks_main_pre_loop(struct server *server)
-{
-	market = get_time();
-	init_watchtable();
-	init_candles(server); // load build/libta.so, if present
-	init_ranks(server->XLS);
-}
-
 __MODULE_HOOK stocks_main_post_loop  (struct server  *server)
 {
 	verify_stocks(server->XLS);
@@ -93,7 +85,7 @@ __MODULE_HOOK stocks_main_post_loop  (struct server  *server)
 	init_BIX(server->XLS);
 	init_monster(server->XLS, 1); // will be called via a 2nd module layer when monster.c,forks.c,etc all move to a separate subdir of src/stocks/
 	init_ufo(server->XLS);
-//	build_candle_screener();
+	build_candle_screener(server->XLS);
 //	init_options();
 //	init_backtest();
 }
@@ -123,11 +115,14 @@ __MODULE_INIT init_stocks_module(struct server *server)
 	module->enabled             = true;
 	module->session_init_hook   = stocks_session_init;
 	module->session_alloc_hook  = stocks_session_alloc;
-	module->main_pre_loop_hook  = stocks_main_pre_loop;
 	module->main_post_loop_hook = stocks_main_post_loop;
 	server->XLS = CURRENT_XLS   = load_stocks(); // load data/stocks/STOCKS.TXT into server->XLS
 	server->XLS->config         = server;
 	init_wtable();
+	init_watchtable();
+	init_candles(server); // load build/libta.so, if present
+	init_ranks(server->XLS);
+	market = get_time();
 	if (server->XLS)
 		register_module(module);
 	/*

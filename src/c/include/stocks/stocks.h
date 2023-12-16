@@ -611,7 +611,7 @@ void         *cryptocompare_thread (void *args);
 
 static __inline__ double get_stock_price(struct stock *stock, int entry, int nr_entries)
 {
-	if (entry == 0)
+	if (entry == 0 && stock->market->status != NO_MARKET)
 		return stock->current_price;
 	return stock->mag->close[nr_entries-entry];
 }
@@ -620,7 +620,7 @@ static __inline__ double get_stock_delta(struct stock *stock, int entry, int nr_
 {
 	double entry_close, prior_close;
 
-	if (entry == 0)
+	if (entry == 0 && stock->market->status != NO_MARKET)
 		return stock->pr_percent;
 
 	entry_close = stock->mag->close[nr_entries-entry];
@@ -630,21 +630,21 @@ static __inline__ double get_stock_delta(struct stock *stock, int entry, int nr_
 
 static __inline__ double get_stock_open(struct stock *stock, int entry, int nr_entries)
 {
-	if (entry == 0)
+	if (entry == 0 && stock->market->status != NO_MARKET)
 		return stock->price_open;
 	return stock->mag->open[nr_entries-entry];
 }
 
 static __inline__ double get_stock_high(struct stock *stock, int entry, int nr_entries)
 {
-	if (entry == 0)
+	if (entry == 0 && stock->market->status != NO_MARKET)
 		return stock->intraday_high;
 	return stock->mag->high[nr_entries-entry];
 }
 
 static __inline__ double get_stock_low(struct stock *stock, int entry, int nr_entries)
 {
-	if (entry == 0)
+	if (entry == 0 && stock->market->status != NO_MARKET)
 		return stock->intraday_low;
 	return stock->mag->low[nr_entries-entry];
 }
@@ -658,7 +658,7 @@ static __inline__ double get_stock_openpc(struct stock *stock, int entry, int nr
 {
 	double prior_close;
 
-	if (entry == 0 && market != NO_MARKET)
+	if (entry == 0 && stock->market->status != NO_MARKET)
 		return stock->open_pc;
 	prior_close = stock->mag->close[nr_entries-entry-1];
 	return (((stock->mag->open[nr_entries-entry]/prior_close)-1)*100.0);

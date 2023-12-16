@@ -34,13 +34,11 @@ bool alloc_threads(void *dataset, int nr_items, int job_type)
 	struct thread *thread, *threads;
 	struct XLS    *XLS;
 	int            nr_threads, items_per_thread;
-	int            rem, x, y, ridx = 0;
 	
 	nr_stocks         = XLS->nr_stocks;
 	nr_threads        = XLS->config.nr_vcpu;
 	items_per_thread  = nr_stocks/nr_threads;
-	rem               = nr_stocks%items_per_thread;
-	threads           = (struct thread *)zmalloc(sizeof(struct thread) * (nr_stocks+(rem?1:0)));
+	threads           = (struct thread *)zmalloc(sizeof(struct thread) * (nr_stocks));
 	
 }
 */

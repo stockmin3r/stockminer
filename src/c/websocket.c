@@ -120,7 +120,7 @@ extract_frames(char *packet, struct frame *frames, int packet_length)
 		frame->data_length = data_length;
 		frame_length       = data_length + 5 + lensize;
 		*(unsigned int *)frame->mask = *(unsigned int *)(packet+mask_offset);
-		printf("data_off: %d mask_off: %d frame_len: %d packet_length: %d\n", data_offset, mask_offset, frame_length, packet_length);
+//		printf("data_off: %d mask_off: %d frame_len: %d packet_length: %d\n", data_offset, mask_offset, frame_length, packet_length);
 
 		nr_frames++;
 		if (frame_length == packet_length)

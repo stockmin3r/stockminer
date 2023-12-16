@@ -327,22 +327,3 @@ void update_indicators(struct board *board)
 	board->dirty = 0;
 }
 
-void *json_thread(void *args)
-{
-	struct board *board;
-	int x;
-
-	while (1) {
-		struct XLS *XLS = CURRENT_XLS;
-		if (!XLS || !XLS->boards) {
-			os_sleep(100000);
-			continue;
-		}
-		for (x=0; x<NR_BOARDS; x++) {
-			board = XLS->boards[x];
-			if (board->dirty)
-				board->update(board);
-		}
-		os_usleep(100000);
-	}
-}

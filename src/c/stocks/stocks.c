@@ -503,8 +503,8 @@ void *stocks_update_checkpoint(void *args)
 			if (!p)
 				continue;
 			snprintf(path, sizeof(path)-1, "%s/%s.csv", STOCKDB_CSV_PATH, stock->sym);
-			p[packet_size-(p-response)-1] = '\n';
-			fs_appendfile(path, p+1, packet_size-(p-response)-1);
+			p[packet_size-(p-response)] = '\n';
+			fs_appendfile(path, p+1, packet_size-(p-response));
 //			printf(BOLDGREEN "start_timestamp: %lu end_timestamp: %lu" RESET "\n", start_timestamp, end_timestamp);
 
 			nr_stocks++;

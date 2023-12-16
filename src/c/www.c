@@ -39,9 +39,9 @@ struct request rpc_requests[] = {
 
 	/* Stockpage */
 	{ "stockpage",           rpc_stockpage,              3, 3, ARGS_TYPE_ARGV},
-	{ "sp-anyday",           rpc_stockpage_anyday,       2, 2, ARGS_TYPE_ARGV},
+	{ "sp-anyday",           rpc_stockpage_anyday,       3, 3, ARGS_TYPE_ARGV},
 	{ "sp-etab",             rpc_stockpage_earnings,     2, 2, ARGS_TYPE_ARGV},
-	{ "sp-candle",           rpc_stockpage_candle,       3, 3, ARGS_TYPE_ARGV},
+	{ "sp-candle",           rpc_stockpage_candle,       4, 4, ARGS_TYPE_ARGV},
 	{ "sp-indicator",        rpc_stockpage_indicators,   2, 2, ARGS_TYPE_ARGV},
 	{ "sigmon",              rpc_stockpage_signals,      2, 2, ARGS_TYPE_ARGV},
 	{ "search",              rpc_search,                 2, 2, ARGS_TYPE_ARGV},
@@ -941,7 +941,7 @@ void *www_server_async(void *args)
 		return NULL;
 	}
 
-	https_server_events.events  = EPOLLIN;
+	https_server_events.events  = EPOLLIN | EPOLLET;
 	https_server_events.data.fd = https_server_fd;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, https_server_fd, &https_server_events);
 	events = (struct epoll_event *)zmalloc(sizeof(*events) * MAXEVENTS);

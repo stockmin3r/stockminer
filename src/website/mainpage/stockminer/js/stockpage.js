@@ -96,9 +96,9 @@ function stockpage(ticker,QVID,rpc)
 	MQ.addWorkspace({title:ticker,          favicon:1},{background:0}, "", QSID, 2, -1);
 	RQ.addWorkspace({title:"Monthly",       favicon:0},{background:0}, "", QSID, 1, -1);
 	DQ.addWorkspace({title:"Control",       favicon:0},{background:0}, "", QSID, 3, -1);
-	DQ.addWorkspace({title:"TA Screen",     favicon:0},{background:1,click:'indicator_screener_qclick("' + ticker + '")'}, "", QSID, 3, -1);
-	DQ.addWorkspace({title:"Algo Screen",   favicon:0},{background:1,click:'algo_screener_qclick("'      + ticker + '")'}, "", QSID, 3, -1);
-	DQ.addWorkspace({title:"Candle Screen", favicon:0},{background:1,click:'candle_screener_qclick("'    + ticker + '")'}, "", QSID, 3, -1);
+	DQ.addWorkspace({title:"TA Screen",     favicon:0},{background:1,click:'indicator_screener_click("' + ticker + '")'}, "", QSID, 3, -1);
+	DQ.addWorkspace({title:"Algo Screen",   favicon:0},{background:1,click:'algo_screener_click("'      + ticker + '")'}, "", QSID, 3, -1);
+	DQ.addWorkspace({title:"Candle Screen", favicon:0},{background:1,click:'candle_screener_click("'    + ticker + '")'}, "", QSID, 3, -1);
 
 	LQ.workspace['ws0'].tab.setAttribute("active", "");
 	RQ.workspace['ws0'].tab.setAttribute("active", "");
@@ -192,9 +192,9 @@ function stockpage_rpc(rpc, QID) {
 		$(QSID)[0][rpc] = 1;
 	}
 }
-function stockpage_anyday_click() {stokpage_rpc("sp-anyday ",  0)}
-function stockpage_signals_click(){stokpage_rpc("sp-signals ", 1)}     // abducted?!?!? never written!?!?! too many cookies to remember
-function stockpage_scatter_click(){stokpage_rpc("sp-scatter ", 2)}
+function stockpage_anyday_click() {stockpage_rpc("sp-anyday ",  0)}
+function stockpage_signals_click(){stockpage_rpc("sp-signals ", 1)}     // abducted?!?!? never written!?!?! too many cookies to remember
+function stockpage_scatter_click(){stockpage_rpc("sp-scatter ", 2)}
 function stockpage_candle_table_click(t,QID,b){WS.send("sp-candle " + t + " " + W.current_quadspace + "q"+QID+'ws2 ' + b)}
 
 /* Stockpage Earnings Tab (Middle Quad) */
