@@ -57,7 +57,7 @@ int pack_stockpage(struct stock *stock, char *packet, char *div, struct wsid *ws
 
 	if (!price)
 		return 0;
-	packet_len = snprintf(packet, 256, "chart {\"type\":\"stockpage\",\"dtype\":\"array\",\"ticker\":\"%s\",\"div\":\"%s\",\"nr_1d\":\"%d\",\"cb\":\"%s\",\"QVID\":\"%d\",\"QSID\":%d\",\"data\":",
+	packet_len = snprintf(packet, 256, "stockpage {\"type\":\"stock\",\"dtype\":\"array\",\"ticker\":\"%s\",\"div\":\"%s\",\"nr_1d\":\"%d\",\"cb\":\"%s\",\"QVID\":\"%d\",\"QSID\":\"%d\",\"data\":",
 						  stock->sym, div, price->nr_points_1d, cfunc?cfunc:"-", wsid->QVID, wsid->QSID);
 	memcpy(packet+packet_len, price->price_1d, price->price_1d_len);
 	packet_len += price->price_1d_len;

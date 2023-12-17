@@ -115,34 +115,6 @@ function WatchTable_Menu(menu, watchtable, QGID){
 		}};
 	}});
 }
-function Watchlists_RClick_Menu(){
-	$.contextMenu({
-		selector:"#PUB tbody td",
-		trigger:'right',
-		build: function(){return {items:{
-			"Del": {name: "Remove Watchlist", selector:'.context-menu-one td', callback:function(){
-				watchlist_remove(this[0].parentNode.cells[0].textContent,this)
-			}},
-		}};
-	}});
-}
-
-function WatchTable_RClick_Menu(TID){
-    $.contextMenu({
-		selector:"#" + TID + " tbody td",
-		trigger:'right',
-        build: function(){return{items:{
-			"Del": {name: "Remove Stock", selector:'.context-menu-one td', callback:function(){
-				var row = this[0].parentNode, ticker = row.cells[1].textContent, watchlist = $("#"+TID)[0].obj.watchlist;
-				console.log("watchlist: " + watchlist + " rowIndex: " + row.rowIndex + " sIndex: " + row.sectionRowIndex);
-				T[TID].rows(row.rowIndex-1).remove().draw();
-				if (watchlist == undefined)
-					watchlist = 'morphtab';
-				WS.send("watchlist_delstock " + watchlist + " " + ticker);
-			}},
-        }};
-	}});
-}
 
 function XLS_Menu(id, watchtable, QGID){
 	$.contextMenu({
@@ -169,6 +141,55 @@ function XLS_Menu(id, watchtable, QGID){
 			"Theme":  {name:"Theme",        items:Themes},
 			"Create": {name:"Create Theme", callback:CSSEditor},
 			"Script": {name:"Scripting",    callback:JSEditor},
+
+			"Import": {
+				name: "Import",
+				items:{
+					"I0":{name:"Website", callback:function(){GUI_wget_url(watchtable,QGID)}},
+					"I1":{name:"Excel",   callback:function(){table_import(watchtable,1)}},
+					"I2":{name:"CSV",     callback:function(){table_import(watchtable,2)}},
+					"I2":{name:"TXT",     callback:function(){table_import(watchtable,3)}},
+					"I3":{name:"Paste",   callback:function(){table_import(watchtable,4)}},
+				}
+			},
+			"Export": {
+				name: "Export",
+				items:{
+					"E1":{name:"Excel",  callback:function(){table_export(watchtable,1)}},
+					"E2":{name:"CSV",    callback:function(){table_export(watchtable,2)}},
+					"E3":{name:"TXT",    callback:function(){table_export(watchtable,3)}},
+					"E4":{name:"Column", callback:function(){table_export(watchtable,4)}},
+				}
+			},
 		}};
+	}});
+}
+
+function Watchlists_RClick_Menu(){
+	$.contextMenu({
+		selector:"#PUB tbody td",
+		trigger:'right',
+		build: function(){return {items:{
+			"Del": {name: "Remove Watchlist", selector:'.context-menu-one td', callback:function(){
+				watchlist_remove(this[0].parentNode.cells[0].textContent,this)
+			}},
+		}};
+	}});
+}
+
+function WatchTable_RClick_Menu(TID){
+    $.contextMenu({
+		selector:"#" + TID + " tbody td",
+		trigger:'right',
+        build: function(){return{items:{
+			"Del": {name: "Remove Stock", selector:'.context-menu-one td', callback:function(){
+				var row = this[0].parentNode, ticker = row.cells[1].textContent, watchlist = $("#"+TID)[0].obj.watchlist;
+				console.log("watchlist: " + watchlist + " rowIndex: " + row.rowIndex + " sIndex: " + row.sectionRowIndex);
+				T[TID].rows(row.rowIndex-1).remove().draw();
+				if (watchlist == undefined)
+					watchlist = 'morphtab';
+				WS.send("watchlist_delstock " + watchlist + " " + ticker);
+			}},
+        }};
 	}});
 }

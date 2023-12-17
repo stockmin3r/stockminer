@@ -38,7 +38,7 @@ struct request rpc_requests[] = {
 	{ "stage",               rpc_webscript,              3, 3, ARGS_TYPE_ARGV},
 
 	/* Stockpage */
-	{ "stockpage",           rpc_stockpage,              3, 3, ARGS_TYPE_ARGV},
+	{ "stockpage",           rpc_stockpage,              4, 4, ARGS_TYPE_ARGV},
 	{ "sp-anyday",           rpc_stockpage_anyday,       3, 3, ARGS_TYPE_ARGV},
 	{ "sp-etab",             rpc_stockpage_earnings,     2, 2, ARGS_TYPE_ARGV},
 	{ "sp-candle",           rpc_stockpage_candle,       4, 4, ARGS_TYPE_ARGV},

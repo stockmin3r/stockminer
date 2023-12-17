@@ -531,14 +531,15 @@ function rpc_minichart(av)
 /* Indicator Objects */
 function ichart(av,indi,unit)
 {
-	var t = av[1], div = av[2],data=JSON.parse(av[7]), len=data.length, i=0, ohlc=[], volume=[], box = document.createElement('div');
+
+	var args = JSON.parse(av[1]), ticker = args.ticker, div = args.div, data=args.data, len=data.length, i=0, ohlc=[], volume=[], box = document.createElement('div');
 	for (i; i<len; i+= 1) {ohlc.push([data[i][0],data[i][1],data[i][2],data[i][3],data[i][4]]);volume.push([data[i][0],data[i][5]])}
 	box.id  = div;
 	WMAP[div.split("-")[1]].appendChild(box);
 
 	console.log("ichart: " + div);
 	Highcharts.stockChart(div,{
-	title:   {text:t},
+	title:   {text:ticker},
 	credits: {text:''},
 	chart:   {
 		events:{
@@ -572,9 +573,9 @@ function ichart(av,indi,unit)
 	}],
     series:[{
 		type:'line',
-		id:t+'-price',
+		id:ticker+'-price',
 		useOhlcData:true,
-		name:t,
+		name:ticker,
 		color:"darkcyan",
 		data:ohlc,
 		marker:{enabled:false}
@@ -1125,7 +1126,7 @@ function reloadTicker(div,r,enter)
 function chart_table_onclick(id)
 {
 	$('#'+id+' tbody').on('click', 'tr', function() {
-		WS.send("chart2 " + T[id].row(this).data().T + " graph");
+		WS.send("chart " + T[id].row(this).data().T + " graph");
 		$("body").append("<div id=load class=loading></div>");
 	});
 }

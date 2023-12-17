@@ -120,7 +120,10 @@ function datatable(args)
 function newtable(id,ord,col,o){
 	T[id] = $("#"+id).DataTable({
 		dom: 'Bfrtip',
-        buttons:['copyHtml5','excelHtml5','csvHtml5','pdfHtml5'],
+		buttons: [{
+			extend:'excelHtml5',fieldBoundary: '',exportOptions:{columns: 'th:not(:first-child)'}
+		}],
+//      buttons:['copyHtml5','excelHtml5','pdfHtml5'],
 		columns:col,columnDefs:[{targets:col.length,visible:false},{width:"34px",targets:[0]}],
 		rowCallback:function(row,data,index){tableColors(row,data,index,"#"+id+" thead tr",0)},
 		bPaginate:false,order:[[o,ord]],paging:false,info:false,searching:false
@@ -136,7 +139,7 @@ function newtable(id,ord,col,o){
 function wdict_load(screener, dict)
 {
 	var wdst = $(".wdst ul", screener),
-		wsrc = $(".wsrc ul li", screener);
+		wsrc = $("body > .screener .wsrc ul li");
 	$("li", wdst).remove();
 	for (var x = 1; x<dict.length; x++) {
 		var column_id = dict[x].data, li; // v=900, v=901
@@ -666,6 +669,37 @@ function rpc_deftab(av)
 	}
 }
 
+/*
+ * Save a HTML table in CSV format as a file
+ */
+function table_export_csv(watchtable_id)
+{
+	var link     = document.createElement("a");
+	var textarea = document.getElementById("copypaste-textarea");
+	var table    = $("#"+watchtable_id)[0];
+	var csv      = "";
+	var caption  = table.caption.innerText;
+
+	for (var x = 0; x<table.rows.length; x++) {
+		var cells = table.rows[x].cells;
+		for (var y = 0; y<cells.length; y++) {
+			var cell = cells[y].innerText;
+			if (cell == "⚙" || cell == "")
+				continue;
+			csv += cell + ",";
+		}
+		csv += "\r\n";
+	}
+	textarea.innerHTML = csv;
+
+	var content        = textarea.value+"\r\n";
+	var file           = new Blob([content], {type:'text/plain'});
+	link.href          = URL.createObjectURL(file);
+	link.download      = caption?caption:"watchtable.csv";
+	link.click();
+	URL.revokeObjectURL(link.href);
+}
+
 function table_import(TID,input)
 {
 	switch (input) {
@@ -684,19 +718,16 @@ function table_import(TID,input)
 	}
 }
 
-function table_export(TID,output)
+function table_export(watchtable_id,output)
 {
 	switch (output) {
 		case 1:
 			T[TID].buttons(".buttons-excel").trigger();
 			break;
 		case 2:
-			T[TID].buttons(".buttons-csv").trigger();
+			table_export_csv(watchtable_id);
 			break;
 		case 3:
-			break;
-		case 4: // column
-			copy_dt_column(T[TID]);
 			break;
 	}
 }

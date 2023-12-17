@@ -88,7 +88,8 @@ function cssload()
 		T['Watchlist-CSS'].rows.add([{"S":CSS[x].style,"C":CSS[x].owner,"T":CSS[x].type,"R":CSS[x].rating}]).draw()
 }
 
-function JSEditor(){}
+function JSEditor() {Editor(0,"javascript")}
+function CSSEditor(){Editor(0,"css")}
 function html_update(){}
 function js_update(){}
 
@@ -136,7 +137,7 @@ function Editor(component, lang)
 	var editor = $("#editor")[0], component, div, sel;
 
 	editor.style.display = 'block';
-	if (component==0)
+	if (!component)
 		component = EDITOR[editor.component];
 	else {
 		// switching components

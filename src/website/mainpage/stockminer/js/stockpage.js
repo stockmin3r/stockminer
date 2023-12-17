@@ -43,8 +43,7 @@ function rpc_stockpage(av)
 //		stockpage(av[1],av[4],0,1);
 		stockpage(ticker,QVID,1);
 	/* MQ */
-	chart['stock'](av);
-
+	chart(av);
 	/* Bull Quad */
 	av.div = ticker + "-P" + QVID + "Q" + QSID + "q0ws0";
 //	LQ = av[2] = av[1] + "-P" + av[4] + "Q" + av[5] + "q0ws0";
@@ -112,7 +111,8 @@ function stockpage(ticker,QVID,rpc)
 	DQ['ws3'].style.display='none';
 
 	if (!rpc)
-		WS.send("chart " + MQ.qdiv.substr(1) + "ws0 " + ticker);
+		WS.send("stockpage " + ticker + " " + QVID + " " + QSID);
+//		WS.send("chart " + MQ.qdiv.substr(1) + "ws0 " + ticker);
 	$(MQ.qdiv)[0].className += " MQ";
 	$(quadspace.quad[0].qdiv)[0].className += " LQ";
 	$(quadspace.quad[1].qdiv)[0].className += " RQ";

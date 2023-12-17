@@ -22,7 +22,7 @@ class Stockdata:
 	def __init__(self,ticker,csv_path,colgen_path):
 		self.symbol      = ticker
 		self.colgen_path = colgen_path
-		self.xls         = pd.read_csv(csv_path + '/' + self.symbol + '.csv', names=['Date','Open','High','Low','Close', 'Volume'])
+		self.xls         = pd.read_csv(csv_path + '/' + self.symbol + '.csv', names=['Date','Open','High','Low','Close', 'AdjClose', 'Volume'])
 		self.xls['Date'] = pd.to_datetime(self.xls['Date'])
 		self.last_close  = self.xls.loc[self.xls.index[-1], 'Close']
 
@@ -182,9 +182,9 @@ class Analysis(Stockdata):
 
 	# open%, daily%, close%, next open%, next daily%, next close%
 	def deltas(self):
-		self.xls['Open%']	    = (self.xls['Open']  / self.xls['Close'].shift(1) - 1) * 100
-		self.xls['Daily%']	    = (self.xls['Close'] / self.xls['Open']           - 1) * 100
-		self.xls['Close%']	    = (self.xls['Close'] / self.xls['Close'].shift(1) - 1) * 100
+		self.xls['Open%']       = (self.xls['Open']  / self.xls['Close'].shift(1) - 1) * 100
+		self.xls['Daily%']      = (self.xls['Close'] / self.xls['Open']           - 1) * 100
+		self.xls['Close%']      = (self.xls['Close'] / self.xls['Close'].shift(1) - 1) * 100
 		self.xls['next Open%']  =  self.xls['Open%'].shift(-1)
 		self.xls['next Daily%'] =  self.xls['Daily%'].shift(-1)
 		self.xls['next Close%'] =  self.xls['Close%'].shift(-1)

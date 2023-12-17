@@ -34,7 +34,7 @@ struct external_api {
 } EXTERNAL_API [] = {
 /* HEAD SCRIPTS */
 {"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery",            "rY/jv8mMhqDabXSo+UCggqKtdmBfd3qC2/KvyTDNQ6PcUJXaxK1tMepoQda4g5vB", LICENSE_MIT,         PERMISSIVE, !DEFER, },
-{"https://cdn.datatables.net/v/dt/dt-1.10.21/datatables",                 "qIz2SOTATpqA/FQ0hh1w5JAM66ujgfjBn3VIDHRQALyA23QzYbQvMEtlQXGiX07c", LICENSE_MIT,         PERMISSIVE, !DEFER, },
+{"https://cdn.datatables.net/v/dt/dt-1.13.7/datatables",                 "qIz2SOTATpqA/FQ0hh1w5JAM66ujgfjBn3VIDHRQALyA23QzYbQvMEtlQXGiX07c", LICENSE_MIT,         PERMISSIVE, !DEFER, },
 {"https://code.highcharts.com/stock/highstock",                           "lMRDDWIzVUedPfSFOiOJhlEMnZufWQ2qKHeu2YP5xZHGhBLoaXgNvCTgKSEPwkzn", LICENSE_HIGHCHARTS, !PERMISSIVE, !DEFER, },
 {"https://code.highcharts.com/stock/indicators/indicators-all",           "jLpemzsfcRDYsAbWw/hErdwRLuVk6AGjCCocwf3okb6JjF4JBuhMv0W7gDk+NPhP", LICENSE_HIGHCHARTS, !PERMISSIVE, !DEFER, },
 {"https://code.jquery.com/ui/1.13.2/jquery-ui",                           "4D3G3GikQs6hLlLZGdz5wLFzuqE9v4yVGAcOH86y23JqBDPzj9viv0EqyfIa6YUL", LICENSE_MIT,         PERMISSIVE, !DEFER, },
@@ -50,8 +50,8 @@ struct external_api {
 /* TAIL SCRIPTS */
 {"https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify",         "cwS6YdhLI7XS60eoDiC+egV0qHp8zI+Cms46R0nbn8JrmoAzV9uFL60etMZhAnSu", LICENSE_APACHE2_MPL,!PERMISSIVE,  DEFER  },
 {"https://code.highcharts.com/modules/data",                              "TqGyq0XPLLamTC1+4jrFsi0mxHPTg8JDL4JXACaMTsh2cMMzmloKZjU9vkjYhZA+", LICENSE_HIGHCHARTS, !PERMISSIVE,  DEFER, },
-{"https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons",        "+s/TnIu83YK7P52PVQgRXxsBRu3lpXimVpMDKXx4z7l/YqHQ5UgMQFDsSR9LTS0e", LICENSE_MIT,         PERMISSIVE,  DEFER, },
-{"https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5",             NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
+{"https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons",        "+s/TnIu83YK7P52PVQgRXxsBRu3lpXimVpMDKXx4z7l/YqHQ5UgMQFDsSR9LTS0e", LICENSE_MIT,         PERMISSIVE,  DEFER, },
+{"https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5",             NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://cdn.datatables.net/plug-ins/1.10.21/sorting/natural",           "h3oS/DGBfrFl5LZtSFk9RFU+pzHmURTX7+CFwAjm6QWSTdjwxCNgPIlzA/On5XBM",                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.9.2/jquery.ui.position",   NULL,                                                LICENSE_MIT,         PERMISSIVE,  DEFER, },
 {"https://code.highcharts.com/stock/modules/drag-panes",                  NULL,                                                               LICENSE_MIT,         PERMISSIVE,  DEFER, },

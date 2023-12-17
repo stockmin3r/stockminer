@@ -122,7 +122,6 @@ int main(int argc, char *argv[])
 	while (stockdata_checkpoint < SD_CHECKPOINT_COMPLETE)
 		sleep(1);
 
-	fs_log("checkpoint");
 	module_hook(&Server, MODULE_MAIN_PRE_LOOP);
 //	create_stock_threads(Server.XLS);
 	module_hook(&Server, MODULE_MAIN_POST_LOOP);
