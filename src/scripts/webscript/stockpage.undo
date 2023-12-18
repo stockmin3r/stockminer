@@ -1,0 +1,5 @@
+*stockpage tester undo*
+del stockpage TSLA 0
+del stockpage AAPL 0
+del stockpage RNG 0
+del stockpage CVNA 0

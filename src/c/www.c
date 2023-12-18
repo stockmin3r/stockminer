@@ -35,7 +35,7 @@ struct request rpc_requests[] = {
 	{ "qswitch",             rpc_qswitch,                3, 4, ARGS_TYPE_ARGV},
 	{ "qupdate",             rpc_quadverse_update,       6, 6, ARGS_TYPE_ARGV},
 	{ "qexport",             rpc_quadverse_export,       6, 6, ARGS_TYPE_ARGV},
-	{ "stage",               rpc_webscript,              3, 3, ARGS_TYPE_ARGV},
+	{ "stage",               rpc_stage,                  3, 3, ARGS_TYPE_ARGV},
 
 	/* Stockpage */
 	{ "stockpage",           rpc_stockpage,              4, 4, ARGS_TYPE_ARGV},
@@ -92,7 +92,7 @@ struct request rpc_requests[] = {
 	/* CandleSticks */
 	{ "candle",              rpc_candle_stock,           2, 2, ARGS_TYPE_ARGV},
 	{ "csp",                 rpc_csp,                    3, 3, ARGS_TYPE_ARGV},
-	{ "csr",                 rpc_csr,                    3, 3, ARGS_TYPE_ARGV},
+	{ "csr",                 rpc_csr,                    1, 1, ARGS_TYPE_ARGV},
 	{ "czoom",               rpc_candle_zoom,            3, 3, ARGS_TYPE_ARGV},
 
 	/* Options */
@@ -676,7 +676,6 @@ int www_websocket_sync(char *req, struct connection *connection)
 	printf(BOLDRED "CLOSED CONNECTION: %.8s client_id: %d fd: %d" RESET "\n", (char *)&session->user->cookies[connection->websocket_id], connection->websocket_id, session->websockets[connection->websocket_id]->fd);
 	session->websockets[connection->websocket_id]->fd = -1;
 //	openssl_destroy(connection);
-	session->websockets[connection->websocket_id]     = NULL;
 	return 0;
 }
 

@@ -104,9 +104,9 @@ op   = {'addPoint':addPoint,       'update':update,       'stockchart':stockchar
         'init':    rpc_init,       'fini':  rpc_fini,     'stage':     rpc_stageload,  'profile':rpc_profile,     'qspace':  rpc_qspace,    'index':      rpc_menu,
         'anyday':  rpc_anyday,     'peak':  rpc_peak,     'stockpage': rpc_stockpage,  'etab':   rpc_etab,        'sigmon':  rpc_sigmon,    'err':        rpc_login_error,
         'cookie':  rpc_set_cookie, 'user':  rpc_set_user, 'regok':     rpc_regok,      'nonce':  rpc_nonce,       'query':   rpc_query,     'checkpoint': rpc_checkpoint,
-        'wspace':  rpc_wspace,     'qpage': rpc_qpage,    'qcache':    rpc_qcache,     'qreload':rpc_qreload,     'qupdate': rpc_qupdate,
+        'wspace':  rpc_wspace,     'qpage': rpc_qpage,    'qcache':    rpc_qcache,     'qreload':rpc_qreload,     'qupdate': rpc_qupdate,   'webscripts': rpc_webscripts,
         'candle':  candle,         'csr':   rpc_csr,      'czoom':     rpc_candle_zoom,'csp':    rpc_csp,         'candy':   rpc_stockpage_candles,
-        'netsh':   rpc_netsh,      'qsh':   rpc_qsh,      'admin':     admin,          'styles': rpc_styles,      'newtab':  rpc_newtab},
+        'netsh':   rpc_netsh,      'admin': admin,        'styles':    rpc_styles,     'newtab': rpc_newtab},
 
 SBC    = {913:[{f:-24.9,t:-20.0,c:"#ffa500",b:1},{f:-99,t:-25.0,c:"#FF3406",b:1}],
 		  400:[{f:1.0,t:4.0,c:"#ffff00",b:0}],

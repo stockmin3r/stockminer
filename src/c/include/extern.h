@@ -16,6 +16,8 @@ extern int                stockdata_checkpoint;
 extern int                NR_USERS;
 extern int                stockdata_pending;
 extern bool               STOCKDATA_PENDING;
+extern char              *webscripts;
+extern int                webscripts_size;
 
 extern const char *DB_PATH;
 extern const char *DB_USERS_PATH;

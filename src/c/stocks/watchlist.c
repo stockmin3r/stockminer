@@ -30,8 +30,8 @@ int watchlist_stocks(struct session *session, char *packet, char *watchlist_name
 	return (packet_len-1);
 }
 
-// RPC_stageload var stocks = "", stage = av[1], watchlist_name = av[2], QGID = av[3], stocklist = av[4].split("-");
-void rpc_webscript(struct rpc *rpc)
+// rpc_stageload var stocks = "", stage = av[1], watchlist_name = av[2], QGID = av[3], stocklist = av[4].split("-");
+void rpc_stage(struct rpc *rpc)
 {
 	struct session    *session        = rpc->session;
 	struct connection *connection     = rpc->connection;

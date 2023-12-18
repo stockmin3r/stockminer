@@ -21,7 +21,7 @@ function qsh_exec()
 		var code = qscript[x].split(" ");
 		if (code == "")
 			break;
-		var f = QSHELL['sh_' + code[0] + "_" + code[1]];
+		var f = window['sh_' + code[0] + "_" + code[1]];
 		if (!f)
 			console.log("qsh_exec func undefined: " + f);
 		else
@@ -30,10 +30,10 @@ function qsh_exec()
 }
 
 /*
- * "QSHELL" Webtest Scripts
+ * Webscript RPC
  */
-function rpc_qsh(av) {
-	av = av.slice(1);   // clear qsh
+function rpc_webscripts(av) {
+	av = av.slice(1);   // clear "qsh"
 	av = av.join(" ");
 	av = av.split("!");
 	for (var x = 0; x<av.length; x++) {
@@ -60,7 +60,7 @@ function sh_set_watchlist(av){
 	$("#watchname").val(av[2]);
 }
 function sh_save_watchlist()     {watchlist_save();$("#share .checkbox_ctrl")[0].click()}
-function sh_set_quadverse(av)    {this.quadverse(av[2], 0)}
+function sh_set_quadverse(av)    {QUADVERSE_SWITCH(av[2], 0)}
 function sh_set_display(av)      {$(av[2]).css("display", av[3])}
 function sh_set_text(av)         {$(av[2]).val(av[3])}
 function sh_add_stocks(av)       {WS.send("watchlist_addstock " + av[2] + " " + av[3].split(",").join(" "))}

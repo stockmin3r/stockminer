@@ -1,0 +1,14 @@
+*Create New Quadspace with two charts per quad*
+add quadspace 0
+add chart TSLA 0 5 0
+add chart AAPL 0 5 0
+add chart NOW 0 5 1
+add chart RNG 0 5 1
+add chart CVNA 0 5 2
+add chart SHOP 0 5 2
+add chart AAL 0 5 3
+add chart AXON 0 5 3
+set grid grid50 0 5 0
+set grid grid50 0 5 1
+set grid grid50 0 5 2
+set grid grid50 0 5 3

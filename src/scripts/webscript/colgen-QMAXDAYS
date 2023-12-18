@@ -1,0 +1,14 @@
+*Column Generator: Max Days to return 5%/10%*
+set shake .wdst
+move tag #WSRC_li[v=257] #WDST
+move tag #WSRC_li[v=258] #WDST
+move tag #WSRC_li[v=259] #WDST
+move tag #WSRC_li[v=263] #WDST
+move tag #WSRC_li[v=264] #WDST
+move tag #WSRC_li[v=265] #WDST
+move tag #WSRC_li[v=272] #WDST
+move tag #WSRC_li[v=273] #WDST
+move tag #WSRC_li[v=274] #WDST
+move tag #WSRC_li[v=265] #WDST
+move tag #WSRC_li[v=265] #WDST
+move tag #WSRC_li[v=265] #WDST

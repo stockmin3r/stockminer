@@ -40,5 +40,6 @@ void        job_exec_python      (char *python_path, char *python_script, char *
 void        sched_exec_scrape    (int argc, char *argv[]);
 struct job *new_job              (int options,job_comp_f completion);
 void        init_webscript       (void);
+void        apc_webscript        (struct connection *connection, char **argv);
 
 #endif

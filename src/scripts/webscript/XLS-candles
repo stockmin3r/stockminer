@@ -1,0 +1,20 @@
+*Column Generator: Candlestick 1d/2d/3d/etc Trend*
+set shake .wdst
+move tag #WSRC_li[v=800] #WDST
+move tag #WSRC_li[v=851] #WDST
+move tag #WSRC_li[v=852] #WDST
+move tag #WSRC_li[v=853] #WDST
+move tag #WSRC_li[v=854] #WDST
+move tag #WSRC_li[v=855] #WDST
+move tag #WSRC_li[v=856] #WDST
+move tag #WSRC_li[v=857] #WDST
+move tag #WSRC_li[v=858] #WDST
+move tag #WSRC_li[v=859] #WDST
+move tag #WSRC_li[v=860] #WDST
+move tag #WSRC_li[v=865] #WDST
+move tag #WSRC_li[v=871] #WDST
+move tag #WSRC_li[v=899] #WDST
+move tag #WDST_li[v=900] #WSRC
+move tag #WDST_li[v=901] #WSRC
+move tag #WDST_li[v=903] #WSRC
+move tag #WDST_li[v=904] #WSRC

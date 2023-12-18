@@ -59,5 +59,6 @@ cscope.out
 !src/external/*
 !src/website/**/*
 !src/scripts/*
+!src/scripts/webscript/*
 !src/python/**/*
 !notes/*

@@ -1,0 +1,14 @@
+*Column Generator: Success Rate to Return 5%/10%*
+set shake .wdst
+move tag #WDST_li[v=260] #WSRC
+move tag #WDST_li[v=261] #WSRC
+move tag #WDST_li[v=262] #WSRC
+move tag #WDST_li[v=266] #WSRC
+move tag #WDST_li[v=267] #WSRC
+move tag #WDST_li[v=268] #WSRC
+move tag #WDST_li[v=275] #WSRC
+move tag #WDST_li[v=276] #WSRC
+move tag #WDST_li[v=277] #WSRC
+move tag #WDST_li[v=281] #WSRC
+move tag #WDST_li[v=282] #WSRC
+move tag #WDST_li[v=283] #WSRC

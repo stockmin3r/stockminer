@@ -1,0 +1,6 @@
+*Create Watchlist*
+set quadverse Screener
+show tab 0 1
+del stocks ENPH,CVNA,RNG,SHOP,NVDA Top5
+del watchlist Watchlist
+del tr #morphtab Ticker=ENPH,CVNA,RNG,SHOP,NVDA

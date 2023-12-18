@@ -202,7 +202,7 @@ void fs_appendfile_nl(char *path, char *file, int64_t filesize)
 
 void fs_log(char *msg)
 {
-	fs_appendfile_nl(DB_LOG_PATH, msg, strlen(msg));
+	fs_appendfile_nl((char *)DB_LOG_PATH, msg, strlen(msg));
 }
 
 int64_t fs_readfile_str_mtime(char *path, char *buf, time_t *mtime)

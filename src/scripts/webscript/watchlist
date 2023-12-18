@@ -1,0 +1,15 @@
+*Create Watchlist*
+set quadverse Screener
+show tab 0 1
+set text .morphtick ENPH
+add stocks morphtab ENPH
+set text .morphtick CVNA
+add stocks morphtab CVNA
+set text .morphtick RNG
+add stocks morphtab RNG
+set text .morphtick SHOP
+add stocks morphtab SHOP
+set text .morphtick NVDA
+add stocks morphtab NVDA
+set watchlist Watchlist
+save watchlist

@@ -283,10 +283,11 @@ function tableColors_onclick()
 {
 	$("#color-diag").css("display", "block");
 	var cs = COLORS[$(".cs-select option:selected").val()], rules, column, from, to, c, slots=6;
+	var screener = window.event.target.parentNode.parentNode;
 
-	column = $(".wdst li.boxtick", wmgr)[0];
+	column = $(".wdst li.boxtick", screener)[0];
 	if (!column) {
-		column = $(".wsrc li.boxtick", wmgr)[0];
+		column = $(".wsrc li.boxtick", screener)[0];
 		if (!column)
 			return;
 	}

@@ -33,27 +33,28 @@ function init_stockpage()
 		"bPaginate":false,"order": [[2, "asc" ]],"paging":false,"bDestroy":false,"info":false,"searching":false});
 
 }
-
+var A;
 function rpc_stockpage(av)
 {
-	var QVID = av.QVID, QSID = av.QSID, ticker = av.ticker;
+	A = av;
+	var args = JSON.parse(av[1]), QVID = args.QVID, QSID = args.QSID, ticker = args.ticker;
 
-	console.log("rpc_stockpage: " + av[7]);
-	if (av[7])
-//		stockpage(av[1],av[4],0,1);
-		stockpage(ticker,QVID,1);
-	/* MQ */
+	stockpage(ticker,QVID,1);
+
+	/* MQ (Middle Quad) */
 	chart(av);
+
 	/* Bull Quad */
-	av.div = ticker + "-P" + QVID + "Q" + QSID + "q0ws0";
+	args.div = ticker + "-P" + QVID + "Q" + QSID + "q0ws0";
 //	LQ = av[2] = av[1] + "-P" + av[4] + "Q" + av[5] + "q0ws0";
-	ichart(av,['aroon','macd'], 'day');
+	ichart(args,['aroon','macd'], 'day');
 
 	/* Bear Quad */
-	av.div = ticker + "-P" + QVID + "Q" + QSID + "q1ws0";
+	args.div = ticker + "-P" + QVID + "Q" + QSID + "q1ws0";
 //	RQ = av[2] = av[1] + "-P" + av[4] + "Q" + av[5] + "q1ws0";
-	ichart(av,['aroon','macd','bb'], 'month');
+	ichart(args,['aroon','macd','bb'], 'month');
 }
+
 var DICT;
 function stockpage(ticker,QVID,rpc)
 {
@@ -95,7 +96,7 @@ function stockpage(ticker,QVID,rpc)
 	MQ.addWorkspace({title:ticker,          favicon:1},{background:0}, "", QSID, 2, -1);
 	RQ.addWorkspace({title:"Monthly",       favicon:0},{background:0}, "", QSID, 1, -1);
 	DQ.addWorkspace({title:"Control",       favicon:0},{background:0}, "", QSID, 3, -1);
-	DQ.addWorkspace({title:"TA Screen",     favicon:0},{background:1,click:'indicator_screener_click("' + ticker + '")'}, "", QSID, 3, -1);
+	DQ.addWorkspace({title:"TA Screen",     favicon:0},{background:1,click:'stockpage_indicators("' + ticker + '")'}, "", QSID, 3, -1);
 	DQ.addWorkspace({title:"Algo Screen",   favicon:0},{background:1,click:'algo_screener_click("'      + ticker + '")'}, "", QSID, 3, -1);
 	DQ.addWorkspace({title:"Candle Screen", favicon:0},{background:1,click:'candle_screener_click("'    + ticker + '")'}, "", QSID, 3, -1);
 
@@ -156,11 +157,11 @@ function stockpage(ticker,QVID,rpc)
 }
 
 /* StockPage onClick: workspace context */
-function stockpage_indicator(){
+function stockpage_indicators(){
 	WS.send("sp-indicator bulls")
 }
 
-function stockpage_algo_screener_click(t){
+function algo_screener_click(t){
 	if (!SIGMON) {
 		WS.send("sigmon " + t);
 	} else {
@@ -171,7 +172,7 @@ function stockpage_algo_screener_click(t){
 }
 
 /* Bottom quad of the stockpage which hold various tables of which a candle table is one */
-function stockpage_candle_screener_click(t){
+function candle_screener_click(t){
 	if (!CSR) {
 		CSP = t;
 		WS.send("csr");

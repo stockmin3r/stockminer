@@ -153,7 +153,7 @@ void db_engine_file(db_task_t *db_task)
 					user->uid       = ATOMIC_INC(&NR_USERS);
 					user->logged_in = 1;
 					rc              = SUCCESS;
-					fs_appendfile(DB_USERS_PATH, (char *)db_task->value, sizeof(struct user));
+					fs_appendfile((char *)DB_USERS_PATH, (char *)db_task->value, sizeof(struct user));
 				} else {
 					rc = FAILURE;
 				}

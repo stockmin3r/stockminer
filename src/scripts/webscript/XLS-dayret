@@ -1,0 +1,15 @@
+*Column Generator: Days to reach 5/10/15/20% + Return 5/10/15/20%*
+set shake .wdst
+move tag #WSRC_li[v=915] #WDST
+move tag #WSRC_li[v=200] #WDST
+move tag #WSRC_li[v=201] #WDST
+move tag #WSRC_li[v=202] #WDST
+move tag #WSRC_li[v=203] #WDST
+move tag #WSRC_li[v=204] #WDST
+move tag #WSRC_li[v=205] #WDST
+move tag #WSRC_li[v=206] #WDST
+move tag #WSRC_li[v=207] #WDST
+move tag #WDST_li[v=900] #WSRC
+move tag #WDST_li[v=901] #WSRC
+move tag #WDST_li[v=903] #WSRC
+move tag #WDST_li[v=904] #WSRC

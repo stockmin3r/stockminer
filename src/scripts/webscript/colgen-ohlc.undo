@@ -1,0 +1,8 @@
+*Column Generator: OHLC*
+set shake .wdst
+move tag #WDST_li[v=905] #WSRC
+move tag #WDST_li[v=906] #WSRC
+move tag #WDST_li[v=907] #WSRC
+move tag #WDST_li[v=909] #WSRC
+move tag #WDST_li[v=910] #WSRC
+move tag #WDST_li[v=911] #WSRC

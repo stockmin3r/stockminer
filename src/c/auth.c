@@ -36,18 +36,41 @@ void lpc_adduser(struct connection *connection, char **argv)
 	printf(BOLDGREEN "added user: %s uid: %d" RESET "\n", username, user.uid);
 }
 
+#ifdef DEBUG
+void auth_debug(unsigned char *seed, unsigned char *pk, unsigned char *sk, unsigned char *signature)
+{
+	for (int x = 0; x<hydro_sign_SEEDBYTES; x++)
+		printf(BOLDGREEN "%x " RESET, (unsigned char)seed[x]);
+	printf("\n");
+    
+	for (int x = 0; x<hydro_sign_PUBLICKEYBYTES; x++)
+		printf(BOLDRED "%x " RESET, (unsigned char)pk[x]);
+	printf("\n");
+
+	for (int x = 0; x<hydro_sign_SECRETKEYBYTES; x++)
+		printf(BOLDYELLOW "%x " RESET, (unsigned char)sk[x]);
+    
+	printf("\n");
+	for (int x = 0; x<hydro_sign_BYTES; x++)
+		printf(BOLDMAGENTA "%x " RESET, (unsigned char)signature[x]);
+	printf("\n");
+}
+#else
+#define auth_debug
+#endif
+
 void apc_server_auth(struct connection *connection, char **argv)
 {
-	uint8_t      nonce[32];
-	char         challenge[4096] = {0};
-	char         auth[4096] = {0};
-	char        *username, *signature;
-	struct user *user;
-	bool         verified = false;
-	size_t       sig_size, username_size, nbytes;
+	struct session *session;
+	struct user    *user;
+	uint8_t         nonce[32];
+	char            challenge[4096] = {0};
+	char            auth[4096] = {0};
+	char           *username, *signature;
+	bool            verified = false;
+	size_t          sig_size, username_size, nbytes;
 
-//	hydro_random_buf(nonce, sizeof(nonce));
-	memset(nonce, 0x41, 32);
+	hydro_random_buf(nonce, sizeof(nonce));
 	openssl_write_sync(connection, nonce, sizeof(nonce));
 	nbytes    = openssl_read_sync2(connection, auth, sizeof(auth)-1);
 	signature = strchr(auth, '|');
@@ -64,8 +87,14 @@ void apc_server_auth(struct connection *connection, char **argv)
 	challenge[username_size] = '|';
 	memcpy(challenge+username_size+1, nonce, sizeof(nonce));
 
-	if (hydro_sign_verify(signature, challenge, username_size+1+sizeof(nonce), "context0", user->pubkey) == 0)
+	if (hydro_sign_verify(signature, challenge, username_size+1+sizeof(nonce), "context0", user->pubkey) == 0) {
 		verified = true;
+		session  = session_by_username(username);
+		if (!session)
+			goto out;
+		connection->session    = session;
+		connection->authorized = true; // allow the localhost terminal user to use webscript.c::apc_webscript()
+	}
 out:
 	openssl_write_sync(connection, verified?"1":"0", 1);
 }
@@ -116,22 +145,7 @@ void admin_client_auth(char *command)
 	// concatenate the signature - username|signature
 	memcpy(auth+username_size+1, signature, hydro_sign_BYTES);
 
-        for (int x = 0; x<sizeof(kp_seed); x++)
-                printf(BOLDGREEN "%x " RESET, (unsigned char)kp_seed[x]);
-        printf("\n");
-
-        for (int x = 0; x<sizeof(kp.pk); x++)
-                printf(BOLDRED "%x " RESET, (unsigned char)kp.pk[x]);
-        printf("\n");
-
-        for (int x = 0; x<sizeof(kp.sk); x++)
-                printf(BOLDYELLOW "%x " RESET, (unsigned char)kp.sk[x]);
-        printf("\n");
-
-        for (int x = 0; x<hydro_sign_BYTES; x++)
-                printf(BOLDMAGENTA "%x " RESET, (unsigned char)signature[x]);
-        printf("\n");
-
+	auth_debug(kp_seed, kp.pk, kp.sk, signature);
 
 	openssl_write_sync(&apc_connection, auth, username_size+1+hydro_sign_BYTES);
 	auth[0] = 0;

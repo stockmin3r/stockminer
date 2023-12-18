@@ -1,4 +1,5 @@
 #include <conf.h>
+#include <extern.h>
 
 mutex_t       session_lock;
 mutex_t       cookie_lock;
@@ -246,14 +247,15 @@ void session_set_config(struct connection *connection)
 	}
 
 	/* random nonce for Password-Based Authenticated Login (picked up by js/login.js::login_auth() */
-	memset(connection->nonce, 0x41, 32);
-//	hydro_random_buf(connection->nonce, sizeof(connection->nonce));
+	hydro_random_buf(connection->nonce, sizeof(connection->nonce));
 	base64_encode   (connection->nonce, sizeof(connection->nonce), nonce64);
-	for (int x = 0; x<32; x++)
-		printf(BOLDYELLOW "%x ", (unsigned char)connection->nonce[x]);
-	printf(RESET "\n");
-	printf(BOLDYELLOW "%s" RESET "\n", nonce64);
 	packet_size += snprintf(packet+packet_size, 96, "nonce %s@", nonce64);
+
+	// webscript (temporary)
+	memcpy(packet+packet_size, webscripts, webscripts_size);
+	packet_size          += webscripts_size;
+	packet[packet_size++] = '@';
+
 	/* Update the packet size */
 	connection->packet_size += packet_size;
 }

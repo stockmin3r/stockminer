@@ -1,0 +1,12 @@
+*Column Generator: Delta Buy/Sell - Quant stats*
+set shake .wdst
+move tag #WSRC_li[v=229] #WDST
+move tag #WSRC_li[v=230] #WDST
+move tag #WSRC_li[v=231] #WDST
+move tag #WSRC_li[v=232] #WDST
+move tag #WSRC_li[v=233] #WDST
+move tag #WSRC_li[v=234] #WDST
+move tag #WSRC_li[v=235] #WDST
+move tag #WSRC_li[v=236] #WDST
+move tag #WSRC_li[v=237] #WDST
+move tag #WSRC_li[v=238] #WDST

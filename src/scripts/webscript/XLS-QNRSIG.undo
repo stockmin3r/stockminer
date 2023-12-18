@@ -1,0 +1,12 @@
+*Column Generator: #Signals Action1/Action4*
+set shake .wdst
+move tag #WDST_li[v=254] #WSRC
+move tag #WDST_li[v=255] #WSRC
+move tag #WDST_li[v=256] #WSRC
+move tag #WDST_li[v=269] #WSRC
+move tag #WDST_li[v=270] #WSRC
+move tag #WDST_li[v=271] #WSRC
+move tag #WSRC_li[v=900] #WDST
+move tag #WSRC_li[v=901] #WDST
+move tag #WSRC_li[v=903] #WDST
+move tag #WSRC_li[v=904] #WDST

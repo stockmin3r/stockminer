@@ -1,0 +1,5 @@
+*Column Generator: MACD TA Stats*
+set shake .wdst
+move tag #WDST_li[v=139] #WSRC
+move tag #WDST_li[v=140] #WSRC
+move tag #WDST_li[v=141] #WSRC

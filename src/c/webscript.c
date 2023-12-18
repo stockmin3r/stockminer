@@ -2,11 +2,11 @@
 #include <conf.h>
 
 static char *server_cookie;
-static char *test_scripts;
-static int   test_scripts_len;
-static int   max_scripts_len;
 static int   nr_loops = 1;
 static int   wait_time;
+char        *webscripts;
+int          webscripts_size;
+int          max_scripts_size;
 
 void init_webscript()
 {
@@ -16,16 +16,16 @@ void init_webscript()
 	char           path[512];
 	int64_t        filesize, pathlen;
 
-	if (!fs_opendir("scripts/jobs", &dirmap))
+	if (!fs_opendir("src/scripts/webscript", &dirmap))
 		return;
-	test_scripts    = (char *)malloc(64 KB);
-	max_scripts_len = 64 KB;
-	strcpy(test_scripts, "qsh ");
-	test_scripts_len = 4;
+	webscripts    = (char *)malloc(64 KB);
+	max_scripts_size = 64 KB;
+	strcpy(webscripts, "webscripts ");
+	webscripts_size = 11;
 	while ((filename=fs_readdir(&dirmap)) != NULL) {
 		if (*filename == '.')
 			continue;
-		pathlen = snprintf(path, sizeof(path)-32, "scripts/jobs/%s", filename);
+		pathlen = snprintf(path, sizeof(path)-32, "src/scripts/webscript/%s", filename);
 		if (path[pathlen-1] == '~')
 			continue;
 		if (stat(path, &sb) == -1)
@@ -33,50 +33,47 @@ void init_webscript()
 		file = fs_mallocfile_str(path, &filesize);
 		if (!file)
 			continue;
-		if (test_scripts_len + filesize + 4 > max_scripts_len) {
-			max_scripts_len += MAX(64 KB, filesize+1);
-			test_scripts     = (char *)realloc(test_scripts, max_scripts_len);
-			if (!test_scripts) {
-				printf(BOLDRED "[-] no memory to allocate test scripts!" RESET "\n");
+		if (webscripts_size + filesize + 4 > max_scripts_size) {
+			max_scripts_size += MAX(64 KB, filesize+1);
+			webscripts     = (char *)realloc(webscripts, max_scripts_size);
+			if (!webscripts)
 				exit(-1);
-			}
 		}
-		test_scripts_len += snprintf(test_scripts+test_scripts_len, max_scripts_len-test_scripts_len-32, "%s%s!", filename, file);
+		webscripts_size += snprintf(webscripts+webscripts_size, max_scripts_size-webscripts_size-32, "%s%s!", filename, file);
 		free(file);
 	}
 	fs_closedir(&dirmap);
 }
 
-void netshell_cmd(char *str)
-{
-	char cmd[4096];
-
-	snprintf(cmd, sizeof(cmd)-1, "%.8s %s", server_cookie, str);
-//	apc_send_str(APC_NETSH, cmd);
-}
-
 void run_script(char *job)
 {
-	char *p;
-	char path[256];
+	char  path[256];
+	char  cmd[4096];
+	char *script, *p;
 
-	snprintf(path, sizeof(path)-1, "scripts/jobs/%s", job);
-	job = fs_mallocfile_str(path, NULL);
-	if (!job)
+	snprintf(path, sizeof(path)-1, "scripts/webscript/%s", job);
+	script = fs_mallocfile_str(path, NULL);
+	if (!script)
 		return;
-	while (p=strchr(job, '\n')) {
+
+	while (p=strchr(script, '\n')) {
 		*p++ = 0;
-		if (*job == '*') {
-			job = p;
+		if (*script == '*') {
+			script = p;
 			continue;
 		}
-		if (!strncmp(job, "sleep ", 6))
-			os_sleep(atoi(job+6));
-		netshell_cmd(job);
-		job = p;
+		if (!strncmp(script, "sleep ", 6))
+			os_sleep(atoi(script+6));
+
+		/*
+		 * Format the script line command
+		 */
+		snprintf(cmd, sizeof(cmd)-1, "webscript %s", script);
+		apc_send_command(cmd);
+		script = p;
 		os_usleep(500000);
 	}
-	free(job);
+	free(script);
 }
 
 void cmd_netshell_chain(char *scripts)
@@ -101,26 +98,19 @@ void cmd_netshell_chain(char *scripts)
 		}
 	}
 }
-/*
-apc_result_t *apc_netsh(int sockfd)
+
+void apc_webscript(struct connection *connection, char **argv)
 {
 	struct session *session;
-	char buf[8 KB];
-	char cmd[9 KB];
-	size_t packet_len = 0;
-	int nbytes;
+	char            cmd[8 KB];
+	packet_size_t   packet_size;
 
-	recv(sockfd, (void *)&packet_len, 4, 0);
-	if (packet_len > 256)
+	session = session_by_username(argv[0]);
+	if (connection->session != session || !connection->authorized)
 		return;
-	nbytes = recv(sockfd, buf, sizeof(buf)-1, 0);
-	buf[nbytes] = 0;
-	if (nbytes <= 0)
-		return;
-	session = session_by_cookie(buf);
-	if (!session)
-		return;
-	nbytes = snprintf(cmd, sizeof(cmd)-1, "netsh %s", buf+9);
-	websockets_sendall(session, cmd, nbytes);
+
+	packet_size = snprintf(cmd, sizeof(cmd)-1, "netsh %s", argv[1]);
+	printf("cmd: %s\n", cmd);
+	websockets_sendall(session, cmd, packet_size);
 }
-*/
+

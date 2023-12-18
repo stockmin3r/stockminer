@@ -304,7 +304,9 @@ void build_candle_screener(struct XLS *XLS)
 	for (x=0; x<nr_stocks; x++) {
 		stock = stocks[x];
 		mag   = stock->mag;
-		if (stock->rank == -1 || stock->rank > 200 || !mag || !mag->nr_candles || !(C=stock->last_candle))
+//		if (stock->rank == -1 || stock->rank > 200 || !mag || !mag->nr_candles || !(C=stock->last_candle))
+//			continue;
+		if (nr_stocks > 50 || !mag || !mag->nr_candles || !(C=stock->last_candle))
 			continue;
 
 		candle_screener_size += sprintf(candle_screener+candle_screener_size,

@@ -1,0 +1,6 @@
+*Column Generator: MA TA Stats*
+set shake .wdst
+move tag #WSRC_li[v=100] #WDST
+move tag #WSRC_li[v=101] #WDST
+move tag #WSRC_li[v=102] #WDST
+move tag #WSRC_li[v=103] #WDST

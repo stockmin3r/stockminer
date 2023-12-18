@@ -250,6 +250,7 @@ function chart(av)
 	}
 	CONF = conf;
 	if (av.chartware == "highcharts") {
+		console.log("stockchart!")
 		if (av.type == "stock")
 			stockchart(av);
 		else
@@ -527,12 +528,11 @@ function rpc_minichart(av)
     series:       [{type:'line',name:ticker,data:points,color:av[7],dataGrouping:{enabled:false}}]
 	});
 }
-      
-/* Indicator Objects */
-function ichart(av,indi,unit)
-{
 
-	var args = JSON.parse(av[1]), ticker = args.ticker, div = args.div, data=args.data, len=data.length, i=0, ohlc=[], volume=[], box = document.createElement('div');
+/* Indicator Objects */
+function ichart(args,indi,unit)
+{
+	var ticker = args.ticker, div = args.div, data=args.data, len=data.length, i=0, ohlc=[], volume=[], box = document.createElement('div');
 	for (i; i<len; i+= 1) {ohlc.push([data[i][0],data[i][1],data[i][2],data[i][3],data[i][4]]);volume.push([data[i][0],data[i][5]])}
 	box.id  = div;
 	WMAP[div.split("-")[1]].appendChild(box);
@@ -549,10 +549,10 @@ function ichart(av,indi,unit)
 //				this.xAxis[0].setExtremes(D[D.length-100][0], null,true);
 				WMAP[div.split("-")[1]].w.workspace['ws0'].obj.push({type:"chart", ref:this});
 				for (var x = 0; x<indi.length; x++) {
-					menu      = charts['graph'].menu; // XXX: STATIC
+					menu      = Object.values(charts)[0].menu;
 					menu.indi = indi[x];
 					this.menu = menu;
-					iadd(this, 0, t+'-price');
+					iadd(this, 0, ticker+'-price');
 				}
 				this.reflow();
 			}
@@ -630,7 +630,7 @@ function iadd(chart,sh,t,rpc)
 	var menu = chart.menu, type = menu.indi, /* Currently Selected Indicator */
 	QGID,sid, id, s, config = {}, input, param, params = {}, period = [];
 
-	console.log("iadd on chart: " + menu.indi);
+	console.log("iadd indicator: " + menu.indi);
 	if (type === "add")
 		return Chart_addTicker(chart, $('.add-ticker',menu)[0].value);
 	

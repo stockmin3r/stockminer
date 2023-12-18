@@ -1,0 +1,15 @@
+*Column Generator: ANYDAY Quarter Success - Quant Stats*
+set shake .wdst
+move tag #WDST_li[v=418] #WSRC
+move tag #WDST_li[v=419] #WSRC
+move tag #WDST_li[v=420] #WSRC
+move tag #WDST_li[v=421] #WSRC
+move tag #WDST_li[v=422] #WSRC
+move tag #WDST_li[v=423] #WSRC
+move tag #WDST_li[v=424] #WSRC
+move tag #WDST_li[v=425] #WSRC
+move tag #WDST_li[v=426] #WSRC
+move tag #WDST_li[v=427] #WSRC
+move tag #WDST_li[v=428] #WSRC
+move tag #WDST_li[v=429] #WSRC
+call colmod - 1

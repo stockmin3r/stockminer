@@ -15,6 +15,7 @@ static struct apc apc_commands[] = {
 	{ APC, "ebuild",      apc_ebuild_stocks }, // Instructs Server to rebuild earnings .e binary files from .earn txt files
 	{ APC, "options",     lpc_options       }, // Terminal Procedure Call (alters the admin prompt for Stock Options specific commands)
 	{ APC, "auth",        apc_server_auth   }, // server admin auth entry point
+	{ APC, "webscript",   apc_webscript     }, // webscript fuzzing
 	{ LPC, "adduser",     lpc_adduser       }, // add user to db/users.db
 	{ LPC, "help",        lpc_help          }, // Local Procedure Call: calls lpc_help()
 	{ LPC, "users",       lpc_users         }, // List users from the database (Currently just a file)

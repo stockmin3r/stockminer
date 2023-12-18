@@ -218,6 +218,7 @@ struct connection        {
 	int                  protocol;
 	unsigned int         events;
 	int                  has_cookie;
+	bool                 authorized;
 };
 
 struct user {
@@ -506,7 +507,7 @@ void              rpc_watchlist_remove    (struct rpc *rpc); // watchlib.c
 void              rpc_watchlist_clear     (struct rpc *rpc); // watchlist.c
 void              rpc_watchlist_load      (struct rpc *rpc); // watchlist.c
 void              rpc_watchlist_alert     (struct rpc *rpc); // watchlist.c
-void              rpc_webscript           (struct rpc *rpc); // watchlist.c
+void              rpc_stage               (struct rpc *rpc); // watchlist.c
 void              rpc_watchtable_addstocks(struct rpc *rpc); // watchlist.c
 void              rpc_watchtable_sort     (struct rpc *rpc); // watchtable.c
 void              rpc_watchtable_load     (struct rpc *rpc); // watchtable.c
@@ -904,7 +905,6 @@ void   apc_exec                  (char *command);
 
 /* term.c */
 void terminal_loop(void);
-
 
 struct curldata {
     char         *memory;

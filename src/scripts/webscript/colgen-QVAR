@@ -1,0 +1,6 @@
+*Column Generator: Value At Risk*
+set shake .wdst
+move tag #WSRC_li[v=241] #WDST
+move tag #WSRC_li[v=242] #WDST
+move tag #WSRC_li[v=243] #WDST
+move tag #WSRC_li[v=244] #WDST
