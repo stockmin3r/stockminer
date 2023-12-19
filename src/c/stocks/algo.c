@@ -2,7 +2,6 @@
 #include <extern.h>
 #include <stocks/stocks.h>
 
-int            current_month;
 int            month_days_array[24];
 int           *month_days;
 int months[] = { 0x2d31302d, 0x2d32302d, 0x2d33302d, 0x2d34302d, 0x2d35302d, 0x2d36302d,
@@ -821,8 +820,7 @@ void load_stock_csv(struct XLS *XLS, struct stock *stock, struct mag *mag, unsig
 	price->price_1d_close    = (char *)malloc(32 KB);
 	price->price_1d_close[0] = '[';
 	price->price_1d[0]       = '[';
-
-	mag->months[month++] = start_entry;
+	mag->months[month++]     = start_entry;
 	for (entry=start_entry; entry<nr_entries; entry++) {
 		year = *(unsigned int *)mag->date[entry];
 		if (year == YEAR_2022) {
@@ -834,21 +832,19 @@ void load_stock_csv(struct XLS *XLS, struct stock *stock, struct mag *mag, unsig
 		if (entry == YEAR_2023)
 			month_days_array[month-1]++;
 
+		/*
+		 * Add 1D Historical OHLC to a JSON array
+		 */
 		timestamp  = ny_time(mag->date[entry])*1000;
 		nbytes     = sprintf(price->price_1d+ohlc_len, "[%lu,%.2f,%.2f,%.2f,%.2f,%llu],", timestamp, mag->open[entry], mag->high[entry], mag->low[entry], mag->close[entry], mag->volume[entry]);
 		ohlc_len   += nbytes;
 		nbytes     = sprintf(price->price_1d_close+close_len, "[%lu,%.2f],", timestamp, mag->close[entry]);
 		close_len  += nbytes;
 	}
-	price->price_1d_len                 = ohlc_len;
-	price->price_1d_close_len           = close_len;
+	price->price_1d_len                    = ohlc_len;
+	price->price_1d_close_len              = close_len;
 	price->price_1d[price->price_1d_len-1] = ']';
-
-	*(price->price_1d_close+close_len-1) = ']';
-	if (count_months) {
-		current_month = month;
-		printf("current_month: %d\n", current_month);
-	}
+	*(price->price_1d_close+close_len-1)   = ']';
 }
 
 // use for stack buffers in synchronous code

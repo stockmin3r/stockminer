@@ -733,13 +733,9 @@ void random_string_len(char *str, int64_t len)
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz";
-	if (len <= 0 || len >= 32 KB) {
-		str[0] = 0;
-		return;
-	}
-    for (int i = 0; i < len; ++i)
-        str[i] = alphanum[random_int() % (sizeof(alphanum) - 1)];
-    str[len] = 0;
+	for (int i = 0; i < len; ++i)
+		str[i] = alphanum[random_int() % (sizeof(alphanum) - 1)];
+	str[len] = 0;
 }
 
 void random_string(char *str)

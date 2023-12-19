@@ -9,8 +9,8 @@ time_t current_minute;     // current unix timestamp      (UTC)
 int    current_minute_utc; // current minute of the hour  (UTC)
 int    current_hour;       // current hour   of the day   (UTC)
 int    current_day;        // current day    of the week  (UTC)
-int    current_week;       // current week   of the month (UTC) 
-//int    current_month;      // current month  of the year  (UTC)
+int    current_week;       // current week   of the month (UTC)
+int    current_month;      // current month  of the year  (UTC)
 int    trading_day;        // offset from the start of the year (trading days only, needs to go in an eventual market struct)
 
 int TODAY_IS_SATURDAY;
@@ -120,6 +120,7 @@ void time_load_EOD()
 	time(&current_unix);
 	gmtime_r(&current_unix, &utc_tm);
 	sprintf(current_date, "%d-%d-%d", utc_tm.tm_year+1900, utc_tm.tm_mon+1, utc_tm.tm_mday);
+	current_month = utc_tm.tm_mon;
 
 	for (int x = 0; x<sizeof(trading_calendar)/sizeof(struct calendar); x++) {
 		struct calendar *calendar = &trading_calendar[x];

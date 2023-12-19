@@ -132,6 +132,12 @@ function editor_close()
 //	$("#P0Q1q2").append(tab);
 }
 
+function init_editor()
+{
+	ace.config.set("basePath", "https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/");
+}
+
+
 function Editor(component, lang)
 {
 	var editor = $("#editor")[0], component, div, sel;

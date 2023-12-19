@@ -195,6 +195,7 @@ function init_stockminer()
 	compat();
 	init_charts();
 	init_stockpage();
+	init_editor();
 
 	chart_table_onclick("LG");
 	chart_table_onclick("LL");

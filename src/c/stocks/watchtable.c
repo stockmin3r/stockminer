@@ -442,7 +442,7 @@ stock_get_trend(struct column_value *cvalue, int column_id)
 			cvalue->value_type   = VALUE_TYPE_DOUBLE;
 			break;
 		case COL_PKP:
-			cvalue->value.int32 = mag->peak_pc[nr_entries-entry];
+			cvalue->value.DOUBLE = mag->peak_pc[nr_entries-entry];
 			cvalue->value_type   = VALUE_TYPE_DOUBLE;
 			break;
 		case COL_NDDW:

@@ -10,6 +10,7 @@
 #include <stocks/candles.h>
 #include <stocks/ranks.h>
 #include <stocks/forks.h>
+#include <stocks/backtest.h>
 
 #define PRE_MARKET             1
 #define DAY_MARKET             2
@@ -409,15 +410,16 @@ struct stock {
 	unsigned short   ranks_2023[12];
 	unsigned short   ranks_2024[12];
 	char             rankstr[32];
-	int              rank;
-	int              prev_rank;
-	unsigned short   nr_ranks;
-	unsigned short   exchange;
-	unsigned short   id;
-	unsigned short   thread_id;
-	unsigned short   airfork_stock_class;
-	unsigned short   dead;
-	unsigned short   nr_data_retries;
+	uint16_t         rank;
+	uint16_t         prev_rank;
+	uint8_t          sector_index;
+	uint8_t          dead;
+	uint16_t         nr_ranks;
+	uint16_t         exchange;
+	uint16_t         id;
+	uint16_t         thread_id;
+	uint16_t         airfork_stock_class;
+	uint16_t         nr_data_retries;
 	/* Price */
 	double           prior_close;
 	double           price_open;

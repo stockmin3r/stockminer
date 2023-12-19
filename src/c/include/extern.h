@@ -18,6 +18,7 @@ extern int                stockdata_pending;
 extern bool               STOCKDATA_PENDING;
 extern char              *webscripts;
 extern int                webscripts_size;
+extern char              *SECTORS[];
 
 extern const char *DB_PATH;
 extern const char *DB_USERS_PATH;
@@ -38,6 +39,7 @@ extern char *test_scripts;
 extern int   test_scripts_len;
 
 extern int   current_week;
+extern int   current_month;
 extern int  *month_days;
 
 extern int  NR_RANKS;

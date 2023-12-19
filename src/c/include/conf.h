@@ -266,10 +266,17 @@ struct session {
 	struct style        *styles;
 	struct object       *avatar;
 	struct connection   *websockets[MAX_WEBSOCKETS];
+	struct port         *portlist[MAX_PORTFOLIOS];
+	struct backjson     *current_backtest;
+	struct backtest     *current_backtest2;
+	char                *ports_json;
+	char                 cookie[16];
 	time_t               timestamp;
 	mutex_t              session_lock;
 	mutex_t              watchlist_lock;
 	int                  ufo_tables;
+	uint32_t             nr_ports;
+	uint32_t             ports_json_len;
 	bool                 rpc_boot;
 	unsigned char        current_quadverse[MAX_WEBSOCKETS];
 	unsigned char        page;
