@@ -99,8 +99,8 @@ void init_db(struct server *server)
 
 void db_enqueue(int database, int engine, int op, char *key, void *value, uint64_t vsize, struct connection *connection, db_callback_t callback)
 {
-	db_queue_t *db_queue_entry = malloc(sizeof(db_queue_t));
-	db_task_t  *db_task        = malloc(sizeof(db_task_t));
+	db_queue_t *db_queue_entry = (db_queue_t *)malloc(sizeof(db_queue_t));
+	db_task_t  *db_task        = (db_task_t  *)malloc(sizeof(db_task_t));
 
 	if (!db_task || !db_queue_entry)
 		return;
@@ -216,7 +216,7 @@ void *db_submit_tasks(void *args)
 	/* Database Thread Loop */
 	for (int x = 0; x<NR_TASKS; x++) {
 		sleep(1);
-		user = zmalloc(sizeof(*user));
+		user = (struct user *)zmalloc(sizeof(*user));
 		strcpy(user->uname, users[x]);
 		printf("enqueing: %s\n", users[x]);
 		db_enqueue(DATABASE_USERS, DATABASE_FILE, DB_APPEND, users[x], (void *)user, sizeof(*user), NULL, NULL);
@@ -232,7 +232,7 @@ void db_user_add(struct user *user, struct connection *connection)
 void db_user_update(struct user *user)
 {
 	printf("updating user: %s\n", user->uname);
-	struct db_task *task = zmalloc(sizeof(*task));
+	struct db_task *task = (struct db_task *)zmalloc(sizeof(*task));
 
 	db_enqueue(DATABASE_USERS, DATABASE_FILE, DB_OVERWRITE, NULL, user, sizeof(user), NULL, NULL);
 }

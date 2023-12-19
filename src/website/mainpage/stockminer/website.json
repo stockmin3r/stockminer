@@ -19,7 +19,11 @@
 			title:"Stocks",
 			grid:"gridmain",
 			quads:[{
-				workspace: [{mod:"addTable",  title:"Lowcaps",  args:{id:"LG,LL", params:{
+				workspace: [{mod:"addTable",  title:"Lowcaps",  args:{id:"LG,LL",   events:[{
+																							click: "table_onclick_loadchart",
+																							target: "q1ws0",
+																							}],
+																					params:{
 																							columns:[["T","P","D","V"],["T","P","D","V"]],
 																							order:[2,2],
 																							slope:["desc","asc"]

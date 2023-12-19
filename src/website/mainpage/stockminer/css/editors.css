@@ -53,8 +53,9 @@
 	border:2px solid #585a5e;
 	float:right;
 }
-#editor textarea {width:99%!important;height:99%!important}
+#editor textarea       {width:99%!important;height:99%!important}
 .UTR .watchtable-tools {margin:0 auto;margin-left:12.3%}
+.editor-tab            {color:white}
 
 /******************************
  *       Template Mod         *

@@ -33,7 +33,7 @@ struct request rpc_requests[] = {
 
 	/* QuadVerse */
 	{ "qswitch",             rpc_qswitch,                3, 4, ARGS_TYPE_ARGV},
-	{ "qupdate",             rpc_quadverse_update,       6, 6, ARGS_TYPE_ARGV},
+	{ "qupdate",             rpc_quadverse_update,       6, 7, ARGS_TYPE_ARGV},
 	{ "qexport",             rpc_quadverse_export,       6, 6, ARGS_TYPE_ARGV},
 	{ "stage",               rpc_stage,                  3, 3, ARGS_TYPE_ARGV},
 

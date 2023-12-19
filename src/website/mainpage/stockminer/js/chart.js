@@ -314,6 +314,7 @@ function stockchart(av)
 					chart.xAxis[0].setExtremes(data[len-50][0], data[len-1][0], false);
 					chart.redraw();
 				}*/
+
 				chart.renderer.image(LINE,  28, 5, 25, 20).add().attr({title:"Line",                class:"line svg"});
 				chart.renderer.image(AREA,  53, 5, 25, 20).add().attr({title:"Area",                class:"area svg"});
 				chart.renderer.image(CDL,   78, 5, 25, 34).add().attr({title:"Candlestick",         class:"candle svg"});
@@ -359,7 +360,6 @@ function stockchart(av)
 					localStorage.ctype = "area";
 					chart.series[0].update({type:'area',color:"#821eda",useOhlcData:true});localStorage.ctype="area"
 				};
-
 				var sel = $("<select class=freq><option class=m1>1 Minute</option><option class=m15>15 Minutes</option><option class=d1>1 Day</option><option class=W1>1 Week</option><option class=M1>1 Month</option></select>");				
 				$("#"+div).prepend(sel);
 				chart.sel = sel = sel[0];
@@ -394,12 +394,15 @@ function stockchart(av)
 				cfreq['W1']  = function(){sel.onchange(3,chart)}
 				cfreq['M1']  = function(){sel.onchange(4,chart)}
 
+/*
+				// tbis takes a considerable amount of time
 				if (localStorage.ctype)
 					ctypes[localStorage.ctype]();
 				if (localStorage.cfreq)
 					cfreq [localStorage.cfreq]();
 				else
 					sel.onchange(2,chart);
+*/
 
 				ID(div).className += " qchart";
 				$("#"+div).draggable({handle:'.highcharts-title',grid:[20,20],snap:"#"+ws,stop:function(){updatePosition(box, ticker)}});
@@ -1130,8 +1133,6 @@ function chart_table_onclick(id)
 		$("body").append("<div id=load class=loading></div>");
 	});
 }
-
-
 
 function ChartMenu()
 {

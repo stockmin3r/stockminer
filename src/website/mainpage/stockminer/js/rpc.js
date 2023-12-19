@@ -125,7 +125,7 @@ var TBL,TNAME;
 function table(av)   {
 	TNAME = av[1];
 	TBL   = av;
-	/*console.log("TABLE: " + av[1] + " " + av[2]);*/
+//	console.log("TABLE: " + av[1] + " " + av[2]);
 	T[av[1]].clear().rows.add(JSON.parse(av[2])).draw()
 }
 

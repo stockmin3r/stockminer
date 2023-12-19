@@ -153,7 +153,7 @@ char *build_mainpage(struct server *server)
 	/* CSS */
 	max_buf          = 2048;
 	nbytes           = 0;
-	head_css_scripts = malloc(2048);
+	head_css_scripts = (char *)malloc(2048);
 	for (int x = 0; x<nr_head_css; x++) {
 		nbytes += snprintf(head_css_scripts+nbytes, 256, "%s\n\t", head_css[x]);
 		REALLOC(head_css_scripts, char *, nbytes, max_buf);
@@ -162,7 +162,7 @@ char *build_mainpage(struct server *server)
 	/* JavaScript */
 	max_buf         = 2048;
 	nbytes          = 0;
-	head_js_scripts = malloc(2048);
+	head_js_scripts = (char *)malloc(2048);
 	for (int x = 0; x<nr_head_js; x++) {
 		nbytes += snprintf(head_js_scripts+nbytes, 256, "%s\n\t", head_js[x]);
 		REALLOC(head_js_scripts, char *, nbytes, max_buf);
@@ -171,7 +171,7 @@ char *build_mainpage(struct server *server)
 	/* JavaScript (defer) */
 	max_buf          = 2048;
 	nbytes           = 0;
-	defer_js_scripts = malloc(2048);
+	defer_js_scripts = (char *)malloc(2048);
 	for (int x = 0; x<nr_defer_js; x++) {
 		nbytes += snprintf(defer_js_scripts+nbytes, 256, "%s\n\t", defer_js[x]);
 		REALLOC(defer_js_scripts, char *, nbytes, max_buf);
@@ -201,7 +201,7 @@ struct website *build_website(struct server *server)
 	 * Allocate memory for the "website" and all the struct page's that
 	 * represent src/website/{mainpage,backpage}
 	 */
-	website = zmalloc(sizeof(*website));
+	website = (struct website *)zmalloc(sizeof(*website));
 	if (!website)
 		return NULL;
 	website->mainpage = (struct page **)zmalloc(sizeof(struct page *) * 4);
@@ -218,7 +218,7 @@ struct website *build_website(struct server *server)
 		while ((filename=fs_readdir(&dirmap)) != NULL) {
 			if (*filename == '.')
 				continue;
-			page           = zmalloc(sizeof(*page));
+			page           = (struct page *)zmalloc(sizeof(*page));
 			page->filename = filename;
 			if (strstr(directory, "mainpage"))
 				website->mainpage[website->nr_mainpages++] = page;
@@ -330,9 +330,9 @@ website_load_pages(struct page **pages, int nr_pages, int PAGE_CONTAINER_INDEX)
 	char           *page_dirs[] = { "src/website/mainpage", "src/website/backpage" };
 	char           *src_dirs[]  = { "css", "js", "html" };
 
-	html_files = malloc(96 KB);
-	js_files   = malloc(96 KB);
-	css_files  = malloc(96 KB);
+	html_files = (char *)malloc(96 KB);
+	js_files   = (char *)malloc(96 KB);
+	css_files  = (char *)malloc(96 KB);
 	html_files[0] = 0;
 	js_files[0] = 0;
 	css_files[0] = 0;
@@ -384,7 +384,7 @@ website_gzip_mainpage(struct page *mainpage)
 	char         *mainpage_response_gz;
 	int           zbytes;
 
-	mainpage_response_gz = malloc(mainpage->filesize + SIZEOF_MAINPAGE + 256);
+	mainpage_response_gz = (char *)malloc(mainpage->filesize + SIZEOF_MAINPAGE + 256);
 	strcpy(mainpage_response_gz, HTTP_MAINPAGE);
 	zbytes = zip_compress(mainpage->file, mainpage_response_gz+SIZEOF_MAINPAGE, mainpage->filesize);
 	md5_string(md5_checksum(mainpage_response_gz+SIZEOF_MAINPAGE, ebuf, zbytes), ETag);

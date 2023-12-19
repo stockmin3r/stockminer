@@ -155,7 +155,7 @@ void init_backtest();
 int get_json_backtest(struct session *session, char *backname, int http_fd);
 int get_port(struct session *session, uint64_t port_id, int http_fd);
 void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *backtest, double money_initial, char **stocklist, int nstocks);
-void backtest_save(struct session *session, uint64_t port_id, char *name, int export);
+void backtest_save(struct session *session, uint64_t port_id, char *name, int do_export);
 int linechart_positions(char **json_out, int nr_positions, struct position *position);
 struct backjson *get_backtest(struct session *session, uint64_t port_id, uint64_t backtest_id);
 struct port *get_portfolio(struct session *session, uint64_t port_id);

@@ -36,11 +36,11 @@ function rpc_checkpoint(av)
 	}
 
 	$("#checkpoint").val(av[2]);
-	checkpoint_progress(av[2]);
-	if (av[2] == 100.0) {
+	if (av[2] == 100.00) {
 		clearInterval(checkpoint_timer);
 		return;
 	}
+	checkpoint_progress(av[2]);
 	if (!checkpoint_timer)
 		checkpoint_timer = setInterval(checkpoint_poll, 3000);
 

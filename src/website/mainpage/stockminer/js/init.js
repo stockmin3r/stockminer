@@ -252,6 +252,8 @@ function init_quadverse(){
 	init_stock_screener();
 	QUADVERSE  = ID("QUADVERSE");
 	LoadQuadverse(WEBSITE);
+		W.showtab(W.workspace['ws0'].tab);
+		QUADVERSE_SWITCH('Screener');
 	W          = QuadVerses['Screener'];
 	ECELL[916] = 1; // editable cells in watchtables
 	init_obj_trash();
@@ -313,50 +315,46 @@ function loadprofile(p,title)
 // called by the server after the websocket connection is established
 function rpc_init(av)
 {
+	console.log("rpc init");
 	init_qspace();
-	if (!av[1]) {
-		W.showtab(W.workspace['ws0'].tab);
+	if (av[1] == 'stocks') {
 		QUADVERSE_SWITCH('Screener');
-	} else {
-		if (av[1] == 'stocks') {
-			QUADVERSE_SWITCH('Screener');
-			stockpage(av[2],-1);
-		/*  0   1       2           3    4    5            */
-		/* init qpage   qpage_json  name QVID              */
-		/* init profile qpage_json, name QVID profile_json */
-		} else if (av[1] == 'profile' || av[1] == 'qpage') {
-			var QSPACE = JSON.parse(av[2])[0], name, QVID = av[4], start = 0;
+		stockpage(av[2],-1);
+	/*  0   1       2           3    4    5            */
+	/* init qpage   qpage_json  name QVID              */
+	/* init profile qpage_json, name QVID profile_json */
+	} else if (av[1] == 'profile' || av[1] == 'qpage') {
+		var QSPACE = JSON.parse(av[2])[0], name, QVID = av[4], start = 0;
 
-			console.log("INIT: " + av.join(" "));
-			QCACHE[QVID] = QSPACE;
-			if (QVID > 5) {
-				name = av[3];
-				W = new_quadverse(name, "", QVID);
-			} else {
-				name = 'Profile';
-				W = Q[4];
-			}
-
-			if (av[1] == 'profile') {
-				loadprofile(av.slice(5).join(" ").split("`").slice(1), name);
-				start = 1;
-			}
-
-			for (var QSID=start; QSID<QSPACE.length; QSID++) {
-				if (!QSPACE[QSID] || QSPACE[QSID] == -1)
-					continue;
-				for (var x = 0; x<QSPACE.length; x++)
-					if (QSPACE[x] == -1)
-						W.idmap[x] = -1;
-				W.addQuadspace(QSPACE[QSID].title, 0, QSPACE[QSID].grid, 4, "quadspace_load",0,0,1).custom = 1;
-			}
-			Q[0].showtab(Q[0].workspace['ws0'].tab);
-			QUADVERSE_SWITCH(name);
-			if (!start)
-				quadspace_load(W.PID,0);
-			W.showtab(W.workspace['ws0'].tab);
-			W.URL = document.location.pathname.substr(1);
+		console.log("INIT: " + av.join(" "));
+		QCACHE[QVID] = QSPACE;
+		if (QVID > 5) {
+			name = av[3];
+			W = new_quadverse(name, "", QVID);
+		} else {
+			name = 'Profile';
+			W = Q[4];
 		}
+
+		if (av[1] == 'profile') {
+			loadprofile(av.slice(5).join(" ").split("`").slice(1), name);
+			start = 1;
+		}
+
+		for (var QSID=start; QSID<QSPACE.length; QSID++) {
+			if (!QSPACE[QSID] || QSPACE[QSID] == -1)
+				continue;
+			for (var x = 0; x<QSPACE.length; x++)
+				if (QSPACE[x] == -1)
+					W.idmap[x] = -1;
+			W.addQuadspace(QSPACE[QSID].title, 0, QSPACE[QSID].grid, 4, "quadspace_load",0,0,1).custom = 1;
+		}
+		Q[0].showtab(Q[0].workspace['ws0'].tab);
+		QUADVERSE_SWITCH(name);
+		if (!start)
+			quadspace_load(W.PID,0);
+		W.showtab(W.workspace['ws0'].tab);
+		W.URL = document.location.pathname.substr(1);
 	}
 
 	/*

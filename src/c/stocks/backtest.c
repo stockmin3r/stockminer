@@ -491,7 +491,7 @@ void portfolio_save(struct session *session, struct port *port)
 
 }
 
-void backtest_save(struct session *session, uint64_t port_id, char *name, int export)
+void backtest_save(struct session *session, uint64_t port_id, char *name, int do_export)
 {
 	struct filemap   filemap;
 	struct backdb    backdb;
@@ -510,7 +510,7 @@ void backtest_save(struct session *session, uint64_t port_id, char *name, int ex
 	if (!bj)
 		return;
 	port = get_portfolio(session, port_id);
-	if (export)
+	if (do_export)
 		sprintf(path, "db/ports/%.8s.bpub", (char *)&port_id);
 	else
 		sprintf(path, "db/ports/%.8s.bpriv.%d", (char *)&port_id, session->user->uid);
@@ -1025,12 +1025,12 @@ void HTTP_SAVE_BACKTEST(char *req, int http_fd)
 	char           *post, *p, *name;
 	char            port_id[8];
 	uint64_t        cookie;
-	int             table_index, export;
+	int             table_index, do_export;
 
 	/* GET /SAVE/port_id/0/Name */
 	*(uint64_t *)port_id = *(uint64_t *)(req+10);
 	port_id[7] = 0;
-	export  = *(req+18) - 48;
+	do_export  = *(req+18) - 48;
 	name = req+20;
 	p = strchr(name, ' ');
 	if (!p)
@@ -1038,8 +1038,8 @@ void HTTP_SAVE_BACKTEST(char *req, int http_fd)
 	*p = 0;
 	if (p-name > 62)
 		return;
-	printf("backsave port_id: %s name: %s export: %d\n", port_id, name, export);
-	backtest_save(session, *(uint64_t *)port_id, name, export);
+	printf("backsave port_id: %s name: %s export: %d\n", port_id, name, do_export);
+	backtest_save(session, *(uint64_t *)port_id, name, do_export);
 	send(http_fd, "HTTP/1.1 200 OK\r\n\r\n", 19, 0);
 }
 
