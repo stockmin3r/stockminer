@@ -6,7 +6,8 @@
 #define COLUMN_CLASS_STOCKS_COMMON  1
 #define COLUMN_CLASS_STOCKS_TREND   2
 #define COLUMN_CLASS_STOCKS_FUND    3
-#define COLUMN_CLASS_DYNAMIC        4
+#define COLUMN_CLASS_STOCKS_ALGO    4
+#define COLUMN_CLASS_DYNAMIC        5  // not yet implemented
 
 struct column_hash *COLUMN_HASHTABLE;
 struct column_hash *COLUMN_HASHTABLE_INT;
@@ -16,6 +17,7 @@ struct wfunction wftable[1000];
 static void stock_get_common      (struct column_value *cvalue, int column_id);
 static void stock_get_trend       (struct column_value *cvalue, int column_id);
 static void stock_get_fundamentals(struct column_value *cvalue, int column_id);
+static void stock_get_algo        (struct column_value *cvalue, int column_id);
 
 static bool watchtable_initialized = false;
 
@@ -47,60 +49,148 @@ struct column_value {
 };
 
 struct column builtin_columns[] = {
-	{ "d",           "\"915\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_DATE      },
-	{ "T",           "\"900\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_SYMBOL    },
-	{ "P",           "\"901\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_PRICE     },
-	{ "R",           "\"902\":\"%d\",",           COLUMN_CLASS_STOCKS_COMMON, COL_RANK      },
-	{ "D",           "\"903\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_DELTA     },
-	{ "V",           "\"904\":\"%s\",",           COLUMN_CLASS_STOCKS_COMMON, COL_VOLUME    },
-	{ "O",           "\"905\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_OPEN      },
-	{ "H",           "\"906\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_HIGH      },
-	{ "L",           "\"907\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_LOW       },
-	{ "PC",          "\"908\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_PC        },
-	{ "OP",          "\"909\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_OP        },
-	{ "HP",          "\"910\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_HP        },
-	{ "LP",          "\"911\":\"%.2f\",",         COLUMN_CLASS_STOCKS_COMMON, COL_LP        },
+	{ "d",             "\"915\":\"%s\",",            COLUMN_CLASS_STOCKS_COMMON, COL_DATE        },
+	{ "T",             "\"900\":\"%s\",",            COLUMN_CLASS_STOCKS_COMMON, COL_SYMBOL      },
+	{ "P",             "\"901\":\"%.2f\",",          COLUMN_CLASS_STOCKS_COMMON, COL_PRICE       },
+	{ "R",             "\"902\":\"%d\",",            COLUMN_CLASS_STOCKS_COMMON, COL_RANK        },
+	{ "D",             "\"903\":\"%.2f\",",          COLUMN_CLASS_STOCKS_COMMON, COL_DELTA       },
+	{ "V",             "\"904\":\"%s\",",            COLUMN_CLASS_STOCKS_COMMON, COL_VOLUME      },
+	{ "O",             "\"905\":\"%.2f\",",          COLUMN_CLASS_STOCKS_COMMON, COL_OPEN        },
+	{ "H",             "\"906\":\"%.2f\",",          COLUMN_CLASS_STOCKS_COMMON, COL_HIGH        },
+	{ "L",             "\"907\":\"%.2f\",",          COLUMN_CLASS_STOCKS_COMMON, COL_LOW         },
+	{ "PC",            "\"908\":\"%.2f\",",          COLUMN_CLASS_STOCKS_COMMON, COL_PC          },
+	{ "OP",            "\"909\":\"%.2f\",",          COLUMN_CLASS_STOCKS_COMMON, COL_OP          },
+	{ "HP",            "\"910\":\"%.2f\",",          COLUMN_CLASS_STOCKS_COMMON, COL_HP          },
+	{ "LP",            "\"911\":\"%.2f\",",          COLUMN_CLASS_STOCKS_COMMON, COL_LP          },
 	/* Trend */
-	{ "PK",          "\"912\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_PK        },
-	{ "PKP",         "\"913\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_PKP       },
-	{ "NDUP",        "\"400\":\"%d\",",           COLUMN_CLASS_STOCKS_TREND,  COL_NDUP      },
-	{ "NDDW",        "\"401\":\"%d\",",           COLUMN_CLASS_STOCKS_TREND,  COL_NDDW      },
-	{ "NWUP",        "\"402\":\"%d\",",           COLUMN_CLASS_STOCKS_TREND,  COL_NWUP      },
-	{ "NWDW",        "\"403\":\"%d\",",           COLUMN_CLASS_STOCKS_TREND,  COL_NWDW      },
-	{ "BIX",         "\"406\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_BIX       },
-	{ "5AD21Q1",     "\"418\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q1   },
-	{ "5AD21Q2",     "\"419\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q2   },
-	{ "5AD20Q1",     "\"420\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q1   },
-	{ "5AD20Q2",     "\"421\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q2   },
-	{ "5AD19Q1",     "\"422\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q1   },
-	{ "5AD19Q2",     "\"423\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q2   },
-	{ "10AD21Q1",    "\"424\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q1  },
-	{ "10AD21Q2",    "\"425\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q2  },
-	{ "10AD20Q1",    "\"426\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q1  },
-	{ "10AD20Q2",    "\"427\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q2  },
-	{ "10AD19Q1",    "\"428\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q1  },
-	{ "10AD19Q2",    "\"429\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q2  },
-	{ "5AD21",       "\"430\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD21     },
-	{ "5AD20",       "\"431\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD20     },
-	{ "5AD19",       "\"432\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_5AD19     },
-	{ "10AD21",      "\"433\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD21    },
-	{ "10AD20",      "\"434\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD20    },
-	{ "10AD19",      "\"435\":\"%.2f\",",         COLUMN_CLASS_STOCKS_TREND,  COL_10AD19    },
+	{ "PK",            "\"912\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_PK          },
+	{ "PKP",           "\"913\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_PKP         },
+	{ "NDUP",          "\"400\":\"%d\",",            COLUMN_CLASS_STOCKS_TREND,  COL_NDUP        },
+	{ "NDDW",          "\"401\":\"%d\",",            COLUMN_CLASS_STOCKS_TREND,  COL_NDDW        },
+	{ "NWUP",          "\"402\":\"%d\",",            COLUMN_CLASS_STOCKS_TREND,  COL_NWUP        },
+	{ "NWDW",          "\"403\":\"%d\",",            COLUMN_CLASS_STOCKS_TREND,  COL_NWDW        },
+	{ "BIX",           "\"406\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_BIX         },
+	{ "5AD21Q1",       "\"418\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q1     },
+	{ "5AD21Q2",       "\"419\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_5AD21Q2     },
+	{ "5AD20Q1",       "\"420\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q1     },
+	{ "5AD20Q2",       "\"421\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_5AD20Q2     },
+	{ "5AD19Q1",       "\"422\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q1     },
+	{ "5AD19Q2",       "\"423\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_5AD19Q2     },
+	{ "10AD21Q1",      "\"424\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q1    },
+	{ "10AD21Q2",      "\"425\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_10AD21Q2    },
+	{ "10AD20Q1",      "\"426\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q1    },
+	{ "10AD20Q2",      "\"427\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_10AD20Q2    },
+	{ "10AD19Q1",      "\"428\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q1    },
+	{ "10AD19Q2",      "\"429\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_10AD19Q2    },
+	{ "5AD21",         "\"430\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_5AD21       },
+	{ "5AD20",         "\"431\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_5AD20       },
+	{ "5AD19",         "\"432\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_5AD19       },
+	{ "10AD21",        "\"433\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_10AD21      },
+	{ "10AD20",        "\"434\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_10AD20      },
+	{ "10AD19",        "\"435\":\"%.2f\",",          COLUMN_CLASS_STOCKS_TREND,  COL_10AD19      },
 	/* Fundamentals */
-	{ "fED",        "\"300\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_ED        },
-	{ "fEDOFF",     "\"313\":\"%d\"",             COLUMN_CLASS_STOCKS_FUND,   COL_EDOFF     },
-	{ "fSEC",       "\"301\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_SEC       },
-	{ "fDY",        "\"302\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_DY        },
-	{ "fDIV",       "\"303\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_DIV       },
-	{ "fXD",        "\"304\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_XD        },
-	{ "fAR",        "\"305\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_AR        },
-	{ "fEPS",       "\"306\":\"%.2f\"",           COLUMN_CLASS_STOCKS_FUND,   COL_EPS       },
-	{ "fVAR",       "\"307\":\"%.2f\"",           COLUMN_CLASS_STOCKS_FUND,   COL_EPS       },
-	{ "fMCP",       "\"308\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_MCP       },
-	{ "fPEG",       "\"309\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_PEG       },
-	{ "fPBR",       "\"310\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_PBR       },
-	{ "fPM",        "\"311\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_PM        },
-	{ "fROA",       "\"312\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_ROA       }
+	{ "fED",           "\"300\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_ED          },
+	{ "fEDOFF",        "\"313\":\"%d\"",             COLUMN_CLASS_STOCKS_FUND,   COL_EDOFF       },
+	{ "fSEC",          "\"301\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_SEC         },
+	{ "fDY",           "\"302\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_DY          },
+	{ "fDIV",          "\"303\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_DIV         },
+	{ "fXD",           "\"304\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_XD          },
+	{ "fAR",           "\"305\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_AR          },
+	{ "fEPS",          "\"306\":\"%.2f\"",           COLUMN_CLASS_STOCKS_FUND,   COL_EPS         },
+	{ "fVAR",          "\"307\":\"%.2f\"",           COLUMN_CLASS_STOCKS_FUND,   COL_EPS         },
+	{ "fMCP",          "\"308\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_MCP         },
+	{ "fPEG",          "\"309\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_PEG         },
+	{ "fPBR",          "\"310\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_PBR         },
+	{ "fPM",           "\"311\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_PM          },
+	{ "fROA",          "\"312\":\"%s\"",             COLUMN_CLASS_STOCKS_FUND,   COL_ROA         },
+	/* Algorithmic */
+	{ "days5pc",       "\"200\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_DAYS_5PC    },
+	{ "days10pc",      "\"201\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_DAYS_10PC   },
+	{ "days15pc",      "\"202\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_DAYS_15PC   },
+	{ "days20pc",      "\"203\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_DAYS_20PC   },
+	{ "ret5pc",        "\"204\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_RET_5PC     },
+	{ "ret10pc",       "\"205\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_RET_10PC    },
+	{ "ret15pc",       "\"206\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_RET_15PC    },
+	{ "ret20pc",       "\"207\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_RET_20PC    },
+	{ "max5pc",        "\"208\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_RET_5PC     },
+	{ "max10pc",       "\"209\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_RET_10PC    },
+	{ "max15pc",       "\"210\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_RET_15PC    },
+	{ "max20pc",       "\"211\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_RET_20PC    },
+	{ "a1_esp",        "\"212\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_A1_ESP      },
+	{ "a1",            "\"213\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_A1          },
+	{ "a1_same",       "\"214\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_A1SAME      },
+	{ "a1_result",     "\"215\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_A1RESULT    },
+	{ "a4_esp",        "\"216\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_A4ESP       },
+	{ "a4",            "\"217\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_A4          },
+	{ "1d",            "\"218\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_1D          },
+	{ "3d",            "\"219\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_3D          },
+	{ "5d",            "\"220\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_5D          },
+	{ "8d",            "\"221\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_8D          },
+	{ "13d",           "\"222\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_13D         },
+	{ "21d",           "\"223\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_21D         },
+	{ "42d",           "\"224\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_42D         },
+	{ "63d",           "\"225\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_63D         },
+	{ "RTD",           "\"226\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_RTD         },
+	{ "STREAK",        "\"227\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_STREAK      },
+	{ "DIR",           "\"228\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_DIR         },
+	{ "BUY",           "\"229\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_BUY         },
+	{ "BUY_DELTA",     "\"230\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_BUY_DELTA   },
+	{ "SELL",          "\"231\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SELL        },
+	{ "SELL_DELTA",    "\"232\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SELL_DELTA  },
+	{ "FIB",           "\"233\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_FIB         },
+	{ "FIB_DIR",       "\"234\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_FIB_DIR     },
+	{ "BUY_FIB",       "\"235\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_BUY_FIB     },
+	{ "DELTA_FIB",     "\"236\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_DELTA_FIB   },
+	{ "SELL_FIB",      "\"237\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SELL_FIB    },
+	{ "SDT_FIB",       "\"238\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SDT_FIB     },
+	{ "MEAN",          "\"239\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MEAN        },
+	{ "STD",           "\"240\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_STD         },
+	{ "VAR90",         "\"241\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_VAR90       },
+	{ "VAR95",         "\"242\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_VAR95       },
+	{ "VAR99",         "\"243\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_VAR99       },
+	{ "VAR99P",        "\"244\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_VAR99P      },
+	{ "1_YEAR_AGO",    "\"245\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_1_YEAR_AGO  },
+	{ "1_YEAR_PKPC",   "\"246\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_1_YEAR_PKPC },
+	{ "YTD",           "\"247\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_YTD         },
+	{ "SIG_21_A1",     "\"248\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SIG_21_A1   },
+	{ "SIG_42_A1",     "\"249\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SIG_42_A1   },
+	{ "SIG_63_A1",     "\"250\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SIG_63_A1   },
+	{ "MXD_5PC_21_A1", "\"251\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_5PC_21_A1  },
+	{ "MXD_5PC_42_A1", "\"252\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_5PC_42_A1  },
+	{ "MXD_5PC_63_A1", "\"253\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_5PC_63_A1  },
+	{ "SCS_5PC_21_A1", "\"254\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_5PC_21_A1  },
+	{ "SCS_5PC_42_A1", "\"255\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_5PC_42_A1  },
+	{ "SCS_5PC_63_A1", "\"256\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_5PC_63_A1  },
+	{ "MXD_10PC_21_A1","\"257\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_10PC_21_A1 },
+	{ "MXD_10PC_42_A1","\"258\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_10PC_42_A1 },
+	{ "MXD_10PC_63_A1","\"259\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_10PC_63_A1 },
+	{ "SCS_10PC_21_A1","\"260\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_10PC_21_A1 },
+	{ "SCS_10PC_42_A1","\"261\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_10PC_42_A1 },
+	{ "SCS_10PC_63_A1","\"262\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_10PC_63_A1 },
+	{ "SIG_21_A4",     "\"263\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SIG_21_A4          },
+	{ "SIG_42_A4",     "\"264\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SIG_42_A4          },
+	{ "SIG_63_A4",     "\"265\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SIG_63_A4          },
+	{ "MXD_5PC_21_A4", "\"266\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_5PC_21_A4  },
+	{ "MXD_5PC_42_A4", "\"267\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_5PC_42_A4  },
+	{ "MXD_5PC_63_A4", "\"268\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_5PC_63_A4  },
+	{ "SCS_5PC_21_A4", "\"269\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_5PC_21_A4  },
+	{ "SCS_5PC_42_A4", "\"270\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_5PC_42_A4  },
+	{ "SCS_5PC_63_A4", "\"271\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_5PC_63_A4  },
+	{ "MXD_10PC_21_A4","\"272\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_10PC_21_A4 },
+	{ "MXD_10PC_42_A4","\"273\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_10PC_42_A4 },
+	{ "MXD_10PC_63_A4","\"274\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_MAXDAYS_10PC_63_A4 },
+	{ "SCS_10PC_21_A4","\"275\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_10PC_21_A4 },
+	{ "SCS_10PC_42_A4","\"276\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_10PC_42_A4 },
+	{ "SCS_10PC_63_A4","\"277\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SUCCESS_10PC_63_A4 },
+	{ "1_YEAR_PKPR",   "\"278\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_1_YEAR_PKPR        },
+	{ "PLIMIT",        "\"279\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_PLIMIT             },
+	{ "PDELTA",        "\"280\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_PDELTA             },
+	{ "ONE_YR_P10",    "\"281\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_ONE_YR_P10         },
+	{ "ONE_YR_P5",     "\"282\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_ONE_YR_P5          },
+	{ "LAST_PEAK",     "\"283\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_LAST_PEAK          },
+	{ "P10ORP",        "\"284\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_P10ORP5            },
+	{ "PEAK2",         "\"285\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_PEAK2              },
+	{ "SIG",           "\"286\":\"%s\"",             COLUMN_CLASS_STOCKS_ALGO,   COL_SIG                }
 };
 
 void init_watchtable()
@@ -128,6 +218,9 @@ void init_watchtable()
 			case COLUMN_CLASS_STOCKS_FUND:
 				column->cb = stock_get_fundamentals;
 				break;
+			case COLUMN_CLASS_STOCKS_ALGO:
+				column->cb = stock_get_algo;
+				break;
 		}
 	}
 	watchtable_initialized = true;
@@ -135,8 +228,8 @@ void init_watchtable()
 
 static __inline__ void watchtable_path(struct session *session, char *path)
 {
-	if (session->user->uid == -1)
-		snprintf(path, 32, "db/uid/%s.wtab", session->filecookie);
+	if (!session->user->logged_in)
+		snprintf(path, 64, "db/uid/cookie/%s.wtab", session->filecookie);
 	else
 		snprintf(path, 32, "db/uid/%d.wtab", session->user->uid);
 }
@@ -548,6 +641,371 @@ stock_get_trend(struct column_value *cvalue, int column_id)
 }
 
 static void
+stock_get_algo(struct column_value *cvalue, int column_id)
+{
+	struct stock *stock      = cvalue->stock;
+	struct mag2  *m2         = cvalue->m2;
+	int           nr_entries = cvalue->nr_entries;
+	int           entry      = cvalue->entry;
+	char          timestr[64];
+
+	if (!m2)
+		return;
+
+	switch (column_id) {
+		case COL_DAYS_5PC:
+			cvalue->value.DOUBLE = m2->days_5pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_DAYS_10PC:
+			cvalue->value.DOUBLE = m2->days_10pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_DAYS_15PC:
+			cvalue->value.DOUBLE = m2->days_15pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_DAYS_20PC:
+			cvalue->value.DOUBLE = m2->days_20pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_RET_5PC:
+			cvalue->value.DOUBLE = m2->days_ret_5pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_RET_10PC:
+			cvalue->value.DOUBLE = m2->days_ret_10pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_RET_15PC:
+			cvalue->value.DOUBLE = m2->days_ret_15pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_RET_20PC:
+			cvalue->value.DOUBLE = m2->days_ret_20pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAX_5PC:
+			cvalue->value.DOUBLE = m2->days_max_5pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAX_10PC:
+			cvalue->value.DOUBLE = m2->days_max_10pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAX_15PC:
+			cvalue->value.DOUBLE = m2->days_max_15pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAX_20PC:
+			cvalue->value.DOUBLE = m2->days_max_20pc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_A1_ESP:
+			cvalue->value.DOUBLE = m2->a1esp;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_A1:
+			cvalue->value.DOUBLE = m2->action1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_A1SAME:
+			cvalue->value.DOUBLE = m2->a1same;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_A1RESULT:
+			cvalue->value.DOUBLE = m2->a1result;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_A4ESP:
+			cvalue->value.DOUBLE = m2->a4esp;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_A4:
+			cvalue->value.DOUBLE = m2->action4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_1D:
+			cvalue->value.DOUBLE = m2->day1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_3D:
+			cvalue->value.DOUBLE = m2->day3;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_5D:
+			cvalue->value.DOUBLE = m2->day5;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_8D:
+			cvalue->value.DOUBLE = m2->day8;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_13D:
+			cvalue->value.DOUBLE = m2->day13;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_21D:
+			cvalue->value.DOUBLE = m2->day21;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_42D:
+			cvalue->value.DOUBLE = m2->day42;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_63D:
+			cvalue->value.DOUBLE = m2->day63;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_RTD:
+			cvalue->value.DOUBLE = m2->RTD;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_STREAK:
+			cvalue->value.DOUBLE = m2->streak;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_DIR:
+			cvalue->value.DOUBLE = m2->dir;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_BUY:
+			cvalue->value.DOUBLE = m2->buy;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_BUY_DELTA:
+			cvalue->value.DOUBLE = m2->buy_delta;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SELL:
+			cvalue->value.DOUBLE = m2->sell;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SELL_DELTA:
+			cvalue->value.DOUBLE = m2->sell_delta;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_FIB:
+			cvalue->value.DOUBLE = m2->fib;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_FIB_DIR:
+			cvalue->value.DOUBLE = m2->fib_dir;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_BUY_FIB:
+			cvalue->value.DOUBLE = m2->buy_fib;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_DELTA_FIB:
+			cvalue->value.DOUBLE = m2->buy_delta_fib;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SELL_FIB:
+			cvalue->value.DOUBLE = m2->sell_fib;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SDT_FIB:
+			cvalue->value.DOUBLE = m2->sell_delta_fib;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MEAN:
+			cvalue->value.DOUBLE = m2->mean;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_STD:
+			cvalue->value.DOUBLE = m2->std;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_VAR90:
+			cvalue->value.DOUBLE = m2->var_90;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_VAR95:
+			cvalue->value.DOUBLE = m2->var_95;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_VAR99:
+			cvalue->value.DOUBLE = m2->var_99;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_VAR99P:
+			cvalue->value.DOUBLE = m2->var_99pot;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_1_YEAR_AGO:
+			cvalue->value.DOUBLE = m2->one_year_ago;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_1_YEAR_PKPC:
+			cvalue->value.DOUBLE = m2->one_year_pkpc;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_YTD:
+			cvalue->value.DOUBLE = m2->YTD;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SIG_21_A1:
+			cvalue->value.DOUBLE = m2->sig_21_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SIG_42_A1:
+			cvalue->value.DOUBLE = m2->sig_42_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SIG_63_A1:
+			cvalue->value.DOUBLE = m2->sig_63_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_5PC_21_A1:
+			cvalue->value.DOUBLE = m2->max_days_5pc_21_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_5PC_42_A1:
+			cvalue->value.DOUBLE = m2->max_days_5pc_42_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_5PC_63_A1:
+			cvalue->value.DOUBLE = m2->max_days_5pc_63_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_5PC_21_A1:
+			cvalue->value.DOUBLE = m2->success__5pc_21_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_5PC_42_A1:
+			cvalue->value.DOUBLE = m2->success__5pc_42_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_5PC_63_A1:
+			cvalue->value.DOUBLE = m2->success__5pc_63_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+
+		case COL_MAXDAYS_10PC_21_A1:
+			cvalue->value.DOUBLE = m2->max_days_10pc_21_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_10PC_42_A1:
+			cvalue->value.DOUBLE = m2->max_days_10pc_42_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_10PC_63_A1:
+			cvalue->value.DOUBLE = m2->max_days_10pc_63_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_10PC_21_A1:
+			cvalue->value.DOUBLE = m2->success__10pc_21_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_10PC_42_A1:
+			cvalue->value.DOUBLE = m2->success__10pc_42_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_10PC_63_A1:
+			cvalue->value.DOUBLE = m2->success__10pc_63_a1;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SIG_21_A4:
+			cvalue->value.DOUBLE = m2->sig_21_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SIG_42_A4:
+			cvalue->value.DOUBLE = m2->sig_42_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SIG_63_A4:
+			cvalue->value.DOUBLE = m2->sig_63_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_5PC_21_A4:
+			cvalue->value.DOUBLE = m2->max_days_5pc_21_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_5PC_42_A4:
+			cvalue->value.DOUBLE = m2->max_days_5pc_42_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_5PC_63_A4:
+			cvalue->value.DOUBLE = m2->max_days_5pc_63_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_5PC_21_A4:
+			cvalue->value.DOUBLE = m2->success__5pc_21_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_5PC_42_A4:
+			cvalue->value.DOUBLE = m2->success__5pc_42_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_5PC_63_A4:
+			cvalue->value.DOUBLE = m2->success__5pc_63_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_10PC_21_A4:
+			cvalue->value.DOUBLE = m2->max_days_10pc_21_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_10PC_42_A4:
+			cvalue->value.DOUBLE = m2->max_days_10pc_42_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_MAXDAYS_10PC_63_A4:
+			cvalue->value.DOUBLE = m2->max_days_10pc_63_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_10PC_21_A4:
+			cvalue->value.DOUBLE = m2->success__10pc_21_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_10PC_42_A4:
+			cvalue->value.DOUBLE = m2->success__10pc_42_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_SUCCESS_10PC_63_A4:
+			cvalue->value.DOUBLE = m2->success__10pc_63_a4;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_1_YEAR_PKPR:
+			cvalue->value.DOUBLE = m2->one_year_pk_price;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_PLIMIT:
+			cvalue->value.DOUBLE = m2->plimit;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_PDELTA:
+			cvalue->value.DOUBLE = m2->pdelta;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_ONE_YR_P10:
+			cvalue->value.DOUBLE = m2->one_yr_p10;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_ONE_YR_P5:
+			cvalue->value.DOUBLE = m2->one_yr_p5;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_LAST_PEAK:
+			cvalue->value.str    = unix2str(m2->last_peak, timestr);
+			cvalue->value_type   = VALUE_TYPE_STR;
+			break;
+		case COL_P10ORP5:
+			cvalue->value.DOUBLE = m2->p10orp5;
+			cvalue->value_type   = VALUE_TYPE_DOUBLE;
+			break;
+		case COL_PEAK2:
+			cvalue->value.str    = (char *)PEAK(m2->peak);
+			cvalue->value_type   = VALUE_TYPE_STR;
+			break;
+		case COL_SIG:
+			cvalue->value.str    = (char *)SIGNAL(m2->sig);
+			cvalue->value_type   = VALUE_TYPE_STR;
+			break;
+	}
+}
+
+static void
 stock_get_fundamentals(struct column_value *cvalue, int column_id)
 {
 	struct stock *stock      = cvalue->stock;
@@ -903,64 +1361,60 @@ void rpc_watchtable_sort(struct rpc *rpc)
 void                                                                  \
 SORTUP##_##type(struct stock *stock, struct stock **board)            \
 {                                                                     \
-	struct stock *sp;                                             \
-	int x;                                                        \
-	for (x=0; x<20; x++) {                                        \
-		sp = board[x];                                        \
-		if (stock->type > sp->type) {                         \
-			memmove(&board[x+1], &board[x], (20-x)*8);    \
-			board[x]  = stock;                            \
-			break;                                        \
-		}                                                     \
-	}                                                             \
+    struct stock *sp;                                                 \
+    for (int x=0; x<20; x++) {                                        \
+        sp = board[x];                                                \
+        if (stock->type > sp->type) {                                 \
+            memmove(&board[x+1], &board[x], (20-x)*8);                \
+            board[x]  = stock;                                        \
+            break;                                                    \
+        }                                                             \
+    }                                                                 \
 }                                                                     \
 
 #define SORT_STOCK_DOWN(type)                                         \
 void                                                                  \
 SORTDOWN##_##type(struct stock *stock, struct stock **board)          \
 {                                                                     \
-	struct stock *sp;                                             \
-	int x;                                                        \
-	for (x=0; x<20; x++) {                                        \
-		sp = board[x];                                        \
-		if (stock->type < sp->type) {                         \
-			memmove(&board[x+1], &board[x], (20-x)*8);    \
-			board[x]  = stock;                            \
-			break;                                        \
-		}                                                     \
-	}                                                             \
+    struct stock *sp;                                                 \
+    for (int x=0; x<20; x++) {                                        \
+        sp = board[x];                                                \
+        if (stock->type < sp->type) {                                 \
+            memmove(&board[x+1], &board[x], (20-x)*8);                \
+            board[x]  = stock;                                        \
+            break;                                                    \
+        }                                                             \
+    }                                                                 \
 }                                                                     \
 
 #define SORT_MAG_UP(type)                                             \
 void                                                                  \
 MAGUP##_##type(struct stock *stock, struct stock **board)             \
 {                                                                     \
-	struct stock *sp;                                             \
-	int x;                                                        \
-	for (x=0; x<20; x++) {                                        \
-		sp = board[x];                                        \
-		if (stock->mag->type > sp->mag->type) {               \
-			memmove(&board[x+1], &board[x], (20-x)*8);    \
-			board[x]  = stock;                            \
-			break;                                        \
-		}                                                     \
-	}                                                             \
+    struct stock *sp;                                                 \
+    for (int x=0; x<20; x++) {                                        \
+        sp = board[x];                                                \
+        if (stock->mag->type > sp->mag->type) {                       \
+            memmove(&board[x+1], &board[x], (20-x)*8);                \
+            board[x]  = stock;                                        \
+            break;                                                    \
+        }                                                             \
+    }                                                                 \
 }                                                                     \
 
 #define SORT_MAG_DOWN(type)                                           \
 void                                                                  \
 MAGDOWN##_##type(struct stock *stock, struct stock **board)           \
 {                                                                     \
-	struct stock *sp;                                             \
-	int x;                                                        \
-	for (x=0; x<20; x++) {                                        \
-		sp = board[x];                                        \
-		if (stock->mag->type < sp->mag->type) {               \
-			memmove(&board[x+1], &board[x], (20-x)*8);    \
-			board[x]  = stock;                            \
-			break;                                        \
-		}                                                     \
-	}                                                             \
+    struct stock *sp;                                                 \
+    for (int x=0; x<20; x++) {                                        \
+        sp = board[x];                                                \
+        if (stock->mag->type < sp->mag->type) {                       \
+            memmove(&board[x+1], &board[x], (20-x)*8);                \
+            board[x]  = stock;                                        \
+            break;                                                    \
+         }                                                            \
+     }                                                                \
 }                                                                     \
 
 

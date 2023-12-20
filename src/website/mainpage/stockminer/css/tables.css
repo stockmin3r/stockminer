@@ -198,7 +198,12 @@ table.dataTable td       {box-sizing:content-box}
 .GTAB                    {width:98% !important}
 #SIGMON thead            {position:sticky;top:0}
 #SIGMON                  {width:80% !important}
-.candy-table td          {white-space:nowrap}
+.candy-table td          {white-space:nowrap}                
+#CRT                     {width:70% !important}
+#CRT td                  {font-weight:bold;color:black}
+#CRT td:nth-child(1)     {background-color:#292b2f !important}
+#CRT td:nth-child(2)     {background-color:#292b2f !important;color:dodgerblue !important}
+.cdiv                    {display:block;margin:0 auto;margin-top:2vh;margin-bottom:4vh;width:260px}
 
 .AIRTAB i  {color:green;position:absolute;font-size:15px;display:block;margin-top:-18px;margin-left:-5px;}
 .AIRTAB h3 {position:absolute;margin-left:-1px;font-size:15px;margin-top:-18px;display:block;color:red;margin-left:-5px}

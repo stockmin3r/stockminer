@@ -9,9 +9,7 @@ void watchlist_path(struct session *session, char *path)
 	char cookie[12]   = {0};
 
 	if (!user->logged_in) {
-//		*(uint64_t *)cookie = user->cookie;
-		cookie[sizeof(uint64_t)] = 0;
-		sprintf(path, "db/uid/free/%s.watch", cookie);
+		sprintf(path, "db/uid/cookie/%s.watch", session->filecookie);
 	} else
 		sprintf(path, "db/uid/%d.watch", user->uid);
 }

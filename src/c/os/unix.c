@@ -339,7 +339,7 @@ static void init_fs()
 		fs_mkdir("db/quadverse",  0755);
 		fs_mkdir("db/watchlists", 0755);
 		fs_mkdir("db/uid",        0755);
-		fs_mkdir("db/uid/free",   0755);
+		fs_mkdir("db/uid/cookie", 0755);
 		fs_mkdir("db/uid/0",      0755);
 	}
 

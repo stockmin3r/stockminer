@@ -228,20 +228,13 @@ void init_ip()
 
 static __inline__ void preset_path(struct session *session, char *path)
 {
-	struct user *user = session->user;
-	char cookie[8];
-
-	if (!user->logged_in) {
-//		*(uint64_t *)cookie = user->cookie;
-		cookie[7] = 0;
-		snprintf(path, 32, "db/uid/free/%s.indi", cookie);
-	} else {
-		snprintf(path, 32, "db/uid/%d.indi", user->uid);
-	}
+	if (!session->user->logged_in)
+		snprintf(path, 32, "db/uid/cookie/%s.indi", session->filecookie);
+	else
+		snprintf(path, 32, "db/uid/%d.indi", session->user->uid);
 }
 
-void http_stock_api(struct connection *connection, char *ticker, char *api, char **opt)
-{
+void http_stock_api(struct connection *connection, char *ticker, char *api, char **opt) {
 	struct stock *stock;
 	struct ohlc  *ohlc;
 	char packet[512];

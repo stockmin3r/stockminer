@@ -3,7 +3,10 @@
 
 static __inline__ void qcache_path(struct session *session, char *path)
 {
-	snprintf(path, 32, QCACHE_PATH, session->user->uid);
+	if (!session->user->logged_in)
+		snprintf(path, 64, "db/uid/cookie/%s.qcache", session->filecookie);
+	else
+		snprintf(path, 32, QCACHE_PATH, session->user->uid);
 }
 
 void qcache_save(struct session *session, struct qpage *qpage, int QVID, int QSID)
