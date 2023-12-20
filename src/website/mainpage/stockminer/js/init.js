@@ -315,7 +315,6 @@ function loadprofile(p,title)
 // called by the server after the websocket connection is established
 function rpc_init(av)
 {
-	console.log("rpc init");
 	init_qspace();
 	if (av[1] == 'stocks') {
 		QUADVERSE_SWITCH('Screener');

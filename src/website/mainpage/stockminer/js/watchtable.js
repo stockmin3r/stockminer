@@ -490,6 +490,13 @@ function wtrash()
 	$(screener).append(wmid);
 	$(screener).append($('body > .watchmgr .wdst').clone());
 	colmod(screener, 0, "", null, 1); // reset watchtable
+	$('.sort', screener).each(function(){
+	$(this).sortable({
+			connectWith:$('.sort').not(this),helper:"clone",revert:"invalid",
+			stop:function(event,ui){colmod(screener, screener.watchtable_id, "", null, 1)}
+		});
+	});
+
 }
 
 function wbomb(screener)

@@ -1015,7 +1015,7 @@ function loadScreener(screener,watchtable_id){
 	$('.sort', screener).each(function(){
 		$(this).sortable({
 			connectWith:$('.sort').not(this),helper:"clone",revert:"invalid",
-    		stop:function(event,ui){colmod(screener, watchtable_id, "", null, 1)}
+			stop:function(event,ui){colmod(screener, watchtable_id, "", null, 1)}
 		});
 	});
 	/* WSAVE RPC */
@@ -1071,7 +1071,7 @@ function quadspace_load(QVID,QSID,quads) {
 			quadspace.quad[QID].addBlankspace(QVID, QSID, QID);
 			continue;
 		}
-//		console.log("quadspace_load QSID: " + QSID + " QID: " + QID + " workspace len: " + workspace.length + " workspace: " + workspace);
+		console.log("quadspace_load QSID: " + QSID + " QID: " + QID + " workspace len: " + workspace.length + " workspace: " + workspace);
 		for (var ws=0; ws<workspace.length; ws++) {
 			if (workspace[ws] == "-1")
 				continue;
