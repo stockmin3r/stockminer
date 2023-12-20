@@ -809,12 +809,12 @@ void load_stock_csv(struct XLS *XLS, struct stock *stock, struct mag *mag, unsig
 		default: return;
 	}
 
-	if (start_entry == -1) {
-		if (mag->year_2021 == -1)
-			start_entry = mag->year_2023;
-		else
-			start_entry = mag->year_2022;
-	}
+	/*
+	 * The website loads much slower with year_2022 as an index so use 2023 for now
+	 */
+	if (start_entry == -1)
+		start_entry = mag->year_2023;
+
 	price                    = stock->price;
 	price->price_1d          = (char *)malloc(64 KB);
 	price->price_1d_close    = (char *)malloc(32 KB);
@@ -950,7 +950,7 @@ void init_algo(struct XLS *XLS, struct stock *stock)
 		entry += 1;
 		line   = p2 + 1;
 	}
-	load_stock_csv(XLS, stock, mag, YEAR_2022);
+	load_stock_csv(XLS, stock, mag, YEAR_2023);
 	algorithm_mag1(stock, mag);
 }
 
