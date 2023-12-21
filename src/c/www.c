@@ -616,7 +616,22 @@ int www_websocket_sync(char *req, struct connection *connection)
 		connection->packet_size += 4;
 	}
 
-	// [9] Send Config
+	/* - incomplete
+	 * Send the JSON for all anonymous watchtables (no watchlist was created for them yet)
+	 * which have stocks loaded in them. Some watchtables may be in custom quadspaces
+	 * which only are fully set up after rpc_init() completes so the command to fill these watchtables
+	 * will need to be processed   after rpc_init() completes
+	 *
+	connection->packet[connection->packet_size++] = '@';
+	for (int x = 0; x<session->nr_watchlists; x++) {
+		struct watchlist *watchlist = session->watchlists[x];
+		if (!watchlist || watchlist->origin || !watchlist->nr_stocks)
+			continue;
+		connection->packet_size += watchtable_packet(session, watchlist, connection->packet+connection->packet_size);
+		connection->packet[connection->packet_size++] = '@';
+	}*/
+
+	// Send Config
 	if (connection->packet_size) {
 		connection->packet[connection->packet_size] = 0;
 		websocket_send(connection, connection->packet, connection->packet_size);

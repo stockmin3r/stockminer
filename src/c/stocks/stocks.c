@@ -229,7 +229,7 @@ void init_ip()
 static __inline__ void preset_path(struct session *session, char *path)
 {
 	if (!session->user->logged_in)
-		snprintf(path, 32, "db/uid/cookie/%s.indi", session->filecookie);
+		snprintf(path, 64, "db/uid/cookie/%s.indi", session->filecookie);
 	else
 		snprintf(path, 32, "db/uid/%d.indi", session->user->uid);
 }
@@ -622,6 +622,7 @@ int country_id(char *country)
 struct XLS *load_stocks(void)
 {
 	struct XLS   *XLS = (struct XLS *)zmalloc(sizeof(struct XLS));
+	struct price *price;
 	struct stock *stock;
 	struct stock *crypto[512];
 	char         *line_argv[8];
@@ -673,10 +674,26 @@ struct XLS *load_stocks(void)
 
 		// "AAPL,STOCK,US,NASDAQ,H|L,Apple,Tech,InfoTech", stock->sym, security_type, stock->exchange_str, Highcaps/Lowcaps, stock->name, stock->sector, stock->industry);
 		//   0    1    2    3    4   5     6    7
-		stock->sym         = line_argv[STOCKS_TICKER_IDX];
-		market_cap         = line_argv[STOCKS_MCAP_IDX];
-		stock_type         = line_argv[STOCKS_TYPE_IDX];
-		XLS->STOCKS_STR[x] = stock->sym;
+		stock->sym              = line_argv[STOCKS_TICKER_IDX];
+		market_cap              = line_argv[STOCKS_MCAP_IDX];
+		stock_type              = line_argv[STOCKS_TYPE_IDX];
+		XLS->STOCKS_STR[x]      = stock->sym;
+
+		stock->market           = search_market(stock);
+		stock->candles          = (struct candle **)zmalloc(sizeof(struct candle *) * (NR_CANDLES));
+		stock->price            = price = (struct price *)zmalloc(sizeof(struct price));
+		price->price_1m         = (char *)malloc(96 KB);
+		price->price_mini       = (char *)malloc(32 KB);
+		*price->price_1m        = 0;
+		*price->price_mini      = 0;
+		stock->current_tick     = &stock->tickbuf;
+		stock->sparetick        = &stock->tickbuf2;
+		stock->candle_json      = (char *)malloc(28 KB);
+		stock->candle_json_max  = 28 KB;
+		stock->options_url_size = snprintf(stock->options_url, sizeof(stock->options_url)-1, "/api/global/delayed_quotes/options/%s.json", stock->sym);
+		set_index(stock);
+		load_fundamentals(stock);
+
 		if (!strcmp(stock_type, "STOCK")) {
 			stock->type = STOCK_TYPE_STOCK;
 			if (market_cap) {
@@ -713,6 +730,9 @@ struct XLS *load_stocks(void)
 			stock->exchange = MARKET_ASE;
 		else
 			stock->exchange = MARKET_OTC;
+
+		// 1m ticks for today's trading day
+		stock->ohlc = (struct ohlc *)zmalloc(sizeof(struct ohlc) * (market_get_nr_minutes(stock)));
 	}
 
 	XLS->HIGHCAPS = (struct stock **)malloc(XLS->nr_highcaps * sizeof(struct stock *));

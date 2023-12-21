@@ -251,15 +251,6 @@ void session_set_config(struct connection *connection)
 	base64_encode   (connection->nonce, sizeof(connection->nonce), nonce64);
 	packet_size += snprintf(packet+packet_size, 96, "nonce %s@", nonce64);
 
-	for (int x = 0; x<session->nr_watchlists; x++) {
-		struct watchlist *watchlist = session->watchlists[x];
-		if (!watchlist || watchlist->origin || !watchlist->nr_stocks)
-			continue;
-
-		packet_size += watchtable_packet(session, watchlist, packet+packet_size);
-		packet[packet_size++] = '@';
-	}
-
 	// webscript (temporary)
 	memcpy(packet+packet_size, webscripts, webscripts_size);
 	packet_size          += webscripts_size;

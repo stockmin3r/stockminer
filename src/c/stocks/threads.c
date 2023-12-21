@@ -1,33 +1,6 @@
 #include <conf.h>
 #include <extern.h>
 
-// will be replaced when a task scheduler is written
-
-static void init_stock(struct stock *stock, int stock_id)
-{
-	struct price  *price;
-	int nr_trading_minutes = market_get_nr_minutes(stock);
-
-	if (!nr_trading_minutes)
-		return;
-
-	stock->id               = stock_id;
-	stock->market           = search_market(stock);
-	stock->candles          = (struct candle **)zmalloc(sizeof(struct candle *) * (NR_CANDLES));
-	stock->ohlc             = (struct ohlc    *)zmalloc(sizeof(struct ohlc)     * (nr_trading_minutes));
-	stock->price            = price = (struct price *)zmalloc(sizeof(struct price));
-	price->price_1m         = (char *)malloc(96 KB);
-	price->price_mini       = (char *)malloc(32 KB);
-	*price->price_1m        = 0;
-	*price->price_mini      = 0;
-	stock->current_tick     = &stock->tickbuf;
-	stock->sparetick        = &stock->tickbuf2;
-	stock->candle_json      = (char *)malloc(28 KB);
-	stock->candle_json_max  = 28 KB;
-	stock->options_url_size = snprintf(stock->options_url, sizeof(stock->options_url)-1, "/api/global/delayed_quotes/options/%s.json", stock->sym);
-	set_index(stock);
-	load_fundamentals(stock);
-}
 /*
 bool alloc_threads(void *dataset, int nr_items, int job_type)
 {
@@ -43,7 +16,7 @@ bool alloc_threads(void *dataset, int nr_items, int job_type)
 }
 */
 
-void alloc_stock_threads(struct XLS *XLS)
+void bind_stock_threads(struct XLS *XLS)
 {
 	struct thread *thread;
 	int            nr_threads, stocks_per_thread;
@@ -53,7 +26,7 @@ void alloc_stock_threads(struct XLS *XLS)
 	rem                  = XLS->nr_stocks%30;
 	nr_threads           = XLS->nr_stocks/30;
 	XLS->stock_threads   = (struct thread *)zmalloc(sizeof(struct thread) * (nr_threads+1));
-	printf("alloc_stock_threads(XLS): total threads: %d stocks_per_thread: %d rem: %d\n", nr_threads, stocks_per_thread, rem);
+	printf("(XLS): total threads: %d stocks_per_thread: %d rem: %d\n", nr_threads, stocks_per_thread, rem);
 	for (x=0; x<nr_threads; x++) {
 		thread         = &XLS->stock_threads[x];
 		thread->stocks = &XLS->STOCKS_PTR[x*stocks_per_thread];
@@ -61,7 +34,7 @@ void alloc_stock_threads(struct XLS *XLS)
 		thread->id     = x;
 		thread->stocks_per_thread = stocks_per_thread;
 		for (y=0; y<stocks_per_thread; y++) {
-			init_stock(thread->stocks[y], stock_id);
+			thread->stocks[y]->id = stock_id;
 			thread->stocks[y]->thread_id = x;
 			if (Server.DEBUG_STOCK && !strcmp(Server.DEBUG_STOCK, thread->stocks[y]->sym))
 				printf(BOLDYELLOW "%s is in thread group: %d" RESET "\n", thread->stocks[y]->sym, x);
@@ -77,7 +50,7 @@ void alloc_stock_threads(struct XLS *XLS)
 	thread->XLS               = XLS;
 	thread->stocks_per_thread = rem;
 	for (x=0; x<rem; x++) {
-		init_stock(thread->stocks[x], stock_id);
+		thread->stocks[x]->id = stock_id;
 		thread->stocks[x]->thread_id = x;
 		if (Server.DEBUG_STOCK && !strcmp(Server.DEBUG_STOCK, thread->stocks[x]->sym))
 			printf(BOLDYELLOW "%s is in thread group: %d" RESET "\n", thread->stocks[x]->sym, nr_threads-1);
@@ -89,7 +62,8 @@ void alloc_stock_threads(struct XLS *XLS)
 
 void create_stock_threads(struct XLS *XLS)
 {
-	alloc_stock_threads(XLS);
+	// bind stock threads to this XLS by assigning stocks/instruments to specific threads
+	bind_stock_threads(XLS);
 	for (int x=0; x<XLS->nr_stock_threads; x++)
 		thread_create(stock_thread, &XLS->stock_threads[x]);
 

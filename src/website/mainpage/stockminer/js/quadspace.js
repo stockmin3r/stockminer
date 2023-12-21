@@ -110,7 +110,7 @@
 		/* this:QuadVerse[W.PID] Context */
 		QVID = this.PID;
 		quadspace.quad  = [];
-		this.nr_ws++;
+		this.nr_ws++; // nr_ws means 'number of quadspaces' for a quadverse and 'number of workspaces' for a quad
 		this.workspace.append(quadspace);
 		QSID = quadspace.QSID = this.newid(skip);
 		this.quadspace[QSID]  = quadspace;
@@ -302,10 +302,17 @@
 	 *   + watchtable.obj.screener:               pointer to the screener linked to this table
 	 */
 	addWatchtable(args){
-		var QGID = args.QGID, watchtable_id = args.TID, QVID,QSID,QID,WSID,watchtable,id,screener,obj;
+		var QGID = args.QGID, watchtable_id = args.TID, quad, QVID,QSID,QID,WSID,watchtable,id,screener,obj;
 		// QuadMenu() && ModLoad() paths (ModLoad() doesn't supply a QGID, in this function its args (QSID,QID) are unused)
 		if (!QGID)
 			QGID = this.qdiv+"ws"+this.current_workspace;
+
+		/*  For workspaces & quadverses .w points to the parent "container"
+		 *  for a workspace .w will point to the parent quad
+		 *  for a quadspace .w will point to the parent quadverse
+		 */
+		quad = WMAP[QGID.substr(1)].w;
+
 		watchtable = Watchtable({type:'watchlist',dict:STAB,QGID:QGID,TID:watchtable_id,menu:1,order:1});
 		if (!watchtable_id)
 			watchtable_id = watchtable.id;
@@ -314,15 +321,14 @@
 		QVID = id[0], QSID = id[1], QID = id[2], WSID = id[3];
 		obj  = {type:"wstab", TID:watchtable_id}
 		// if this is the first watchtable in this Workspace then create a watchtools controller and assign the new watchtable we created to it
-		if (!get_QUAD_OBJ(['any'], "watchtools", this)) {
-			this.addWatchtools(this, QGID, "ws"+WSID, watchtable_id);
+		if (!get_QUAD_OBJ(['any'], "watchtools", quad)) {
+			quad.addWatchtools(quad, QGID, "ws"+WSID, watchtable_id);
 			console.log("setting watchtools curobj to watchtable");
 		}
 		// if this QuadSpace has a Screener and the Screener has no Watchtable assigned to it then assign it this one
-		screener = get_QSP_OBJ([0,{filter:'stocks'}], "screener", this.quadspace);
+		screener = get_QSP_OBJ([0,{filter:'stocks'}], "screener", quad.quadspace);
 		if (screener.length) {
 			screener = screener[0];
-			console.log("got screener object!: " + watchtable_id);
 			screener.curobj.push(watchtable);
 			obj.screener = screener;
 		}
@@ -330,7 +336,7 @@
 		watchtable.link = 'cyan';
 		watchtable.obj  = obj;
 		obj.ref         = watchtable;
-		this.workspace["ws"+WSID].obj.push(obj);
+		quad.workspace["ws"+WSID].obj.push(obj);
 		watchtable.onclick = function(){selobj(watchtable)};
 		$("#P"+QVID+"Q"+QSID+"q"+QID).css("overflow", "auto");
 

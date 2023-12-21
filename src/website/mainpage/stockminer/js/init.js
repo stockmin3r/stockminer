@@ -2,7 +2,7 @@
  * filename: mainpage/stockminer/js/init.js
  * License:  Public Domain
  ********************************************/
-/*
+/* -- thisdescription is years old
  * qcache@user@init     // already logged in path
  * qcache@init
  *
@@ -252,8 +252,8 @@ function init_quadverse(){
 	init_stock_screener();
 	QUADVERSE  = ID("QUADVERSE");
 	LoadQuadverse(WEBSITE);
-		W.showtab(W.workspace['ws0'].tab);
-		QUADVERSE_SWITCH('Screener');
+	W.showtab(W.workspace['ws0'].tab);
+	QUADVERSE_SWITCH('Screener');
 	W          = QuadVerses['Screener'];
 	ECELL[916] = 1; // editable cells in watchtables
 	init_obj_trash();

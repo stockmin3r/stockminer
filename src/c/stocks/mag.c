@@ -1,5 +1,6 @@
 #include <conf.h>
 #include <stocks/stocks.h>
+#include <extern.h>
 
 struct column pythonTA_columns[] = {
 	{ "MAVG200",     "\"MAVG200\":\"%.2f\"",   COL_MAVG200      },
@@ -13,7 +14,7 @@ struct column pythonTA_columns[] = {
 	{ "EMA200",      "\"EMA200\":\"%.2f\"",    COL_EMA200       },
 	{ "MFI2",        "\"MFI2\":\"%.2f\"",      COL_MFI2         },
 	{ "vADI",        "\"vADI\":\"%.2f\"",      COL_VOL_ADI      },
-	{ "vOVH",        "\"vOVH\":\"%.2f\"",      COL_VOL_OVH      },
+	{ "vOBV",        "\"vOBV\":\"%.2f\"",      COL_VOL_OBV      },
 	{ "vCMF",        "\"vCMF\":\"%.2f\"",      COL_VOL_CMF      },
 	{ "vEM",         "\"vEM\":\"%.2f\"",       COL_VOL_EM       },
 	{ "vVPT",        "\"vVPT\":\"%.2f\"",      COL_VOL_VPT      },
@@ -333,4 +334,22 @@ void build_mag(char *ticker, struct XLS *XLS)
 		build_mag2(stock, nr_entries);
 		build_mag3(stock, nr_entries);
 	}
+}
+
+void stockdata_poll_thread(struct thread *thread)
+{
+	struct dirmap dirmap;
+	char          directory[256];
+	struct XLS   *XLS = thread->XLS;
+	char         *filename;
+	int           nr_mag2 = 0;
+
+	if (!fs_opendir(STOCKDB_MAG2_PATH, &dirmap))
+		return;
+
+	while ((filename=fs_readdir(&dirmap)) != NULL) {
+		if (strstr(filename, ".m2"))
+			nr_mag2++;
+	}
+
 }

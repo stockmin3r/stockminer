@@ -370,6 +370,10 @@ struct stock {
 	int              nr_call_options;
 	int              nr_put_options;
 	int              options_url_size;
+	/* number of stockdata structs loaded */
+	uint16_t         nr_mag2_loaded;
+	uint16_t         nr_mag3_loaded;
+	uint16_t         nr_mag4_loaded;
 	/* ESP */
 	int              nr_qslide;
 	int              a1esp;
