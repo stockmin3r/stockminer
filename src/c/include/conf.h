@@ -219,6 +219,7 @@ struct connection        {
 	unsigned int         events;
 	int                  has_cookie;
 	bool                 authorized;
+	bool                 sent_checkpoint;
 };
 
 struct user {

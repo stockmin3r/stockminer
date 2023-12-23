@@ -61,8 +61,8 @@ struct request rpc_requests[] = {
 	{ "uchart",              rpc_user_chart,             2, 2, ARGS_TYPE_JSON},
 
 	/* UFOS */
-	{ "ufoinit",             rpc_ufo,                    3, 3, ARGS_TYPE_ARGV},
-	{ "ufomega",             rpc_ufo_megachart,          2, 2, ARGS_TYPE_ARGV},
+	{ "ufoinit",             rpc_ufo,                    4, 4, ARGS_TYPE_ARGV},
+	{ "ufomega",             rpc_ufo_megachart,          3, 3, ARGS_TYPE_ARGV},
 
 	/* Watchlists & Watchtables */
 	{ "watchtable",          rpc_watchtable_columns,     5, 5, ARGS_TYPE_ARGV},
@@ -657,9 +657,13 @@ int www_websocket_sync(char *req, struct connection *connection)
 				printf(BOLDCYAN "CRITICAL: nr_frames: %d" RESET "\n", nr_frames);
 				break;
 			}
-			rpc.connection = connection;
-			rpc.session    = session;
-			rpc_checkpoint(&rpc);
+			if (stockdata_checkpoint != SD_CHECKPOINT_COMPLETE && !connection->sent_checkpoint) {
+				rpc.connection = connection;
+				rpc.session    = session;
+				rpc_checkpoint(&rpc);
+				connection->sent_checkpoint = true;
+			}
+				
 			mutex_lock(&session->session_lock);
 			for (int x=0; x<nr_frames; x++) {
 				frame = &frames[x];

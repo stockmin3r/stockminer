@@ -4,31 +4,6 @@
 
 int NR_DELTA_STOCKS  = 19;
 
-/* Price Lowcaps */
-struct board *price_15m;
-struct board *price_5m;
-struct board *price_1m;
-struct board *price_15mL;
-struct board *price_5mL;
-struct board *price_1mL;
-/* Price Highcaps */
-struct board *price_15mH;
-struct board *price_5mH;
-struct board *price_1mH;
-struct board *price_15mLH;
-struct board *price_5mLH;
-struct board *price_1mLH;
-/* Volume Lowcaps */
-struct board *volume_15m;
-struct board *volume_5m;
-struct board *volume_1m;
-struct board *volume_15mH;
-struct board *volume_5mH;
-struct board *volume_1mH;
-/* Indicators */
-struct board *bull_board;
-struct board *bear_board;
-
 char *json_board(struct board *board, int *json_len) {
 	int buffer = board->buffer;
 	switch (buffer) {
@@ -141,6 +116,9 @@ int ufo_tables(struct session *session, char *packet, struct workspace *workspac
 	char *json;
 	int json_size, packet_len = 0, x;
 
+	if (!XLS->boards)
+		return 0;
+
 	if (workspace->ufo_tables & UFO_LOWCAPS) {
 		for (x=0; x<NR_LOWCAP_BOARDS; x++) {
 			board = XLS->boards[LOWCAP_BOARD_IDX+x];
@@ -162,7 +140,7 @@ int ufo_tables(struct session *session, char *packet, struct workspace *workspac
 			packet_len += json_size;
 			*(packet+packet_len++) = '@';
 		}
-	}	
+	}
 	if (workspace->ufo_tables & UFO_VOLUME) {
 		for (x=0; x<NR_VOLUME_BOARDS; x++) {
 			board = XLS->boards[VOLUME_BOARD_IDX+x];
@@ -185,6 +163,9 @@ int ufo_load_charts(struct session *session, char *packet, struct workspace *wor
 	struct chart     *chart;
 	char              moveTo[128] = { '0', 0 };
 	int               packet_len  = 0, nbytes, x;
+
+	if (!CURRENT_XLS->boards)
+		return 0;
 
 	if (workspace->ufo_tables & UFO_LOWCAPS)
 		get_ufostocks(ufostocks, CURRENT_XLS->boards, interval, table);
@@ -230,6 +211,9 @@ void rpc_ufo(struct rpc *rpc)
 	struct workspace  *workspace;
 	struct wsid        wsid;
 	int                packet_len;
+
+	if (!CURRENT_XLS->boards)
+		return;
 
 	if (price_volume != 'P' && price_volume != 'V')
 		return;

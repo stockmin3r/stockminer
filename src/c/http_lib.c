@@ -33,6 +33,9 @@ char *curl_get(char *url, char *page)
 
 	headers = curl_slist_append(headers, "Accept-Encoding: gzip");
 	headers = curl_slist_append(headers, "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0");
+	if (strstr(url, "api.wsj.net")) {
+		headers = curl_slist_append(headers, "Dylan2010.EntitlementToken: 57494d5ed7ad44af85bc59a51dd87c90");
+	}
 	curl    = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_URL, url);
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -61,7 +64,7 @@ out:
 	curl_easy_cleanup(curl);
 	curl_slist_free_all(headers);
 	free(cdata.memory);
-	printf("url failed: %s %.50s\n", url, page);
+//	printf("url failed: %s %.50s\n", url, page);
 	return (NULL);
 }
 

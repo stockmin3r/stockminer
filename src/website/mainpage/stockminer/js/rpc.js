@@ -92,8 +92,7 @@ function update(av){
 var MINI;
 function rpc_upmini(av){
 	MINI = av;
-	var ticker = av[1], div = av[2], data, cpr = av[4], delta = av[5],mpc,mpr
-	s = charts[div].series[0],l;
+	var ticker=av[1],div=av[2],data,cpr=av[4],delta=av[5],mpc,mpr,l,s = charts[div].series[0];
 
 	if (av[3] == "") {
 		console.log("fake mini: " + JSON.stringify(av));

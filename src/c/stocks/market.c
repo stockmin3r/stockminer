@@ -18,8 +18,8 @@
  */
 struct market markets[] =
 {
-	{ US, STOCK_TYPE_STOCK,  MARKET_NASDAQ,  9,  0, 14, 30, 21, 0, 1, 0, MARKET_WEEKDAYS, 12,  720 },
-	{ US, STOCK_TYPE_STOCK,  MARKET_NYSE,   12,  0, 14, 30, 21, 0, 1, 0, MARKET_WEEKDAYS,  9,  540 },
+	{ US, STOCK_TYPE_STOCK,  MARKET_NASDAQ,  9,  0, 14, 30, 21, 0, 1, 0, MARKET_WEEKDAYS, 12,  960 },
+	{ US, STOCK_TYPE_STOCK,  MARKET_NYSE,   12,  0, 14, 30, 21, 0, 1, 0, MARKET_WEEKDAYS,  9,  720 },
 	{ WW, STOCK_TYPE_CRYPTO, MARKET_CRYPTO,  0,  0,  0,  0,  0, 0, 0, 0, MARKET_24_7,     24, 1440 }
 };
 
@@ -240,6 +240,7 @@ bool ticker_needs_update(struct stock *stock, time_t *start_timestamp, time_t *e
 	 */
 	if (stat(path, &sb) == -1) {
 		*start_timestamp = UNIX_TIMESTAMP_1990;
+		*start_timestamp = UNIX_TIMESTAMP_2016;
 		return true;
 	}
 

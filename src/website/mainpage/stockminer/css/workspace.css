@@ -10,7 +10,7 @@
 	width:100%!important;
 	margin-bottom:100px;
 }
-#ufo ~ * {margin-top:10px}
+#ufo ~ * {margin-top:20px}
 
 #cbox  {float:left}
 #grids {width:200%;margin-left:10px;clear:right}

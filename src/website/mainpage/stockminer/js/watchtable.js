@@ -764,14 +764,13 @@ function col(i,c)
 }
 
 /*
- * UFO Screener
+ * UFO Screener: select box onchange event handler for the "UFO table type" select box
  */
 function ufoload(){
 	var wlist = $("#ufo-select option:selected").text(),
 	wsx  = document.getElementById(window.event.target.parentNode.parentNode.id),
 	QGID = W.current_quadspace+"q0ws0",
 	ufo  = $("#ufo").detach();
-	console.log("ufoload!@");
 	while (wsx.firstChild)
 		wsx.removeChild(wsx.firstChild);
 	if (wlist === "Highcaps") {
@@ -782,7 +781,6 @@ function ufoload(){
 			T['R15mL'].destroy(1);
 			T['R5mL'].destroy(1);
 			T['R1mL'].destroy(1);
-			console.log("doing ufo init");
 			ufoinit(MTAB, QGID.substr(1));
 			$(QGID).append(ufo);
 			WS.send("ufoinit PH1 15 "+W.current_quadspace+"q0ws0")

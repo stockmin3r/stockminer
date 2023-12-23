@@ -26,6 +26,7 @@ bool openssl_connect_sync(struct connection *connection, unsigned int ipaddr, un
 	connection->protocol = TLS_CLIENT;
 	SSL_set_fd(connection->ssl, connection->fd);
 	SSL_set_connect_state(connection->ssl);
+//	SSL_set_tlsext_host_name(connection->ssl, "api.wsj.net");
 
 	for (int x=0; x<MAX_RETRIES; x++) {
 		if (openssl_connect_retry(connection->ssl) == true)

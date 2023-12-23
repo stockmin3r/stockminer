@@ -58,11 +58,11 @@ void wsj_stock_api(struct stock *stock)
 				break;
 			case WSJ_API_STOCK_CURTICK:
 				wsj_api_src  = WSJ_CUR;
-				wsj_api_dst  = &WSJ->CLOSE;
+				wsj_api_dst  = &WSJ->CUR;
 				wsj_api_size = sizeof(WSJ_CUR)-1;
 				break;
 		}
-		total_size   = wsj_api_size + ticker_size + sizeof(WSJ_OHLC)-1 + sizeof(WSJ_HDR)-1;
+		total_size   = wsj_api_size + ticker_size + sizeof(WSJ_OHLC)-1;// + sizeof(WSJ_HDR)-1;
 		*wsj_api_dst = buf = (char *)malloc(total_size+1);
 		strcpy(buf, wsj_api_src);
 		if (exchange == MARKET_NYSE) {
@@ -80,7 +80,7 @@ void wsj_stock_api(struct stock *stock)
 		}
 		strcat(buf+wsj_api_size, ticker);
 		memcpy(buf+wsj_api_size+ticker_size,                    WSJ_OHLC, sizeof(WSJ_OHLC));
-		memcpy(buf+wsj_api_size+ticker_size+sizeof(WSJ_OHLC)-1, WSJ_HDR,  sizeof(WSJ_HDR)-1);
+//		memcpy(buf+wsj_api_size+ticker_size+sizeof(WSJ_OHLC)-1, WSJ_HDR,  sizeof(WSJ_HDR)-1);
 	}
 }
 
@@ -149,6 +149,7 @@ void wsj_index_api(struct stock *stock)
 	char        *wsj_api_src, **wsj_api_dst,  *ticker,     *buf;
 	int          wsj_api_size, type, exchange, ticker_size, total_size, x, y;
 
+	return;
 	for (x=0; x<NR_GLOBAL_INDEXES; x++) {
 		switch (x) {
 			case WSJ_US_INDEX_SPX: {
@@ -354,6 +355,19 @@ int get_timestamps(char *page, time_t *timestamps)
 	return (nr_timestamps);
 }
 
+/* [WSJ EOD CLOSE API]
+ - Example for the AAPL "close" price that can be used after EOD to get the previous day's OHLC bar, so it can be appended to its respective data/stocks/stockdb/csv ticker
+ {"TimeInfo":{"TickCount":1,"FirstTick":1703203200000,"LastTick":1703203200000,"IsIntraday":false,"Step":86400000,
+  "TimeFrameStart":1703255400000,"TimeFrameEnd":1703278740000,"Ticks":[1703203200000]},
+  "Series":[{"SeriesId":"s1","ResponseId":"s1-1","DesiredDataPoints":["Open","High","Low","Last"],"ToolTipDataPoints":[],
+  "Ticker":"AAPL","CountryCode":"US","CommonName":"Apple Inc.","OfficialId":"STOCK-US-AAPL","BlueGrassChannels":[{"ChannelType":"DelayedChannel","ChannelName":"/zigman2/quotes/202934861/delayed"},{"ChannelType":"CompositeChannel","ChannelName":"/zigman2/quotes/202934861/composite"},{"ChannelType":"RealtimeChannel","ChannelName":"/zigman2/quotes/202934861/lastsale"}],"UtcOffset":-300,"TimeZoneAbbreviation":"ET",
+  "DataPoints":[[195.18,195.41,192.97,193.6]],"FormatHints":{"UnitSymbol":"$","Suffix":false,"DecimalPlaces":4},"MarketSessions":null,
+  "ExtraData":
+     [{"Name":"MostRecentOpen","Date":1703203200000,"Value":195.18},
+     {"Name":"MostRecentLast", "Date":1703203200000,"Value":193.6},
+     {"Name":"PriorClose",     "Date":1703116800000,"Value":194.68}],
+  "TimeZoneData":{"SwitchDateUtc":1699167600000,"UtcOffsetBeforeSwitch":-240,"UtcOffsetAfterSwitch":-300,"IsDstBeforeSwitch":true,"IsDstAfterSwitch":false,"StandardAbbreviation":"EST","DaylightAbbreviation":"EDT","ShortAbbreviation":"ET"},"ExtraToolTips":null,"InstrumentType":"Stock","DjId":"13-3122","CurrentQuote":null},{"SeriesId":"i3","ResponseId":"i3-2","DesiredDataPoints":["Volume"],"ToolTipDataPoints":[],"Ticker":null,"CountryCode":null,"CommonName":null,"OfficialId":null,"BlueGrassChannels":[],"UtcOffset":0,"TimeZoneAbbreviation":null,"DataPoints":[[37149566.0]],"FormatHints":{"UnitSymbol":null,"Suffix":false,"DecimalPlaces":0},"MarketSessions":null,"ExtraData":null,"TimeZoneData":null,"ExtraToolTips":null,"InstrumentType":null,"DjId":null,"CurrentQuote":null}],"Events":[],"Aggregates":[],"Debug":null}
+*/
 void wsj_get_EOD(struct stock *stock, char *page)
 {
 	struct stat sb;
@@ -361,6 +375,7 @@ void wsj_get_EOD(struct stock *stock, char *page)
 	char       *csv, *p;
 	double      csv_open, csv_high, csv_low, csv_close;
 	uint64_t    csv_volume;
+	time_t      start_timestamp;
 	int fd,     csv_size;
 
 	p = strstr(page, "Points\":[[");
@@ -396,7 +411,7 @@ void wsj_get_EOD(struct stock *stock, char *page)
 	read(fd, csv, sb.st_size);
 
 	csv_size  = cstring_remove_line(csv, 1, sb.st_size);
-	csv_size += snprintf(csv+csv_size, 256, "%s,%.3f,%.3f,%.3f,%.3f,%llu\n", QDATE[1], csv_open, csv_high, csv_low, csv_close, csv_volume);
+	csv_size += snprintf(csv+csv_size, 256, "%s,%.3f,%.3f,%.3f,%.3f,%llu\n", stock->market->prev_eod_timestamp, csv_open, csv_high, csv_low, csv_close, csv_volume);
 	lseek(fd, 0, SEEK_SET);
 	write(fd, csv, csv_size);
 	ftruncate(fd, csv_size);
@@ -447,10 +462,11 @@ int wsj_load_1m(struct stock *stock)
 	char            path[256];
 	int             nr_ohlc = 0, mini_len = 0, nbytes, filesize;
 
-	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/wsj/%s", stock->sym);
-	if (stock->dead || !fs_file_exists(path) || !(map=MAP_FILE_RO(path, &filemap)))
+	if (stock->dead)
 		return 0;
-
+	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/wsj/%s", stock->sym);
+	if (!(map=MAP_FILE_RO(path, &filemap)))
+		return 0;
 	price               = stock->price;
 	filesize            = filemap.filesize;
 	price->price_1m_len = filesize;
@@ -494,6 +510,7 @@ int wsj_load_1m(struct stock *stock)
 	stock->nr_ohlc = nr_ohlc;
 
 	/* Append the 1m data after the 1d data */
+	price->price_1d[price->price_1d_len-1] = ',';
 	memcpy(price->price_1d+price->price_1d_len, price->price_1m+1, price->price_1m_len-1);
 	price->price_1d_len = price->price_1m_len+price->price_1d_len-1;
 	*(price->price_1d+price->price_1d_len) = ']';
@@ -600,7 +617,7 @@ void update_allday(struct stock *stock, char *page)
 	*(price->price_1m+json_size-1)   = ']';
 	*(price->price_mini+mini_size-1) = ']';
 
-	snprintf(path, sizeof(path)-1, "data/stocks/wsj/%s", stock->sym);
+	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/wsj/%s", stock->sym);
 	fs_newfile(path, price->price_1m, price->price_1m_len);
 }
 
@@ -610,26 +627,36 @@ int WSJ_update_allday_price(struct stock *stock)
 	struct WSJ   *WSJ = &stock->API.WSJ;
 	struct price *price;
 	char          page[96 KB];
+	bool          loaded = false;
 
 	if (Server.stocks_1M == STOCKDATA_OFF)
 		return 0;
-
-	price = stock->price;
-	if (stock->dead)
-		return 0;
-	if (market == NO_MARKET) {
-		if (!wsj_load_1m(stock) && price->price_1d_len)
-			*(price->price_1d+price->price_1d_len-1) = ']';
-		price->stale = 1;
-		return 0;
-	}
 
 	/*
 	 * - Loaded During NO_MARKET
 	 *    + wsj_load_1m() of previous day's 1m OHLCvs
 	 *    + set price->stale = 1
-	 * - Market ENDS after AFH
  	 */
+	price = stock->price;
+	if (stock->dead || !stock->API.WSJ.ALL)
+		return 0;
+	if (stock->market->status == NO_MARKET) {
+		if (wsj_load_1m(stock))
+			loaded = true;
+		if (price->price_1d_len)
+			*(price->price_1d+price->price_1d_len-1) = ']';
+//		price->stale = 1; // when the next calendar trading day comes, a new price struct is allocated
+	}
+/*
+	if (market == NO_MARKET) {
+		if (!wsj_load_1m(stock) && price->price_1d_len)
+			*(price->price_1d+price->price_1d_len-1) = ']';
+		price->stale = 1;
+		return 0;
+	}*/
+	if (loaded)
+		return 0;
+
 	if (price->stale) {
 		struct price *newprice   = (struct price *)zmalloc(sizeof(struct price));
 		newprice->price_1d       = (char *)malloc(256 KB);
@@ -644,7 +671,6 @@ int WSJ_update_allday_price(struct stock *stock)
 		newprice->stale          = 0;
 		stock->price             = newprice;
 		price                    = newprice;
-		printf("setting stock to stale: %s [%d %d] mini: %d\n", stock->sym, Server.nr_working_stocks, Server.nr_failed_stocks, price->price_mini_len);
 		Server.nr_working_stocks = 0;
 		Server.nr_failed_stocks  = 0;
 	}
@@ -754,50 +780,8 @@ void WSJ_update_current_price(struct stock *stock)
 
 int wsj_query(struct stock *stock, char *url, int url_size, char *uncompressed, void (*query)(struct stock *stock, char *page))
 {
-	struct connection connection;
-	char              gzpage[128 KB];
-	char             *compressed;
-	uint64_t          compressed_size;
-	packet_size_t     zbytes;
-	int               ret = 0, uncompressed_size;
-
-	if (!openssl_connect_sync(&connection, Server.WSJ_ADDR, 443))
-		return 0;
-	SSL_write(connection.ssl, url, url_size);
-	zbytes = openssl_read_http(&connection, gzpage, 64 KB);
-	if (zbytes > 64 KB) {
-		if (strstr(gzpage, "Unknown instrument")) {
-			stock->update = 0;
-			stock->dead   = 1;
-			printf(BOLDRED "Unknown Instrument: %s" RESET "\n", stock->sym);
-		}
-		goto out;
-	}
-	if (strstr(gzpage, "Unknown instrument")) {
-		stock->update = 0;
-		stock->dead   = 1;
-		printf("Unknown Instrument: %s\n", stock->sym);
-		goto out;
-	}
-
-	compressed         = strstr(gzpage, "\r\n\r\n");
-	compressed        += 4;
-	compressed_size    = zbytes-(compressed-gzpage);
-	uncompressed_size  = *(int *)(gzpage+zbytes-4);
-	if (uncompressed_size > 96 KB || uncompressed_size <= 0)
-		goto out;
-	uncompressed_size  = zip_decompress2((unsigned char *)compressed, (unsigned char *)uncompressed, compressed_size, uncompressed_size);
-	if (uncompressed_size <= 0)
-		goto out;
-	uncompressed[uncompressed_size] = 0;
-	query(stock, uncompressed);
-	printf("%s\n", uncompressed);
-	if (Server.DEBUG_STOCK && !strcmp(stock->sym, Server.DEBUG_STOCK))
-		printf(BOLDYELLOW "[stock: %s]\n%s" RESET "\n", stock->sym, uncompressed);
-	ret = 1;
-out:
-	openssl_destroy(&connection);
-	return ret;
+	if (curl_get(url, uncompressed))
+		query(stock, uncompressed);
 }
 
 void argv_wsj_allday(char *ticker)

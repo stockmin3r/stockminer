@@ -110,11 +110,9 @@ void update_current_price(struct stock *stock)
 
 	switch (*data_source) {
 		case STOCKDATA_WSJ:
-			printf("updating current price for: %s\n", stock->sym);
 			WSJ_update_current_price(stock);
 			break;
 		case STOCKDATA_OFF:
 			break;
-		
 	}
 }

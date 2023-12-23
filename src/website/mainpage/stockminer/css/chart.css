@@ -27,7 +27,7 @@
 .ctools {font-weight:normal !important}
 
 /* MiniCharts */
-.minibox {border:2px inset #36393f;height:310px;margin-top:16px}
+.minibox {border:2px inset #36393f;height:310px;margin-top:35px!important}
 .megabox {border:2px inset #36393f;height:865px}
 .lbx     {height:60px;width:100%;cursor:pointer;background-color:#2f3136}
 .mpr     {color:white;font-size:32px;font-weight:bold;text-align:center}

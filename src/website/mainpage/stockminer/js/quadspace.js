@@ -1157,7 +1157,7 @@ function quadspace_load(QVID,QSID,quads) {
 /********************************************************************
  * ONCLICK handlers for specific (built-in) QuadSpaces & Workspaces
  *******************************************************************/
-function ufo_qclick() {
+function ufo() {
 	if (UINIT)
 		return;
 	UINIT=1;
