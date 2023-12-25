@@ -523,6 +523,7 @@
 						"Add": {
 							"name": "Add",
 							"items":{
+								"Add0":{"name": "Editor",     callback:function(){Editor(0,"javascript","#P"+QVID+"Q"+QSID+"q"+QID+"ws"+WSID)}},
 								"Add1":{"name": "Chart",      callback:function(){self.QCMenu_LoadTicker()}},
 								"Add2":{"name": "WatchTable", callback:function(){self.addWatchtable({send_rpc:1})}},
 								"Add3":{"name": "XLS",        callback:function(){loadXLS(0,0,QVID,QSID,QID,WSID)}},
@@ -532,7 +533,7 @@
 								"Add7":{"name": "PyScript",   callback:function(){self.QuadMenu_PyScript()}},
 								"Add8":{"name": "Xterm",      callback:function(){self.QuadMenu_xterm()}},
 								"Add9":{"name": "JTerm",      callback:function(){self.QuadMenu_jterm()}}
-							}},						
+							}},
 						}
 		            };
 		        }

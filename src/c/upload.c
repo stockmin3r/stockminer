@@ -406,7 +406,7 @@ int websocket_upload_object(struct session *session, struct connection *connecti
 	char             *packet, *blob, *blob_type, *blob_fmt, *QGID, *URL, *filename, *p;
 	int               argc, action, objtype, filetype, filesize, objsize, packet_len, nr_frames, hsize, content_len_offset, dirty = 0, qsubargs = 0, websocket_header_size;
 
-	p = strstr(req, " HTTP/1.1\r\n\r\n");
+	p = strstr(req, " HTTP/1.1\r\n");
 	if (!p)
 		return 0;
 	*p = 0;

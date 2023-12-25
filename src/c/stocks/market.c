@@ -48,6 +48,8 @@ void market_set_EOD(time_t current_utc_timestamp, int country_id, char *prev_day
 					market->prev_eod_timestamp = prev_eod_timestamp;
 					market->next_eod_timestamp = curr_eod_timestamp;
 				}
+				if ((market->next_eod_timestamp-market->prev_eod_timestamp)/3600/24 > 1)
+					market->holiday = true;
 			} else {
 				market->prev_eod = strdup(prev_day);
 				market->next_eod = strdup(curr_day);

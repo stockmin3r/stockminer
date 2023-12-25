@@ -915,7 +915,9 @@ int www_process_async(struct connection *connection)
 	/* now that the SSL handshake is complete, connection->recv() points to connection_ssl_recv() */
 //	printf("calling recv(): %p max_size: %lld\n", connection->recv, connection->packet_size_max);
 	nbytes = connection->recv(connection);
+	printf(BOLDCYAN "nbytes: %d" RESET "\n", nbytes);
 	if (nbytes <= -1) {
+		printf("ssl read error\n");
 		return -1;
 	}
 	if (nbytes == 0) {
@@ -959,7 +961,7 @@ void *www_server_async(void *args)
 		return NULL;
 	}
 
-	https_server_events.events  = EPOLLIN | EPOLLET;
+	https_server_events.events  = EPOLLIN | EPOLLET | EPOLLHUP;
 	https_server_events.data.fd = https_server_fd;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, https_server_fd, &https_server_events);
 	events = (struct epoll_event *)zmalloc(sizeof(*events) * MAXEVENTS);
@@ -989,7 +991,10 @@ void *www_server_async(void *args)
 			} else if (event->events & EPOLLIN) {
 				/* Connection Event recv() */
 				connection = (struct connection *)event->data.ptr;
-				connection->recv(connection);
+				if (!connection->recv(connection)) {
+					close(event->data.fd);
+					continue;
+				}
 				printf("EPOLLIN fd: %d epoll_fd: %d\n", connection->fd, epoll_fd);
 				fflush(stdout);
 			} else if (event->events & EPOLLOUT) {
@@ -999,6 +1004,9 @@ void *www_server_async(void *args)
 				fflush(stdout);
 				event->events &= ~EPOLLOUT;
 				epoll_ctl(epoll_fd, EPOLL_CTL_MOD, connection->fd, event);
+			} else if (event->events & EPOLLRDHUP) {
+				close(event->data.fd);
+				continue;
 			}
 		}
 	}

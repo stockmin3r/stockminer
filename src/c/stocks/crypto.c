@@ -28,10 +28,8 @@ void update_crypto_data(char *buf)
 	snprintf(ticker, sizeof(ticker)-1, "%s-%s", argv[CCCAGG_CRYPTO_IDX], argv[CCCAGG_CURRENCY_IDX]);
 
 	stock = search_stocks(ticker);
-	if (!stock) {
-		printf(BOLDRED "ticker error: %s" RESET "\n", ticker);
+	if (!stock)
 		return;
-	}
 	// December 8 2023, timestamp should always be higher than this date
 	new_timestamp = strtoull(argv[CCCAGG_TIMESTAMP_IDX], NULL, 10);
 	if (new_timestamp < 1702038335)
@@ -39,7 +37,6 @@ void update_crypto_data(char *buf)
 
 	stock->current_price  = strtod  (argv[CCCAGG_PRICE_IDX], NULL);
 	stock->current_volume = strtoull(argv[CCCAGG_VOLUME_IDX], NULL, 10);
-	printf("price: %.3f vol: %lu curtimestamp: %lu laststamp: %lu\n", stock->current_price, stock->current_volume, stock->current_timestamp, new_timestamp);
 
 	if (stock->current_price > stock->current_high)
 		stock->current_high = stock->current_price;
@@ -50,17 +47,15 @@ void update_crypto_data(char *buf)
 	if (!stock->current_timestamp)
 		stock->current_timestamp = new_timestamp;
 
-	if ((stock->current_timestamp-new_timestamp) >= 60) {
+	if ((new_timestamp-stock->current_timestamp) >= 60) {
 		// a new tick has passed
 		ohlc = &stock->ohlc[stock->nr_ohlc++];
 		stock->current_timestamp = new_timestamp;
 		stock->current_open      = stock->current_price;
 		addPoint(stock, stock->current_timestamp, stock->current_open, stock->current_high, stock->current_low, stock->current_close, stock->current_volume);
-		printf(BOLDRED "ohlc: %p\n", ohlc);
 	} else {
 		// update the current tick's OHLCv's
 		ohlc = &stock->ohlc[stock->nr_ohlc];
-		printf(BOLDGREEN "ohlc: %p\n", ohlc);
 	}
 
 	ohlc->open   = stock->current_open;
@@ -124,7 +119,7 @@ void cryptocompare_handler(struct connection *connection)
 	websocket_send(connection, subactions, subaction_size);
 	while ((nbytes=openssl_read_sync2(connection, sslbuf, sizeof(sslbuf)))) {
 		nr_frames = websocket_recv(sslbuf, nbytes, &frames[0], wsbuf, 0);
-		printf("nr_frames: %d packet: %s\n", nr_frames, wsbuf);
+//		printf("nr_frames: %d packet: %s\n", nr_frames, wsbuf);
 		update_crypto_data(wsbuf);
 	}
 }

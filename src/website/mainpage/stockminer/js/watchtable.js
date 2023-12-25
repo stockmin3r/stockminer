@@ -773,7 +773,7 @@ function ufoload(){
 	ufo  = $("#ufo").detach();
 	while (wsx.firstChild)
 		wsx.removeChild(wsx.firstChild);
-	if (wlist === "Highcaps") {
+	if (wlist === "Highcap Stocks") {
 		if ($(QGID)[0].UFO_TYPE == UFO_PRICE) {
 			T['R15'].destroy(1);
 			T['R5'].destroy(1);

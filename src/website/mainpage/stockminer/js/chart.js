@@ -394,7 +394,6 @@ function stockchart(av)
 				cfreq['W1']  = function(){sel.onchange(3,chart)}
 				cfreq['M1']  = function(){sel.onchange(4,chart)}
 
-/*
 				// tbis takes a considerable amount of time
 				if (localStorage.ctype)
 					ctypes[localStorage.ctype]();
@@ -402,7 +401,6 @@ function stockchart(av)
 					cfreq [localStorage.cfreq]();
 				else
 					sel.onchange(2,chart);
-*/
 
 				ID(div).className += " qchart";
 				$("#"+div).draggable({handle:'.highcharts-title',grid:[20,20],snap:"#"+ws,stop:function(){updatePosition(box, ticker)}});

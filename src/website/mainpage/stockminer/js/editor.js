@@ -1,6 +1,14 @@
 /* ***********************************************************************************************
  *                                    CSS EDITOR
  ************************************************************************************************/
+var EDITOR     = { watchtable: { div: [ "#P0Q1q2ws0" ], parent: "#P0Q1q2"}};
+var EDITOR_OPS = { html: html_update, css: css_update, javascript: javascript_update};
+
+function JSEditor() {Editor(0,"javascript")}
+function CSSEditor(){Editor(0,"css")}
+function html_update(){}
+function javascript_update(){}
+
 function editor_keyup()
 {
 	var editor = $("#editor")[0],tab = $("#morphtab")[0], new_class = $("#css-class")[0].value, old_class = tab.classList[0], utsave = $("#utsave")[0];
@@ -26,9 +34,23 @@ function editor_tab(e)
 }
 function css_save()
 {
-	var utsave = $("#utsave")[0], save = utsave.innerText, css = css_editor.getValue(), css_name = $("#css-class")[0].value;
+	var utsave, save, css, css_name, QGID;
+
+	if (window.event.target.parentNode.nodeName == "body") { 
+		editor = $("#editor")[0];
+	} else {
+		QGID   = window.event.target.parentNode.parentNode.id;
+		editor = $("#editor", QGID)[0];
+	}
+
+	utsave   = $("#utsave",    editor)[0];
+	css_name = $("#css-class", editor)[0];
+	css      = editor['css'].getValue()
+	save     = utsave.innerText;
+
 	if (save == 'Saved')
 		return;
+
 	utsave.style.color = "green";
 	utsave.innerText   = "Saved";
 	if (!localStorage[css_name]) {
@@ -69,8 +91,8 @@ function js_save()
 		JEXT['Theme'+nr_js] = {"name":JCLASS[nr_js], callback:function(i){TableTheme(JCLASS[i.substr(5)])}};
 	}
 	/* Update the user's CSS */
-	localStorage[css_name] = css;
-	WS.send("css " + $("#morphtab")[0].old_class + " " + css);
+	localStorage[js_name] = js;
+	WS.send("css " + $("#morphtab")[0].old_class + " " + jss);
 }
 
 function rpc_styles(av)
@@ -87,14 +109,6 @@ function cssload()
 	for(var x=0;x<CSS.length;x++)
 		T['Watchlist-CSS'].rows.add([{"S":CSS[x].style,"C":CSS[x].owner,"T":CSS[x].type,"R":CSS[x].rating}]).draw()
 }
-
-function JSEditor() {Editor(0,"javascript")}
-function CSSEditor(){Editor(0,"css")}
-function html_update(){}
-function js_update(){}
-
-var EDITOR     = { watchtable: { div: [ "#morphtab-box", "body > .watchtable-tools" ] }};
-var EDITOR_OPS = { html: html_update, css: css_update, js: js_update};
 
 function css_update(new_class)
 {
@@ -117,19 +131,13 @@ function css_update(new_class)
 var DIV;
 function editor_close()
 {
-	var editor = $("#editor")[0], component = EDITOR[editor.component], div = component.div, parentDiv = component.parentDiv, sel;
+	var editor = $("#editor")[0], component = EDITOR[editor.component], div = component.div, parentDiv = component.parent, sel;
 	DIV = div;
 	window.event.target.parentNode.style.display = "none";
 	for (var x = 0; x<div.length; x++) {
 		sel = div[x];
-		if (sel.indexOf(">") == -1)
-			$(parentDiv[0]).append($(sel).detach());
-		else
-			$(sel).remove();
+		$(parentDiv[0]).append($(sel).detach());
 	}
-
-//	var tab = $($("#morphtab")[0].parentNode.parentNode.parentNode).detach();
-//	$("#P0Q1q2").append(tab);
 }
 
 function init_editor()
@@ -137,10 +145,21 @@ function init_editor()
 	ace.config.set("basePath", "https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/");
 }
 
-
-function Editor(component, lang)
+function Editor(component, lang, QGID)
 {
-	var editor = $("#editor")[0], component, div, sel;
+	var editor, editor_id, component, div, sel;
+
+	if (QGID) {
+		editor = $("#editor").clone()[0];
+		$(QGID).append(editor);
+		bshide(QGID);
+		editor_id = QGID.substr(1) + "-" + lang + "-editor";
+		$(QGID + " #" + lang + "-editor")[0].id = editor_id;
+	} else {
+		QGID   = "";
+		editor = $("#editor")[0];
+		editor_id = lang+"-editor";
+	}
 
 	editor.style.display = 'block';
 	if (!component)
@@ -153,28 +172,30 @@ function Editor(component, lang)
 		editor.component = component;
 		component = EDITOR[component];
 	}
-	//	$(".UTR", editor).append($("#morphtab")[0].parentNode.parentNode.parentNode);
-	div = component.div;
-	for (var x = 0; x<div.length; x++) {
-		sel = div[x];
-		if (sel.indexOf(">") != -1)
-			sel = $(sel).clone();
-		else
-			sel = $(sel).detach();
-		$(".UTR", editor).append(sel);
-	}
 
+	/*
+	 * Load editable CSS "components" into the right editor box -
+	 * (only for the editor dialog box which doesn't reside inside a workspace quad)
+	 */
+	if (!QGID) {
+		div = component.div;
+		for (var x = 0; x<div.length; x++) {
+			sel = div[x];
+			sel = $(sel).detach();
+			$(".UTR", editor).append(sel);
+		}
+	}
+	$(".UTL", $(editor_id)[0].parentNode).css("display", "none");
+	$(editor_id).css("display",'block');
 	if (!editor[lang]) {
-		editor = editor[lang] = ace.edit(lang+"-editor", {mode:"ace/mode/"+lang, selectionStyle:"text"});
+		editor = editor[lang] = ace.edit(editor_id, {mode:"ace/mode/"+lang, selectionStyle:"text"});
 		editor.setTheme("ace/theme/dracula");
 		EDITOR_OPS[lang]();
-//		css_update();
 		editor.commands.addCommand({
 		    name:'save',
 		    bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
 		    exec: function(e) {
 				EDITOR_OPS[lang]();
-//				css_update();
 			}
 		});
 		editor.textInput.getElement().onkeyup = function(){
@@ -182,5 +203,8 @@ function Editor(component, lang)
 			utsave.style.color = "lightgreen";
 			utsave.innerText   = "Save";
 		}
+		$("#"+editor_id).click(function(){
+			$(".selected").removeClass("selected");
+		});
 	}
 }

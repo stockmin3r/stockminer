@@ -255,7 +255,7 @@ int connection_ssl_recv(struct connection *connection)
 
 	printf("ssl read: %d\n", nbytes);
 	if (nbytes > 0) {
-		printf("%s\n", connection->packet);
+		printf(BOLDGREEN "%s" RESET "\n" BOLDYELLOW "nbytes: %d" RESET "\n", connection->packet, nbytes);
 		return nbytes;
 	}
 	int err = SSL_get_error(connection->ssl, err);

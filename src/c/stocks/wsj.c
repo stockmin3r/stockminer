@@ -647,13 +647,7 @@ int WSJ_update_allday_price(struct stock *stock)
 			*(price->price_1d+price->price_1d_len-1) = ']';
 //		price->stale = 1; // when the next calendar trading day comes, a new price struct is allocated
 	}
-/*
-	if (market == NO_MARKET) {
-		if (!wsj_load_1m(stock) && price->price_1d_len)
-			*(price->price_1d+price->price_1d_len-1) = ']';
-		price->stale = 1;
-		return 0;
-	}*/
+
 	if (loaded)
 		return 0;
 

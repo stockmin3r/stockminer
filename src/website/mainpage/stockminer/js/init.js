@@ -316,7 +316,10 @@ function loadprofile(p,title)
 function rpc_init(av)
 {
 	init_qspace();
-	if (av[1] == 'stocks') {
+	if (!av[1]) {
+		W.showtab(W.workspace['ws0'].tab);
+		QUADVERSE_SWITCH('Screener');
+	} else if (av[1] == 'stocks') {
 		QUADVERSE_SWITCH('Screener');
 		stockpage(av[2],-1);
 	/*  0   1       2           3    4    5            */

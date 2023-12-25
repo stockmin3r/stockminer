@@ -61,12 +61,15 @@ void addPoint(struct stock *stock, time_t new_tick, double new_open, double new_
 	tick->current_ohlc_size = sprintf(tick->current_ohlc, "[%lu,%.2f,%.2f,%.2f,%.2f,%llu]", new_tick, new_open, new_high, new_low, new_close, new_volume);
 
 	/* Update 1m OHLC that gets sent to browser on entry */
-	if (price->price_1m_len) {
+	if (price->price_1m_len)
 		*(price->price_1m+price->price_1m_len-1) = ',';
-		strcpy(price->price_1m+price->price_1m_len, tick->current_ohlc);
-		*(price->price_1m+price->price_1m_len+tick->current_ohlc_size) = ']';
-		price->price_1m_len += tick->current_ohlc_size+1;
-	}
+	strcpy(price->price_1m+price->price_1m_len, tick->current_ohlc);
+	*(price->price_1m+price->price_1m_len+tick->current_ohlc_size) = ']';
+
+	if (price->price_1m_len)
+		price->price_1m_len++; // for the ','   ---^
+	price->price_1m_len += tick->current_ohlc_size;
+
 	/* Update 1m OHLC that gets sent to browser on entry */
 	if (*(price->price_1d+price->price_1d_len-1) == ']' && *(price->price_1d+price->price_1d_len-2) == ']') {
 		*(price->price_1d+price->price_1d_len-1) = ',';
