@@ -25,14 +25,13 @@ DLIST_HEAD(port_list);
 
 #define NR_POSITIONS  1
 #define NR_SECTORS    11
-#define PROFIT_TARGET 5.0
+#define PROFIT_TARGET 5.0 // sell after this ticker has gained 5% from the day the position was entered (needs to be a variable)
 #define MAX_RANKS     100
 
 int BACKTEST_INITIALIZED;
 
 void backtest_long      (char *ticker, struct backtest *backtest);
 int  backtest_linechart (char **json_out, char *buf, int nr_entries, double *sum);
-void session_load_ports (struct session *session);
 
 #define ITABLE   "<table class=UTAB>"   \
 				 "<caption>Current Positions</caption>" \
@@ -98,7 +97,7 @@ char *HTAB_ENTRY =  "<tr>"
 					"<td %s</td>"
 					"</tr>";
 
-#define PORT_DIV "<div id=%s class=portfolio onclick=Q.port_load()>" \
+#define PORT_DIV "<div id=%s class=portfolio onclick:port_load()>" \
 				 	"<div class=minichart id=%s-chart></div>"    \
 				 	"<div class=port-mini-title>%s</div>"          \
 				 	"<div class=port-mini-desc>%s</div>"           \
@@ -387,8 +386,8 @@ void backtest_open_position(struct backtest *backtest, struct esp_signal *esp)
 	position.stock_price = mag->close[position.day_index];
 	position.date      = *(uint64_t *)(mag->date[position.day_index]);
 	position.nr_shares = (position.size/position.stock_price);
-//	printf(BOLDWHITE "[esp->day: %d day_index: %d {%.2f} [%s] Opening Position (%s) %.2f shares (total: $%.2f) idx: %d price: %.2f" RESET "\n",esp->day, position.day_index,
-//	backtest->money_available, esp->date, stock->sym, position.nr_shares, position.size, position.day_index, position.stock_price);
+	printf(BOLDWHITE "[esp->day: %d day_index: %d {%.2f} [%s] Opening Position (%s) %.2f shares (total: $%.2f) idx: %d price: %.2f" RESET "\n",esp->day, position.day_index,
+	backtest->money_available, esp->date, stock->sym, position.nr_shares, position.size, position.day_index, position.stock_price);
 
 	position.profit              = 0;
 	position.status              = 0;
@@ -448,21 +447,18 @@ int scan_esp(struct backtest *backtest, struct esp_signal **esp_signals, int cur
 struct backjson *get_backtest(struct session *session, uint64_t port_id, uint64_t backtest_id)
 {
 	struct backjson *bj;
-	struct port *port;
+	struct port     *port;
 
 	port = get_portfolio(session, port_id);
 	if (!port)
 		return NULL;
 
-//	mutex_lock(&session->backtest_lock);
 	for (int x=0; x<session->nr_ports; x++) {
 		bj = port->backtest[x];
 		if (bj->gid == backtest_id) {
-//			mutex_unlock(&session->backtest_lock);
 			return (bj);
 		}
 	}
-//	mutex_unlock(&session->backtest_lock);
 	return (NULL);
 }
 
@@ -470,18 +466,14 @@ struct port *get_portfolio(struct session *session, uint64_t port_id)
 {
 	struct port *port;
 
-//	mutex_lock(&session->backtest_lock);
 	for (int x=0; x<session->nr_ports; x++) {
 		port = session->portlist[x];
 		if (!port)
-			printf("PORT IS FUCING NULL\n");
+			return NULL;
 		printf("SESSION PORT: %-8s vs: %-8s\n", (char *)&port->port_id, (char *)&port_id);
-		if (port->port_id == port_id) {
-//			mutex_unlock(&session->backtest_lock);
+		if (port->port_id == port_id)
 			return (port);
-		}
 	}
-//	mutex_unlock(&session->backtest_lock);
 	return (NULL);
 }
 
@@ -518,11 +510,9 @@ void backtest_save(struct session *session, uint64_t port_id, char *name, int do
 	memset(&backdb, 0, sizeof(backdb));
 
 	printf(BOLDRED "BACKTEST_SAVE ID: %s current json: %s" RESET "\n", (char *)&bj->gid, session->current_backtest2->json);
+	
 	strcpy(bj->name, name);
-//	mutex_lock(&session->backtest_lock);
 	port->backtest[port->nr_backtests++] = bj;
-//	mutex_unlock(&session->backtest_lock);
-
 	build_port_json(session, port, session->current_backtest2);
 
 	strcpy(backdb.main_json, session->current_backtest2->json);
@@ -558,10 +548,7 @@ void backtest_save(struct session *session, uint64_t port_id, char *name, int do
 		strcpy(portdb.name, port->name);
 		strcpy(portdb.desc, port->desc);
 		strcpy(portdb.json_mini, port->json_mini);
-
-		fd = open(path, O_RDWR|O_CREAT|O_APPEND, 0644);
-		write(fd, (void *)&portdb, sizeof(portdb));
-		close(fd);
+		fs_appendfile(path, (char *)&portdb, sizeof(portdb));
 	} else {
 		sprintf(path, "db/ports/%d.port", session->user->uid);
 		map = MAP_FILE_RW(path, &filemap);
@@ -628,7 +615,7 @@ void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *
 //		printf(BOLDGREEN "MONTH: %d days_in_month: %d backtest: %p" RESET "\n", x, days_in_month, backtest);
 		for (y=0; y<days_in_month; y++) {
 			nr_free_positions = backtest_close_positions(backtest);
-			nr_esp_signals = scan_esp(backtest, esp_list, x);
+			nr_esp_signals    = scan_esp(backtest, esp_list, x);
 			if (!nr_esp_signals) {
 				backtest->current_day++;
 				continue;
@@ -667,9 +654,9 @@ void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *
 //	printf(BOLDGREEN "** TOTAL PROFIT: $%.2f    ** [month: %d] $%.2f maxpos: %d" RESET "\n", profit, start_month, backtest->money_available+backtest->money_invested, backtest->max_positions);
 	backtest->json_linechart_len = linechart_positions(&backtest->json_linechart, backtest->nr_positions, &backtest->positions[0]);
 
-	backtest->json = malloc(96 KB);
+	backtest->json    = malloc(96 KB);
 	backtest_sectors(backtest);
-	bj                = malloc(sizeof(*bj));
+	bj                = zmalloc(sizeof(*bj));
 	bj->gain          = (((backtest->money_available+backtest->money_invested)/backtest->money_initial)-1)*100;
 	backtest->gain    = bj->gain;
 
@@ -821,13 +808,13 @@ void backtest_sectors(struct backtest *backtest)
 	backtest->sector_json_len = sector_json_len;
 }
 
-int get_port(struct session *session, uint64_t port_id, int http_fd)
+int get_port(struct session *session, struct connection *connection, uint64_t port_id)
 {
-	struct port *port;
+	struct port     *port;
 	struct backjson *core_bj;
-	char table[16 KB];
-	char *json;
-	int table_size, json_len;
+	char             table[16 KB];
+	char            *json;
+	int              json_len;
 
 	if (!BACKTEST_INITIALIZED)
 		return 0;
@@ -841,7 +828,7 @@ int get_port(struct session *session, uint64_t port_id, int http_fd)
 	memcpy(json+json_len, port->backlist_table, port->backlist_table_len);
 	json[json_len+port->backlist_table_len] = 0;
 	printf("backlist_table: %s full json: %s table_len: %d total len: %d strlen: %lu\n", port->backlist_table, json, port->backlist_table_len, port->backlist_table_len+json_len, strlen(json));
-	net_send(http_fd, json, json_len+port->backlist_table_len);
+	websocket_send(connection, json, json_len+port->backlist_table_len);
 	return 1;
 }
 
@@ -901,7 +888,7 @@ void init_backtest()
 	SESSION_LOCK();
 	session_list = get_session_list();
 	DLIST_FOR_EACH_ENTRY(session, session_list, list) {
-		session_load_ports(session);
+		session_load_portfolios(session);
 	}
 	SESSION_UNLOCK();
 }
@@ -976,71 +963,58 @@ void backtest_long(char *ticker, struct backtest *backtest)
 	struct stock     *stock = search_stocks(ticker);
 	struct stockfund *stockfund;
 	struct mag       *mag;
-	int year_2020, nr_entries, x;
-	double prior_close, close_price, diff;
+	int               year_2023, nr_entries, x;
+	double            prior_close, close_price, diff;
 
 	if (!stock)
 		return;
+
 	mag                      = stock->mag;
-	year_2020                = mag->year_2020;
+	year_2023                = mag->year_2023;
 	stockfund                = &backtest->stockfunds[0];
-	nr_entries               = mag->nr_entries-year_2020;
+	nr_entries               = mag->nr_entries-year_2023;
 	backtest->money_invested = BACKTEST_INVESTMENT;
-	stockfund->nr_shares     = (BACKTEST_INVESTMENT/mag->close[year_2020]);
+	stockfund->nr_shares     = (BACKTEST_INVESTMENT/mag->close[year_2023]);
 	stockfund->funds[0]      = BACKTEST_INVESTMENT;
-	year_2020++;
+	year_2023++;
 	for (x=1; x<nr_entries; x++) {
-		prior_close          = mag->close[year_2020-1];
-		close_price          = mag->close[year_2020++];
+		prior_close          = mag->close[year_2023-1];
+		close_price          = mag->close[year_2023++];
 		diff                 = ((close_price/prior_close)-1)*100.0;
 		stockfund->funds[x]  = stockfund->funds[x-1] * (1+(diff/100));
 	}
 	backtest->json_len = backtest_linechart(&backtest->json, NULL, nr_entries, &stockfund->funds[x]);
 }
 
-void HTTP_BACKTEST(char *port_id, char *backtest_id, int http_fd)
+void rpc_backtest(struct rpc *rpc)
 {
-	struct session *session;
-	struct stock    *stock;
+	struct session *session      = rpc->session;
+	char            *port_id     = rpc->argv[1];
+	char            *backtest_id = rpc->argv[1]+8;
 	struct backjson *bj;
-	char            *post;
-	uint64_t         cookie;
-	int              table_index;
 
-	/* GET /BACK/port_id/backtest_id */
+	/* backtest port_id/backtest_id */
 	port_id[7]               = 0;
 	backtest_id[7]           = 0;
 	bj = get_backtest(session, *(uint64_t *)port_id, *(uint64_t *)backtest_id);
-	if (!bj) {
-		send(http_fd, "HTTP/1.1 200 OK\r\n\r\n", 19, 0);
+	if (!bj)
 		return;
-	}
-	net_send(http_fd, bj->main_json, bj->main_json_len);
+	websocket_send(rpc->connection, bj->main_json, bj->main_json_len);
 }
 
-void HTTP_SAVE_BACKTEST(char *req, int http_fd)
+void rpc_backtest_save(struct rpc *rpc)
 {
 	struct session *session;
 	struct stock   *stock;
-	char           *post, *p, *name;
-	char            port_id[8];
-	uint64_t        cookie;
-	int             table_index, do_export;
+	char           *port_id   =  rpc->argv[1];
+	int             do_export = *rpc->argv[2] - 48;
+	char           *name      =  rpc->argv[3];
 
 	/* GET /SAVE/port_id/0/Name */
-	*(uint64_t *)port_id = *(uint64_t *)(req+10);
-	port_id[7] = 0;
-	do_export  = *(req+18) - 48;
-	name = req+20;
-	p = strchr(name, ' ');
-	if (!p)
-		return;
-	*p = 0;
-	if (p-name > 62)
+	if (strlen(name) > 62)
 		return;
 	printf("backsave port_id: %s name: %s export: %d\n", port_id, name, do_export);
 	backtest_save(session, *(uint64_t *)port_id, name, do_export);
-	send(http_fd, "HTTP/1.1 200 OK\r\n\r\n", 19, 0);
 }
 
 int backtest_args(struct backtest *backtest, char *p)
@@ -1144,57 +1118,43 @@ int backtest_args(struct backtest *backtest, char *p)
 	return 1;
 }
 
-void HTTP_RUN_BACKTEST(char *req, int http_fd)
+void rpc_backtest_run(struct rpc *rpc)
 {
-	struct session  *session;
+	struct session  *session = rpc->session;
+	char            *port_id = rpc->argv[1];
+	char            *args    = rpc->argv[2];
 	struct backtest *backtest;
-	struct stock    *stock;
-	struct port     *port;
-	char            *post, *p;
-	char             port_id[8];
-	uint64_t         cookie;
-	int  capital, maxpos, avgdays, a1q1, a4q1, a1q1_year, a4q1_year;
-	int  capital_dynamic, maxpos_dynamic, avgdays_select, a1q1_select, a4q1_select, pt_select;
+	int              capital, maxpos, avgdays, a1q1, a4q1, a1q1_year, a4q1_year;
+	int              capital_dynamic, maxpos_dynamic, avgdays_select, a1q1_select, a4q1_select, pt_select;
 
-	/* GET /RUN/port__id/capital/avgdays/pt/maxpos/a1q1/a4q1/capital_sel/avgdays_sel/pt_sel/maxpos_sel/a1q1_sel/a4q1_sel/peak/rank */
+	/* backtest_run port_id capital/avgdays/pt/maxpos/a1q1/a4q1/capital_sel/avgdays_sel/pt_sel/maxpos_sel/a1q1_sel/a4q1_sel/peak/rank */
 	if (!BACKTEST_INITIALIZED)
 		return;
 
 	backtest = malloc(sizeof(*backtest));
-	*(uint64_t *)port_id = *(uint64_t *)(req+9);
-	port_id[7] = 0;
 	printf("RUN_BACKTEST() port id: %s\n", port_id);
-	if (!backtest_args(backtest, req+18))
+	if (!backtest_args(backtest, args))
 		return;
-	backtest->http_fd = http_fd;
+	backtest->connection = rpc->connection;
 	backtest_ultra(session, *(uint64_t *)port_id, backtest, 0, NULL, 0);
 }
 
-void HTTP_PORTFOLIO(char *req, int http_fd)
+void rpc_portfolios(struct rpc *rpc)
 {
 	struct session *session;
-	struct stock   *stock;
-	char           *post;
-	char            port_id[8];
-	uint64_t        cookie;
+	char           *portfolio = rpc->argv[1];
 
 	if (!BACKTEST_INITIALIZED)
-		goto out;
-	/* GET /PORT/port_id */
-	/* GET /PORTS */
-	if (*(req+9) == 'S') {
+		return;
+
+	if (*portfolio == '*') {
 		printf("ports json: %s len: %d\n", session->ports_json, session->ports_json_len);
-		net_send(http_fd, session->ports_json, session->ports_json_len);
+		websocket_send(rpc->connection, session->ports_json, session->ports_json_len);
 		return;
 	}
-	*(uint64_t *)port_id = *(uint64_t *)(req+10);
-	port_id[7] = 0;
 
-	printf("PORT_ID: %s\n", port_id);
-	if (get_port(session, *(uint64_t *)port_id, http_fd))
+	if (get_port(session, rpc->connection, *(uint64_t *)portfolio))
 		return;
-out:
-	send(http_fd, "HTTP/1.1 200 OK\r\n\r\n", 19, 0);
 }
 
 
@@ -1244,7 +1204,7 @@ void list_add_portfolio(struct port *port)
 	LIST_ADD(&port->list, &port_list);
 }
 
-void session_load_ports(struct session *session)
+void session_load_portfolios(struct session *session)
 {
 	struct filemap   filemap, filemap2;
 	struct portdb   *portdb;

@@ -67,55 +67,24 @@ void rpc_user_register(struct rpc *rpc)
 {
 	struct session    *session    = rpc->session;
 	struct connection *connection = rpc->connection;
-	char              *usr        = rpc->argv[1];
-	char              *pwd        = rpc->argv[2];
-	int                pwdlen     = pwd ? strlen(pwd) : 0;
-	int                usrlen     = usr ? strlen(usr) : 0;
-	struct user       *user;
-	char               pwhash[crypto_pwhash_STRBYTES], *p = usr;
-	const char        *error;
-
-	if (unlikely(!usr || !pwd || !pwdlen || !usrlen || usrlen >= MAX_USERNAME_SIZE))
-		goto out_error;
-
-	for (int x=0; x<usrlen; x++) {
-		if (!isalnum(*p++))
-			goto out_error;
-	}
-
-	user = session->user;
-	strcpy(user->uname, usr);
-	user->join_date = time(NULL);
-	if (crypto_pwhash_str(pwhash, pwd, pwdlen, crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_MIN) < 0) {
-		error = SYSTEM_ERROR;
-		goto out_error;
-	}
-	memset(pwd, 0, pwdlen);
-	user->logged_in = 1;
-	memcpy(user->pwhash, pwhash, crypto_pwhash_STRBYTES);
-
-	// enqueue db task for the db deathloop to add the user
-	db_user_add(user, connection);
-	return;
-out_error:
-	if (connection)
-		websocket_send(connection, ILLEGAL_USERNAME, 12);
-
-}
-
-void rpc_register(struct rpc *rpc)
-{
-	struct session    *session    = rpc->session;
-	struct connection *connection = rpc->connection;
 	char              *username   = rpc->argv[1];
-	char              *pubkey64   = rpc->argv[2];
 	char              *p          = username;
 	int                usrlen     = strlen(username);
-	int                keylen     = strlen(pubkey64);
+	int                keylen;
 	char               pubkey[hydro_sign_PUBLICKEYBYTES];
+	char              *pubkey64;
 	struct user       *user;
 
-	if (unlikely(!username || !usrlen || usrlen >= MAX_USERNAME_SIZE || keylen > hydro_sign_PUBLICKEYBYTES))
+	pubkey64 = strchr(username, '|');
+	if (!pubkey64)
+		goto out_error;
+
+	*pubkey64++ = 0;
+	if (strlen(pubkey64) != 44)
+		goto out_error;
+
+	usrlen = strlen(username);
+	if (usrlen >= MAX_USERNAME_SIZE)
 		goto out_error;
 
 	for (int x=0; x<usrlen; x++)
@@ -125,10 +94,9 @@ void rpc_register(struct rpc *rpc)
 	user = session->user;
 	strcpy(user->uname, username);
 	user->join_date = time(NULL);
-	base64_decode(pubkey, strlen(pubkey), pubkey);
+	base64_decode(pubkey64, strlen(pubkey64), pubkey);
 	memcpy(user->pubkey, pubkey, hydro_sign_PUBLICKEYBYTES);
 	strcpy(user->uname, username);
-	
 
 	// enqueue db task for the db deathloop to add the user
 	db_user_add(user, connection);
@@ -150,7 +118,7 @@ void rpc_user_login(struct rpc *rpc)
 	struct session    *prev_session = connection->session, *session;
 	char              *username     = rpc->argv[1], *signature64;
 	char               challenge[1024];
-	char               signature[256];
+	char               signature[256] = {0};
 	int                username_size;
 
 	printf("rpc_user_login: %s\n", rpc->argv[1]);
@@ -170,7 +138,7 @@ void rpc_user_login(struct rpc *rpc)
 	memcpy(challenge, username, username_size);
 	challenge[username_size] = '|';
 	memcpy(challenge+username_size+1, connection->nonce, sizeof(connection->nonce));
-	printf("challenge: %s\n", challenge);
+	printf("signature64: %s\n", signature64);
 	for (int x = 0; x<hydro_sign_BYTES; x++)
 		printf(BOLDMAGENTA "%x ", (unsigned char)signature[x]);
 	printf(RESET "\n");
@@ -277,6 +245,8 @@ void init_users()
 		// add user's session to session.c::session_list
 		session_add(session);
 
+		session_load_portfolios(session);
+
 		// Add user to USER_HASHTABLE
 		uhash          = (struct uhash *)zmalloc(sizeof(*uhash));
 		uhash->session = session;
@@ -287,13 +257,13 @@ void init_users()
 		chash          = (struct chash *)zmalloc(sizeof(*chash));
 		chash->session = session;
 		for (int y=0; y<MAX_WEBSOCKETS; y++) {
-			if (!user->cookies[y][0])
+			if (*user->cookie == 0)
 				continue;
-			strncpy(cookie, &user->cookies[y][0], COOKIE_SIZE);
-			chash->cookie = &user->cookies[y][0];
+			strncpy(cookie, user->cookie, COOKIE_SIZE);
+			chash->cookie = user->cookie;
 			HASH_ADD_STR(COOKIE_HASHTABLE, cookie, chash);
 			if (*session->filecookie == '\0') {
-				strncpy(session->filecookie, &user->cookies[y][0], 15);
+				strncpy(session->filecookie, user->cookie, 15);
 				cstring_strchr_replace(session->filecookie, '/', '-');
 			}
 			printf("adding cookie: [%s] to chash: [%p] session: [%p]\n", cookie, chash, session);

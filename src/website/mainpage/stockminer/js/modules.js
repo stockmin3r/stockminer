@@ -525,3 +525,22 @@ function new_jterm(workspace)
 		prompt: 'js> '
 	});
 }
+
+function new_select_option(option_text,select_box,value)
+{
+	var opt = document.createElement("option");
+	opt.appendChild(document.createTextNode(option_text));
+	opt.value = value;
+	$(select_box).append(opt)
+}
+
+function sort_options(select_id)
+{
+	var options = $(select_id + " option");
+	options.detach().sort(function(a,b) {
+		var atext = $(a).text();
+		var btext = $(b).text();
+		return (atext > btext)?1:((atext < btext)?-1:0);
+	});
+	options.appendTo(select_id);
+}

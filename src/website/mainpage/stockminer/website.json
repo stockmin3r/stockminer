@@ -65,6 +65,13 @@
 			"grid":   "grid100 candles",
 			"click":  "candles",
 			"quads":  [{"workspace":  [{"mod": "addCandles", "title": "Candles"}]}]
+		},{
+			"title":  "Backtest",
+			"grid":   "grid100",
+			"click":  "backtest",
+				"quads": [{
+					"workspace":  [{"mod": "addPortfolio",    "title":"Portfolio"}]
+					}]
 		}]
 	},{
 		title:"Options",

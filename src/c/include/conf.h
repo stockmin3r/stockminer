@@ -224,10 +224,9 @@ struct connection        {
 
 struct user {
 	struct session      *session;
-	char                 cookies[MAX_WEBSOCKETS][COOKIE_SIZE];
+	char                 cookie[16];
 	char                 uname[MAX_USERNAME_SIZE+1];
-	char                 pwhash[crypto_pwhash_STRBYTES];
-	char                 pubkey[44];
+	char                 pubkey[hydro_sign_PUBLICKEYBYTES];
 	unsigned int         logged_in;
 	uid_t                uid;
 	uint64_t             config;
@@ -539,6 +538,8 @@ void              rpc_option_page         (struct rpc *rpc); // options.c
 void              rpc_user_register       (struct rpc *rpc); // user.c
 void              rpc_user_login          (struct rpc *rpc); // user.c
 void              rpc_xls                 (struct rpc *rpc); // xls.c
+void              rpc_portfolios          (struct rpc *rpc); // backtest.c
+void              rpc_backtest            (struct rpc *rcp); // backtest.c
 
 /* workspace.c */
 __MODULE_INIT     init_quadverse_module   (void);

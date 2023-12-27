@@ -48,7 +48,7 @@ struct session *session_alloc(struct connection *connection)
 	LIST_ADD(&session->list, &session_list);
 	mutex_unlock(&session_lock);
 
-	cookie_ptr     = &session->user->cookies[connection->websocket_id][0];
+	cookie_ptr     = session->user->cookie;
 	random_cookie(cookie_ptr);
 	chash          = (struct chash *)zmalloc(sizeof(*chash));
 	chash->session = session;
@@ -72,20 +72,16 @@ struct session *session_alloc(struct connection *connection)
 struct session *session_get(struct connection *connection, char *request)
 {
 	struct session *session;
-	char           *p, *cookie = strstr(request, "/c=");
+	char           *p, *cookie = strstr(request, "c=");
 
 	printf(BOLDMAGENTA "connection: %p" RESET "\n", connection);
-	if (!cookie || (*(cookie+3)==' '))
+	if (!cookie)
 		return session_alloc(connection);
-	p = strchr(cookie, ' ');
+	p = strchr(cookie, '\r');
 	if (!p)
 		return session_alloc(connection);
 	*p = 0;
-	cookie += 3;
-	if (*cookie == ' ')
-		cookie++;
-	if (*cookie == '\0' || *(cookie+1) == '\0' || *(cookie+2) == '\0')
-		return NULL;
+	cookie += 2;
 	printf(BOLDCYAN "session_get: cookie: %s" RESET "\n", cookie);
 	session = session_by_cookie(cookie);
 	*p = ' ';
@@ -99,7 +95,7 @@ struct session *session_get(struct connection *connection, char *request)
 		connection->has_cookie   = 1;
 	}
 	if (connection->session)
-		printf(BOLDGREEN "session_get(): %s" RESET "\n", connection->session->user->cookies[connection->websocket_id]);
+		printf(BOLDGREEN "session_get(): %s" RESET "\n", connection->session->user->cookie);
 	return (session);
 }
 
@@ -242,7 +238,7 @@ void session_set_config(struct connection *connection)
 
 	/* Cookie */
 	if (!connection->has_cookie) {
-		packet_size += snprintf(packet+packet_size, 24, "cookie %s@", session->user->cookies[connection->websocket_id]);
+		packet_size += snprintf(packet+packet_size, 24, "cookie %s@", session->user->cookie);
 		printf(BOLDMAGENTA "packet: %s session: %p websocket_id: %d" RESET "\n", packet, session, connection->websocket_id);
 	}
 

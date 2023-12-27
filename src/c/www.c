@@ -52,6 +52,9 @@ struct request rpc_requests[] = {
 	{ "airports",            rpc_airstocks_portfolio,    1, 1, ARGS_TYPE_ARGV},
 	{ "fork",                rpc_airstocks_fork,         1, 1, ARGS_TYPE_ARGV},
 
+	/* Backtest */
+	{ "portfolios",          rpc_portfolios,             2, 2, ARGS_TYPE_ARGV},
+
 	/* Profile */
 	{ "profile_get",         rpc_profile_get,            1, 1, ARGS_TYPE_ARGV},
 	{ "profile_set",         rpc_profile_set,            0, 0, ARGS_TYPE_JSON},
@@ -105,7 +108,7 @@ struct request rpc_requests[] = {
 	{ "boot",                rpc_boot,                   2, 2, ARGS_TYPE_ARGV},
 	{ "fini",                rpc_session_finish,         1, 1, ARGS_TYPE_ARGV},
 	{ "login",               rpc_user_login,             2, 2, ARGS_TYPE_ARGV},
-	{ "register",            rpc_user_register,          3, 3, ARGS_TYPE_ARGV},
+	{ "register",            rpc_user_register,          2, 2, ARGS_TYPE_ARGV},
 	{ "checkpoint",          rpc_checkpoint,             1, 2, ARGS_TYPE_ARGV}
 };
 
@@ -577,7 +580,7 @@ int www_websocket_sync(char *req, struct connection *connection)
 	if (!(session=connection->session=session_get(connection, req)))
 		return 0;
 
-	printf(BOLDWHITE "www_websocket(): %.60s\n" RESET "session: %p\n", req, session);
+	printf(BOLDWHITE "www_websocket(): %s\n" RESET "session: %p\n", req, session);
 
 	/* extract the URL segments */
 	if (!www_get_route(req+8, &url))
@@ -692,7 +695,7 @@ int www_websocket_sync(char *req, struct connection *connection)
 		}
 	}
 	quadverse_unsubscribe(session);
-	printf(BOLDRED "CLOSED CONNECTION: %.8s client_id: %d fd: %d" RESET "\n", (char *)&session->user->cookies[connection->websocket_id], connection->websocket_id, session->websockets[connection->websocket_id]->fd);
+	printf(BOLDRED "CLOSED CONNECTION: %.8s client_id: %d fd: %d" RESET "\n", session->user->cookie, connection->websocket_id, session->websockets[connection->websocket_id]->fd);
 	session->websockets[connection->websocket_id]->fd = -1;
 //	openssl_destroy(connection);
 	return 0;

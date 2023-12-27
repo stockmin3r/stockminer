@@ -500,6 +500,11 @@
     	this.workspace[WSID].MIN = screener_min;
     	this.workspace[WSID].MAX = screener_max;
 	}
+	addPortfolio(args){
+		var portfolios = $("#portfolio").detach()[0];
+		this['ws'+args.WSID].appendChild(portfolios);
+		portfolios.style.display = "block";
+	}
 
 	/*
 	 * MENUS

@@ -144,7 +144,7 @@ function init_editor()
 {
 	ace.config.set("basePath", "https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/");
 }
-
+var EE;
 function Editor(component, lang, QGID)
 {
 	var editor, editor_id, component, div, sel;
@@ -154,7 +154,7 @@ function Editor(component, lang, QGID)
 		$(QGID).append(editor);
 		bshide(QGID);
 		editor_id = QGID.substr(1) + "-" + lang + "-editor";
-		$(QGID + " #" + lang + "-editor")[0].id = editor_id;
+		$(".webscript-editor", editor)[0].id = editor_id;
 	} else {
 		QGID   = "";
 		editor = $("#editor")[0];
@@ -185,10 +185,23 @@ function Editor(component, lang, QGID)
 			$(".UTR", editor).append(sel);
 		}
 	}
-	$(".UTL", $(editor_id)[0].parentNode).css("display", "none");
-	$(editor_id).css("display",'block');
+
+	EID = editor_id;
+	EE  = editor;
+//	$(".UTL", $(editor_id)[0].parentNode).css("display", "none");
+	$("#"+editor_id).css("display",'block');
+	if (lang == "javascript") {
+		var webscripts = Object.keys(Webscripts);
+		for (var x = 0; x<webscripts.length; x++) {
+			new_select_option(webscripts[x], $("#webscript-select", editor), x);
+		}
+		$("#webscript-select", editor).css("display", "block");
+		$(".UTR", editor).css("display", "none");
+		$(editor).addClass("webscript-workspace");
+		$("#"+editor_id)[0].innerHTML = Webscripts[$("#webscript-select option:selected", editor).text()].join("\r\n");
+	}
 	if (!editor[lang]) {
-		editor = editor[lang] = ace.edit(editor_id, {mode:"ace/mode/"+lang, selectionStyle:"text"});
+		editor = editor[lang] = ace.edit(editor_id, {mode:"ace/mode/css", selectionStyle:"text"});
 		editor.setTheme("ace/theme/dracula");
 		EDITOR_OPS[lang]();
 		editor.commands.addCommand({

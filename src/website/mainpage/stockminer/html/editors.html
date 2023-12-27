@@ -9,8 +9,8 @@
 	</div>
 	<span id=utsave onclick=css_save()>Save</span>
 	<input type=text id=css-class value=myStyle onkeyup=editor_keyup()>
-	<select id=webscript-select style="display:none"></select>
-	<div id=css-editor class=UTL style="display:none">
+	<select id=webscript-select  style="display:none" onchange=webscript_eselect_onchange()></select>
+	<div id=css-editor class=UTL style="display:none" class=css-editor>
 		.myStyle {
 			font-weight:bold;
 			cursor:pointer;
@@ -29,8 +29,8 @@
 		}
 		.myStyle th    {padding:10px 18px !important}
 	</div>
-	<div id=javascript-editor class=UTL style="display:none"></div>
-	<div id=html-editor       class=UTL style="display:none"></div>
+	<div id=javascript-editor class="UTL webscript-editor" style="display:none"></div>
+	<div id=html-editor       class="UTL html-editor"      style="display:none"></div>
 	<div class=UTR>
 	</div>
 </div>

@@ -195,11 +195,13 @@ hydro_sign_create(uint8_t csig[hydro_sign_BYTES], const void *m_, size_t mlen,
         hydro_sign_final_create(&st, csig, sk) != 0) {
         return -1;
     }
-	printf("---secretkey---\n");
+	printf("---msg---[%d]\n", mlen);
+	for (int x = 0; x<mlen; x++)
+		printf("%x ", ((unsigned char *)m_)[x]);
+	printf("\n---secretkey---\n");
 	for (int x = 0; x<hydro_sign_SECRETKEYBYTES; x++)
 		printf("%x ", sk[x]);
-	printf("\n");
-	printf("---signature---\n");
+	printf("\n---signature---\n");
 	for (int x = 0; x<hydro_sign_BYTES; x++)
 		printf("%x ", csig[x]);
 	printf("\n");

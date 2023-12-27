@@ -49,6 +49,15 @@ function rpc_netsh(av)  {
 	window['webscript_' + av[1] + "_" + av[2]](av.slice(1))
 }
 
+/*
+ * Webscript editor select box
+ */
+function webscript_eselect_onchange()
+{
+	var editor = window.event.target.parentNode;
+	editor['javascript'].session.setValue(Webscripts[$("#webscript-select option:selected", editor).text()].join("\r\n"));
+}
+
 /**********************
  * Webscript Functions
  *********************/

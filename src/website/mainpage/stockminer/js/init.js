@@ -50,7 +50,7 @@ function init_websocket(action) {
 		// page reload doesn't require any extra information - this is a mess
 		rpc = "";
 	}
-	url = 'wss://localhost:port/ws/' + action + rpc + "c=" + (localStorage.cookie?localStorage.cookie:"");
+	url = 'wss://localhost:port/ws/' + action + rpc;
 	console.log('init_websocket(): ' + url);
 	WS           = new WebSocket(url);
 	WS.onerror   = function() {WS.close()};

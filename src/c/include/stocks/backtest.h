@@ -83,7 +83,7 @@ struct position {
 	double             size;
 	double             target;
 	double             gain;
-	double             stock_price;
+	double             stock_price;   /* Price (EOD) of the ticker on the day the position was opened */
 	double             pc_diff;
 	double             invested;      /* Total amount Invested in Portfolio (Avail+Invested) at the time position was taken */
 	time_t             date;
@@ -95,6 +95,7 @@ struct position {
 };
 
 struct backtest {
+	struct connection  *connection;
 	double              sum[256];
 	struct stockfund    stockfunds[MAX_STOCKS];
 	struct position     positions[MAX_POSITIONS];
@@ -150,16 +151,17 @@ extern struct port port_ultra;
 extern struct portdb ultra_portdb;
 extern struct backdb ultra_backdb;
 
-void backtest_sectors(struct backtest *backtest);
-void init_backtest();
-int get_json_backtest(struct session *session, char *backname, int http_fd);
-int get_port(struct session *session, uint64_t port_id, int http_fd);
-void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *backtest, double money_initial, char **stocklist, int nstocks);
-void backtest_save(struct session *session, uint64_t port_id, char *name, int do_export);
-int linechart_positions(char **json_out, int nr_positions, struct position *position);
-struct backjson *get_backtest(struct session *session, uint64_t port_id, uint64_t backtest_id);
-struct port *get_portfolio(struct session *session, uint64_t port_id);
-void list_add_portfolio(struct port *port);
+void             backtest_sectors       (struct backtest *backtest);
+void             init_backtest          (void);
+int              get_json_backtest      (struct session *session, char *backname, int http_fd);
+int              get_port               (struct session *session, struct connection *connection, uint64_t port_id);
+void             backtest_ultra         (struct session *session, uint64_t port_id, struct backtest *backtest, double money_initial, char **stocklist, int nstocks);
+void             backtest_save          (struct session *session, uint64_t port_id, char *name, int do_export);
+int              linechart_positions    (char **json_out, int nr_positions, struct position *position);
+struct backjson *get_backtest           (struct session *session, uint64_t port_id, uint64_t backtest_id);
+struct port     *get_portfolio          (struct session *session, uint64_t port_id);
+void             list_add_portfolio     (struct port *port);
+void             session_load_portfolios(struct session *session);
 
 #define BTABLE   "<table id=backsave-table>"   \
 				 "<caption>Backtests</caption>" \

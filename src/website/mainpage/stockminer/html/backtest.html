@@ -1,0 +1,99 @@
+	<!-- Portfolio -->
+	<div id=portfolio style="display:none">
+		<h3 class=port-page-title>STOCKMINER ULTRA PORTFOLIO</h3>
+		<div id=port-list></div> <!-- Mini Portfolio List -->
+		<div id=ultra-main>
+			<div id=ultra-left>
+				<div id=port-summary>
+					<div class=port-month>
+					<ul>
+						<li onclick=port_month(0)>January</li>
+						<li onclick=port_month(1)>February</li>
+						<li onclick=port_month(2)>March</li>
+						<li onclick=port_month(3)>April</li>
+						<li onclick=port_month(4)>Mary</li>
+						<li onclick=port_month(5)>June</li>
+						<li onclick=port_month(6)>July</li>
+						<li onclick=port_month(7)>August</li>
+						<li onclick=port_month(8)>September</li>
+						<li onclick=port_month(9)>October</li>
+						<li onclick=port_month(10)>November</li>
+						<li onclick=port_month(11)>December</li>
+					</ul>
+					</div>
+					<div id=port-stats>
+						<div class=port-stats-title>Ultra Aggressive</div>
+						<div id=ultra-gain></div>
+					</div>
+					<div class="backtest-load" onclick=backtest_opt()><div class=toolt1p>📽<span class=toolt1ptext>Backtest Advanced Options</span></div></div>
+					<div class="backtest-save" onclick=backtest_save()><div class=toolt1p>💾<span class=toolt1ptext>Save Backtest</span></div></div>
+				</div>
+				<div class=port-capital>
+					<input type=text value=10000 id=ultra-capital class=port-capital-input><span class=capital-start onclick=run_backtest()>Starting Investment</span>
+				</div>
+				<section id=ultra-pie-section class=port-sectors>
+						<div id=ultra-piechart></div>
+				</section>
+			</div> <!-- #ultra-left -->
+
+			<div id=ultra-right>
+				<div id=ultra-linechart></div>
+				<div id=ultra-itable><h3>Money Invested</h3></div>
+			</div>
+
+			<div id=ultra-htable><h3>Transaction History</h3></div>
+		</div> <!-- #ultra-main -->
+	</div> <!-- #portfolio -->
+
+
+	<!-- Backtest Box Advanced Options -->
+	<div id=backtest-box style="display:none">
+		<div class=left-control>
+			<div>Starting Capital:</div><div class=port-input>
+				<input type=text value=10000>
+				<select id=backbox-select-capital><option value=1>Dynamic</option><option value=0>Static</option></select>
+			</div>
+			<div>Avgdays:</div><div class=port-input><input type=text id=backbox-avgdays>
+				<select id=backbox-select-avgdays>
+					<option value=1>2020</option>
+					<option value=2>2019</option>
+					<option value=3>2018</option>
+				</select>
+			</div>
+			<div>Profit Target:</div><div class=port-input><input type=text id=backbox-pt value=5%>
+				<select id=backbox-select-pt><option value=1>Dynamic</option><option value=0>Static</option></select>
+			</div>
+			<div>Peak:</div><div class=port-input><input type=text id=backbox-peak></div>
+			<div>Max Rank:</div><div class=port-input><input type=text id=backbox-rank value=100></div>
+		</div>
+		<div class=right-control>
+			<div>Max Positions:</div><div class=port-input><input type=text id=backbox-maxpos value=5>
+				<select id=backbox-select-maxpos><option value=0>Static</option><option value=1>Dynamic</option></select>
+			</div>
+			<div>Quarter Filter (A1):</div><div class=port-input><input type=text id=backbox-a1q1 value=70>
+				<select id=backbox-select-a1q1>
+					<option value=1>2020</option>
+					<option value=2>2019</option>
+					<option value=3>2018</option>
+				</select>
+			</div>
+			<div>Quarter Filter (A4):</div><div class=port-input><input type=text id=backbox-a4q1 value=70>
+				<select id=backbox-select-a4q1>
+					<option value=1>2020</option>
+					<option value=2>2019</option>
+					<option value=3>2018</option>
+				</select>
+			</div>
+		</div>
+		<div class=run-backtest onclick=run_backtest()>Run Backtest</div>
+	</div>
+
+	<!--  BackSave Dialog Box -->
+	<div id=backtest-save style="display:none">
+		<span>Backtest Name:</span><input type=text id=backtest-name>
+		<span class=close-backsave onclick=close_backsave()>X</span>
+		<div id=backsave-btn onclick=backsave()>Save</div>
+		<div id=backpub>Share Backtest<div><input id=backpub-check type=checkbox></div></div>
+	</div>
+
+	<div id=backtest-list style="display:none"></div>

@@ -108,6 +108,8 @@ void init_ranks(struct XLS *XLS)
 	if (ranks_initialized)
 		return;
 
+	rank_tables = zmalloc(sizeof(struct rank_table) * NR_RANKS);
+
 	fs_readfile_str((char *)"data/stocks/ranks/ranks.txt", buf, sizeof(buf));
 	ticker = buf;
 	XLS->ranked_stocks = (struct stock **)malloc(XLS->nr_stocks * sizeof(struct stock *));

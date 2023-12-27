@@ -28,10 +28,12 @@ THE SOFTWARE.
 #include <sha1.h>
 
 #define WEBSOCKET_UUID                  "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-#define WEBSOCKET_HANDSHAKE_RESPONSE    "HTTP/1.1 101 Switching Protocols\r\n" \
-                                        "Upgrade: websocket\r\n"               \
-                                        "Connection: Upgrade\r\n"              \
-                                        "Sec-WebSocket-Accept: %s\r\n\r\n"     \
+
+#define WEBSOCKET_HANDSHAKE_RESPONSE    "HTTP/1.1 101 Switching Protocols\r\n"              \
+                                        "Upgrade: websocket\r\n"                            \
+                                        "Connection: Upgrade\r\n"                           \
+                                        "Set-Cookie: c=%s; Secure; HttpOnly; Path=/ws;\r\n" \
+                                        "Sec-WebSocket-Accept: %s\r\n\r\n"
 
 #define WEBSOCKET_KEYLEN 60
 #define MAX_FRAMES       5
@@ -63,7 +65,7 @@ bool websocket_handshake(struct connection *connection, char *data)
  	SHA1Result(&sha1, (unsigned char *)hash);
 
 	base64_encode((unsigned char *)hash, SHA1HashSize, (unsigned char *)websocket_base64);
-	nbytes = snprintf(websocket_response, sizeof(websocket_response)-1, WEBSOCKET_HANDSHAKE_RESPONSE, websocket_base64);
+	nbytes = snprintf(websocket_response, sizeof(websocket_response)-1, WEBSOCKET_HANDSHAKE_RESPONSE, connection->session->user->cookie, websocket_base64);
 	openssl_write_sync(connection, websocket_response, nbytes);
 	return (true);
 }
