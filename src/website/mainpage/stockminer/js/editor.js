@@ -11,7 +11,7 @@ function javascript_update(){}
 
 function editor_keyup()
 {
-	var editor = $("#editor")[0],tab = $("#morphtab")[0], new_class = $("#css-class")[0].value, old_class = tab.classList[0], utsave = $("#utsave")[0];
+	var editor = $("#editor")[0],tab = $("#morphtab")[0], new_class = $(".editor-script-name", editor)[0].value, old_class = tab.classList[0], utsave = $("#utsave", editor)[0];
 	css_editor.setValue(css_editor.getValue().replaceAll(tab.old_class, new_class));
 	css_update(new_class);
 	utsave.innerText   = 'Save';
@@ -44,7 +44,7 @@ function css_save()
 	}
 
 	utsave   = $("#utsave",    editor)[0];
-	css_name = $("#css-class", editor)[0];
+	css_name = $(".editor-script-name", editor)[0];
 	css      = editor['css'].getValue()
 	save     = utsave.innerText;
 
@@ -114,7 +114,7 @@ function css_update(new_class)
 {
 	var editor = $("#editor")[0], css = editor['css'].getValue(), div = $(EDITOR[editor.component].div[0])[0];
 
-	if (!new_class && !(new_class = $("#css-class").val()))
+	if (!new_class && !(new_class = $(".editor-script-name", editor).val()))
 		return;
 	if (!div.STYLE) {
 		div.STYLE = document.createElement("style");
@@ -188,17 +188,19 @@ function Editor(component, lang, QGID)
 
 	EID = editor_id;
 	EE  = editor;
-//	$(".UTL", $(editor_id)[0].parentNode).css("display", "none");
 	$("#"+editor_id).css("display",'block');
 	if (lang == "javascript") {
-		var webscripts = Object.keys(Webscripts);
-		for (var x = 0; x<webscripts.length; x++) {
+		var webscripts = Object.keys(Webscripts), webscript = $("#webscript-select option:selected", editor).text();
+		for (var x = 0; x<webscripts.length; x++)
 			new_select_option(webscripts[x], $("#webscript-select", editor), x);
-		}
 		$("#webscript-select", editor).css("display", "block");
 		$(".UTR", editor).css("display", "none");
 		$(editor).addClass("webscript-workspace");
-		$("#"+editor_id)[0].innerHTML = Webscripts[$("#webscript-select option:selected", editor).text()].join("\r\n");
+		$("#"+editor_id)[0].innerHTML = Webscripts[webscript].join("\r\n");
+		$(".editor-title", editor).text("WebScript Editor");
+		$(".editor-script-name", editor).val(webscript);
+	} else if (lang == "CSS") {
+		$(".editor-header", editor).text("CSS Editor");
 	}
 	if (!editor[lang]) {
 		editor = editor[lang] = ace.edit(editor_id, {mode:"ace/mode/css", selectionStyle:"text"});

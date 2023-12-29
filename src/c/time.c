@@ -94,6 +94,7 @@ void load_weeks()
 struct calendar {
 	char *trading_days_filename;
 	int   country_id;
+	int   nr_trading_days;    // number of trading days since the start of this year for this market (US includes NYSE/NASDAQ/ASE)
 };
 
 struct calendar trading_calendar[] = 
@@ -111,7 +112,6 @@ void time_load_EOD()
 	struct tm utc_tm;
 	time_t    current_unix;
 	int64_t   filesize;
-	int       nr_trading_days = 0;
 
 	/*
 	 * The current date (%Y-%m-%d format) (in UTC) eg: 2023-12-09 also represents the "next EOD"
@@ -132,26 +132,26 @@ void time_load_EOD()
 			exit(-1);
 		}
 
-		nr_trading_days = cstring_line_count(buf);
-		if (nr_trading_days <= 0 || nr_trading_days > 365) {
+		calendar->nr_trading_days = cstring_line_count(buf);
+		if (calendar->nr_trading_days <= 0 || calendar->nr_trading_days > 365) {
 			printf(BOLDRED "[-] time_load_EOD(): corrupt stocks/DAYS.TXT file" RESET "\n");
 			exit(-1);
 		}
-		DAYS = (char **)malloc(sizeof(char *) * nr_trading_days);
+		DAYS = (char **)malloc(sizeof(char *) * calendar->nr_trading_days);
 		if (!DAYS)
 			exit(-1);
 
-		nr_trading_days = 0;
+		calendar->nr_trading_days = 0;
 		date = buf;
 		while ((p=strchr(date, '\n'))) {
 			*p++ = 0;
 //			printf("[%d] %s vs %s %d %d\n", x, date, current_date, strlen(date), strlen(current_date));
-			DAYS[nr_trading_days] = strdup(date);
-			nr_trading_days++;
+			DAYS[calendar->nr_trading_days] = strdup(date);
+			calendar->nr_trading_days++;
 			date = p;
 		}
 
-		for (int y = 0; y < nr_trading_days; y++) {
+		for (int y = 0; y < calendar->nr_trading_days; y++) {
 			if (!strncmp(DAYS[y], current_date, strlen(current_date))) {
 				char *previous_trading_day = DAYS[y-1];
 				char *current_trading_day  = DAYS[y];

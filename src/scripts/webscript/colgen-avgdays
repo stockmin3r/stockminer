@@ -1,7 +1,7 @@
 *Column Generator: AvgDays to reach 5%/10% - ANYDAY Quant Stats*
 set shake .wdst
-move tag #WSRC_li[v=420] #WDST
-move tag #WSRC_li[v=421] #WDST
-move tag #WSRC_li[v=422] #WDST
-move tag #WSRC_li[v=424] #WDST
-move tag #WSRC_li[v=425] #WDST
+move tag $QGID(#WSRC_li[v=420]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=421]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=422]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=424]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=425]) $QGID(#WDST)

@@ -1,8 +1,8 @@
 *Column Generator: OHLC*
 set shake .wdst
-move tag #WSRC_li[v=905] #WDST
-move tag #WSRC_li[v=906] #WDST
-move tag #WSRC_li[v=907] #WDST
-move tag #WSRC_li[v=909] #WDST
-move tag #WSRC_li[v=910] #WDST
-move tag #WSRC_li[v=911] #WDST
+move tag $QGID(#WSRC_li[v=905]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=906]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=907]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=909]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=910]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=911]) $QGID(#WDST)

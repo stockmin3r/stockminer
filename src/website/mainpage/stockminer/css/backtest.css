@@ -60,7 +60,7 @@
 	width:28rem;
 	height:15.8rem;
 	margin-left:1rem;
-	margin-top:13vh;
+	margin-top:200px;
 	font-size:13px;
 	font-weight:bold;
 	border-radius:26px;
@@ -74,8 +74,8 @@
 	z-index:100;
 	width:28rem;
 	height:22rem;
-	margin-left:1rem;
-	margin-top:50vh;
+	margin-left:50px;
+	margin-top:500px;
 	font-size:13px;
 	font-weight:bold;
 	border-radius:26px;
@@ -133,7 +133,7 @@
 	z-index:100;
 }
 .backtest-load .toolt1ptext {
-	width:160px;
+	width:160px!important;
 	margin-left:10px;
 }
 
@@ -148,7 +148,7 @@
 	z-index:100;
 }
 .backtest-save .toolt1ptext {
-	width:160px;
+	width:160px!important;
 	margin-left:13px;
 }
 

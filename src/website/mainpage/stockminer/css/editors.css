@@ -19,7 +19,7 @@
 	cursor:pointer;
 	color:lightgreen;
 }
-#css-class{
+.editor-script-name{
 	position:absolute;
 	top:0;
 	left:0;
@@ -56,6 +56,18 @@
 #editor textarea       {width:99%!important;height:99%!important}
 .UTR .watchtable-tools {margin:0 auto;margin-left:12.3%}
 .editor-tab            {color:white}
+
+/* Editor layout for the Webscript Editor */
+.webscript-workspace {
+	width:100%!important;
+}
+.webscript-editor {
+	width:90%!important;
+}
+.webscript-select {
+	color:white;
+}
+
 
 /******************************
  *       Template Mod         *

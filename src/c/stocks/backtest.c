@@ -315,22 +315,22 @@ void close_position(struct backtest *backtest, struct position *position)
 
 int pt_reached(struct position *position)
 {
-	int current_index = (position->day_index + position->nr_days);
-	double prior_close   = position->stock->mag->close[position->day_index];
-	double current_close = position->stock->mag->close[current_index];
+	int    current_index = (position->day_index + position->nr_days);
+	double prior_close   = position->stock->mag->close[position->day_index]; // day_index is an offset into stock->mag->close[] - the day the stock was bought
+	double current_close = position->stock->mag->close[current_index];       // the current day's price
 	double pc_diff;
 
-	pc_diff = (((current_close/prior_close)-1)*100);
-	position->profit = position->nr_shares * current_close;
+	pc_diff           = (((current_close/prior_close)-1)*100);
+	position->profit  = position->nr_shares * current_close;
 	position->pc_diff = pc_diff;
 	if (pc_diff > position->target) {
-//		printf("PT REACHED [%s] - [%s] current_close: %.2f prior_close: %.2f pc_diff: +%.2f%%  #days: %d\n",
-//		position->stock->mag->date[current_index], position->stock->mag->date[position->day_index],current_close, prior_close, pc_diff, position->nr_days);
-		position->gain   = pc_diff;
+		printf("PT REACHED [%s] - [%s] current_close: %.2f prior_close: %.2f pc_diff: +%.2f%%  #days: %d\n",
+		position->stock->mag->date[current_index], position->stock->mag->date[position->day_index],current_close, prior_close, pc_diff, position->nr_days);
+		position->gain = pc_diff;
 		return 1;
 	}
 //	printf(BOLDRED "[date: %s esp->day: %d pos->day_index: %d nrdays: %d]%s prior: %.2f current: %.2f percentage: %.2f date: %s" RESET "\n",
-//	position->esp->stock->mag->date[position->esp->day], position->esp->day, position->day_index, position->nr_days, position->stock->sym, prior_close, current_close, pc_diff, position->esp->date2/*position->stock->mag->date[position->nr_days+position->day_index]*/);
+//	position->stock->mag->date[position->esp->day], position->esp->day, position->day_index, position->nr_days, position->stock->sym, prior_close, current_close, pc_diff, position->esp->date2/*position->stock->mag->date[position->nr_days+position->day_index]*/);
 	return 0;
 }
 
@@ -338,13 +338,12 @@ int backtest_close_positions(struct backtest *backtest)
 {
 	struct position *position;
 	double real_value = 0, new_val = 0;
-	int x;
 
 	if (backtest->nr_open_positions == 0) {
 		backtest->sum[backtest->current_day] = (backtest->money_invested + backtest->money_available);
 		return backtest->max_positions;
 	}
-	for (x=0; x<backtest->nr_positions; x++) {
+	for (int x=0; x<backtest->nr_positions; x++) {
 		position = &backtest->positions[x];
 		if (position->status == POSITION_CLOSED)
 			continue;
@@ -366,28 +365,25 @@ int backtest_close_positions(struct backtest *backtest)
 	return (backtest->max_positions-backtest->nr_open_positions);
 }
 
-void backtest_open_position(struct backtest *backtest, struct esp_signal *esp)
+void backtest_open_position(struct backtest *backtest, struct stock *stock, int day_index)
 {
 	struct position   position;
-	struct stock     *stock = esp->stock;
 	struct mag       *mag = stock->mag;
-	double amount;
-	int x;
+	double            amount;
 
 	memset(&position, 0, sizeof(position));
-	position.stock     = stock;
-	position.day_index = esp->day_index;
-	position.nr_days   = 1;
-	position.target    = backtest->pt;
-	position.status    = POSITION_OPEN;
-	position.esp       = esp;
-	position.month     = backtest->current_month;
-	position.size      = backtest->money_available/(backtest->max_positions-backtest->nr_open_positions);
-	position.stock_price = mag->close[position.day_index];
-	position.date      = *(uint64_t *)(mag->date[position.day_index]);
-	position.nr_shares = (position.size/position.stock_price);
-	printf(BOLDWHITE "[esp->day: %d day_index: %d {%.2f} [%s] Opening Position (%s) %.2f shares (total: $%.2f) idx: %d price: %.2f" RESET "\n",esp->day, position.day_index,
-	backtest->money_available, esp->date, stock->sym, position.nr_shares, position.size, position.day_index, position.stock_price);
+	position.stock       = stock;
+	position.day_index   = day_index;
+	position.nr_days     = 1;
+	position.target      = backtest->pt;
+	position.status      = POSITION_OPEN;
+	position.month       = backtest->current_month;
+	position.size        = backtest->money_available/(backtest->max_positions-backtest->nr_open_positions);
+	position.stock_price = mag->close[day_index];
+	position.date        = *(uint64_t *)(mag->date[day_index]);
+	position.nr_shares   = (position.size/position.stock_price);
+	printf(BOLDWHITE "[day_index: %d {%.2f} [%s] Opening Position (%s) %.2f shares (total: $%.2f) idx: %d price: %.2f" RESET "\n",day_index,
+	backtest->money_available, (char *)&position.date, stock->sym, position.nr_shares, position.size, position.day_index, position.stock_price);
 
 	position.profit              = 0;
 	position.status              = 0;
@@ -396,7 +392,7 @@ void backtest_open_position(struct backtest *backtest, struct esp_signal *esp)
 	backtest->money_available   -= position.size;
 	backtest->money_invested    += position.size;
 	backtest->nr_open_positions += 1;
-//	printf(BOLDYELLOW "POSITION: %.2f addr: %p" RESET "\n", position.invested, &backtest->positions[backtest->nr_positions-1]);
+	printf(BOLDYELLOW "POSITION: %.2f addr: %p" RESET "\n", position.invested, &backtest->positions[backtest->nr_positions-1]);
 }
 
 /* Make sure to check if you still have enough funds to buy the stock */
@@ -560,6 +556,12 @@ void backtest_save(struct session *session, uint64_t port_id, char *name, int do
 	}
 }
 
+struct stock *backtest_select_stock(struct backtest *backtest)
+{
+	int stock_index = random_long()%CURRENT_XLS->nr_stocks;
+
+}
+
 void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *backtest, double money_initial, char **stocklist, int nstocks)
 {
 	struct esp_signal *esp;
@@ -601,11 +603,23 @@ void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *
 		custom_backtest           = 0;
 	}
 
-	// printf("START: %d\n", backtest->a1q1);
 	/*
-	 * ESP Scan/Buy/Sell Loop
+	 * PseudoRandom Backtest
 	 */
-	for (x=start_month; x<current_month; x++) {
+	for (x = 0; x<250; x++) {
+		nr_free_positions   = backtest_close_positions(backtest);
+		for (int y = 0; y <nr_free_positions; y++) {
+			struct stock *stock = backtest_select_stock(backtest);
+			backtest_open_position(backtest, stock, x);
+		}
+	}
+
+	/*
+	 * ESP Scan/Buy/Sell Loop (this will be removed or recoded as it is based on the "ESP" signal algorithm
+	 * which relies on monthly stock rankings whose algorithm will have to be coded from scratch users will
+	 * be able to supply their own stock ranks based on whatever algorithm they come up with
+	 */
+/*	for (x=start_month; x<current_month; x++) {
 		backtest->current_ranks = &rank_tables[x];
 		backtest->current_month = x;
 		backtest->esp_signals   = rank_tables[x].esp_signals;
@@ -630,7 +644,7 @@ void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *
 			}
 			backtest->current_day++;
 		}
-	}
+	}*/
 
 /*	for (x=0; x<backtest->nr_positions; x++) {
 		position = &backtest->positions[x];
@@ -644,12 +658,12 @@ void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *
 	}*/
 	for (x=0; x<backtest->nr_positions; x++) {
 		position = &backtest->positions[x];
-/*		if (position->status == POSITION_CLOSED) {
+		if (position->status == POSITION_CLOSED) {
 			printf("%-6s (bought on: %s) DAYS: %-2d PSIZE: $%.2f PROFIT: $%.2f\n",
-			position->esp->stock->sym, position->esp->date2, position->nr_days, position->size, position->profit-position->size);
+			position->stock->sym, position->esp->date2, position->nr_days, position->size, position->profit-position->size);
 		} else
 			printf("%-6s (bought on: %s) DAYS: %-2d PSIZE: $%.2f [IN PROGRESS]\n",
-			position->esp->stock->sym, position->esp->date2, position->nr_days, position->size);*/
+			position->stock->sym, position->esp->date2, position->nr_days, position->size);
 	}
 //	printf(BOLDGREEN "** TOTAL PROFIT: $%.2f    ** [month: %d] $%.2f maxpos: %d" RESET "\n", profit, start_month, backtest->money_available+backtest->money_invested, backtest->max_positions);
 	backtest->json_linechart_len = linechart_positions(&backtest->json_linechart, backtest->nr_positions, &backtest->positions[0]);

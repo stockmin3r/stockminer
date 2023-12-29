@@ -1,7 +1,7 @@
 *Column Generator: EMA TA Stats*
 set shake .wdst
-move tag #WSRC_li[v=190] #WDST
-move tag #WSRC_li[v=191] #WDST
-move tag #WSRC_li[v=192] #WDST
-move tag #WSRC_li[v=193] #WDST
-move tag #WSRC_li[v=194] #WDST
+move tag $QGID(#WSRC_li[v=190]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=191]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=192]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=193]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=194]) $QGID(#WDST)

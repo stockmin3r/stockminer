@@ -21,6 +21,15 @@ function webscript_exec()
 		var code = webscript[x].split(" ");
 		if (code == "")
 			break;
+		/*
+		 * HTML tags wrapped in a $QGID() can be replaced with the current quadverse ID + the encased string
+		 * eg: "#DST" may expand to "#P0Q1 #DST" which is more specific to the current quadspace in the current quadverse 
+		 */
+		if (code[2] && code[2].indexOf("$QGID(") != -1)
+			code[2] = W.current_quadspace + " " + /\(([^)]+)\)/.exec(code[2])[1];
+
+		if (code[3] && code[3].indexOf("$QGID(") != -1)
+			code[3] = W.current_quadspace + " " + /\(([^)]+)\)/.exec(code[3])[1];
 		var f = window['webscript_' + code[0] + "_" + code[1]];
 		if (!f)
 			console.log("webscript_exec func undefined: " + f);

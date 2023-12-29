@@ -580,7 +580,7 @@ int www_websocket_sync(char *req, struct connection *connection)
 	if (!(session=connection->session=session_get(connection, req)))
 		return 0;
 
-	printf(BOLDWHITE "www_websocket(): %s\n" RESET "session: %p\n", req, session);
+	printf(BOLDWHITE "www_websocket(): %.60s\n" RESET "session: %p\n", req, session);
 
 	/* extract the URL segments */
 	if (!www_get_route(req+8, &url))

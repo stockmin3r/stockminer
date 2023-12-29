@@ -1,8 +1,8 @@
 *Column Generator: #Signals Action1/Action4*
 set shake .wdst
-move tag #WDST_li[v=254] #WSRC
-move tag #WDST_li[v=255] #WSRC
-move tag #WDST_li[v=256] #WSRC
-move tag #WDST_li[v=269] #WSRC
-move tag #WDST_li[v=270] #WSRC
-move tag #WDST_li[v=271] #WSRC
+move tag $QGID(#WDST_li[v=254]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=255]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=256]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=269]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=270]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=271]) $QGID(#WSRC)

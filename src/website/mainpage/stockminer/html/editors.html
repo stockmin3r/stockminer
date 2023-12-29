@@ -1,6 +1,6 @@
 <!-- Code Editor -->
 <div id=editor style="display:none">
-	<h2>CSS Table Styler</h2>
+	<h2 class=editor-title>CSS Table Styler</h2>
 	<span class=QCLOSE onclick=editor_close()>✖</span>
 	<div class=editor-tabs>
 		<span class=editor-tab onclick='Editor(0, "html")'>HTML</span>
@@ -8,7 +8,7 @@
 		<span class=editor-tab onclick='Editor(0, "js")'>JavaScript</span>
 	</div>
 	<span id=utsave onclick=css_save()>Save</span>
-	<input type=text id=css-class value=myStyle onkeyup=editor_keyup()>
+	<input type=text class=editor-script-name value=myStyle onkeyup=editor_keyup()>
 	<select id=webscript-select  style="display:none" onchange=webscript_eselect_onchange()></select>
 	<div id=css-editor class=UTL style="display:none" class=css-editor>
 		.myStyle {

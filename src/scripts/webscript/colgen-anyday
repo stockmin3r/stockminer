@@ -1,15 +1,15 @@
 *Column Generator: ANYDAY Quarter Success - Quant Stats*
 set shake .wdst
-move tag #WSRC_li[v=418] #WDST
-move tag #WSRC_li[v=419] #WDST
-move tag #WSRC_li[v=420] #WDST
-move tag #WSRC_li[v=421] #WDST
-move tag #WSRC_li[v=422] #WDST
-move tag #WSRC_li[v=423] #WDST
-move tag #WSRC_li[v=424] #WDST
-move tag #WSRC_li[v=425] #WDST
-move tag #WSRC_li[v=426] #WDST
-move tag #WSRC_li[v=427] #WDST
-move tag #WSRC_li[v=428] #WDST
-move tag #WSRC_li[v=429] #WDST
+move tag $QGID(#WSRC_li[v=418]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=419]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=420]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=421]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=422]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=423]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=424]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=425]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=426]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=427]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=428]) $QGID(#WDST)
+move tag $QGID(#WSRC_li[v=429]) $QGID(#WDST)
 call colmod - 1

@@ -117,9 +117,7 @@ void cryptocompare_handler(struct connection *connection)
 	openssl_read_sync2(connection, sslbuf, sizeof(sslbuf));
 
 	websocket_send(connection, subactions, subaction_size);
-	while ((nbytes=openssl_read_sync2(connection, sslbuf, sizeof(sslbuf)))) {
-		nr_frames = websocket_recv(sslbuf, nbytes, &frames[0], wsbuf, 0);
-//		printf("nr_frames: %d packet: %s\n", nr_frames, wsbuf);
+	while (websocket_recv2(connection, wsbuf, 0)) {
 		update_crypto_data(wsbuf);
 	}
 }

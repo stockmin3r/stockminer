@@ -1,14 +1,14 @@
 *Column Generator: Max Days to return 5%/10%*
 set shake .wdst
-move tag #WDST_li[v=257] #WSRC
-move tag #WDST_li[v=258] #WSRC
-move tag #WDST_li[v=259] #WSRC
-move tag #WDST_li[v=263] #WSRC
-move tag #WDST_li[v=264] #WSRC
-move tag #WDST_li[v=265] #WSRC
-move tag #WDST_li[v=272] #WSRC
-move tag #WDST_li[v=273] #WSRC
-move tag #WDST_li[v=274] #WSRC
-move tag #WDST_li[v=265] #WSRC
-move tag #WDST_li[v=265] #WSRC
-move tag #WDST_li[v=265] #WSRC
+move tag $QGID(#WDST_li[v=257]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=258]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=259]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=263]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=264]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=265]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=272]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=273]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=274]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=265]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=265]) $QGID(#WSRC)
+move tag $QGID(#WDST_li[v=265]) $QGID(#WSRC)

@@ -35,6 +35,10 @@ THE SOFTWARE.
                                         "Set-Cookie: c=%s; Secure; HttpOnly; Path=/ws;\r\n" \
                                         "Sec-WebSocket-Accept: %s\r\n\r\n"
 
+#define OPCODE_CLOSE      8
+#define OPCODE_PING       9
+#define OPCODE_PONG      10
+
 #define WEBSOCKET_KEYLEN 60
 #define MAX_FRAMES       5
 
@@ -87,6 +91,7 @@ void websocket_connect_sync(char *host, unsigned int ip_address, char *api, webs
 	openssl_write_sync(connection, request, strlen(request));
 	openssl_read_sync2(connection, response, sizeof(response)-1);
 	printf(BOLDWHITE "%s" RESET "\n", response);
+	connection->packet = malloc(16 KB);
 	handler(connection);
 }
 
@@ -136,15 +141,53 @@ extract_frames(char *packet, struct frame *frames, int packet_length)
 	return (nr_frames);
 }
 
-/*
-int websocket_recv(struct connection *connection, struct frame *frames, char *msg, int mask)
+int websocket_send_pong(struct connection *connection, char *packet)
+{
+	int len = packet[1] & 0x7F;
+	printf(BOLDWHITE "len of ping: %d " RESET "\n", len);
+	if (len != 126)
+		return 1;
+	asm("int3");
+	return 1;
+}
+
+int websocket_recv2(struct connection *connection, char *msg, int mask)
 {
 	struct frame *frame;
+	struct frame  frames[MAX_FRAMES];
 	char         *packet      = connection->packet;
 	packet_size_t packet_size = 0;
 	unsigned char opcode;
 	int           nr_frames, x, y;
-*/
+
+	packet_size = openssl_read_sync2(connection, packet, 16 KB);
+	opcode      = packet[0];
+	if (opcode == OPCODE_CLOSE)
+		return -1;
+	if (opcode == OPCODE_PING)
+		return websocket_send_pong(connection, packet);
+
+	nr_frames = extract_frames(packet, frames, packet_size);
+	if (!nr_frames)
+		return -1;
+	frame = &frames[0];
+	if (nr_frames >= MAX_FRAMES)
+		return -1;
+	for (x=0; x<nr_frames; x++) {
+		for (y = 0; y<frame->data_length; y++) {
+			if (mask)
+				msg[y] = frame->data[y] = (unsigned char)frame->data[y] ^ frame->mask[y%4];
+			else
+				msg[y] = frame->data[y] = (unsigned char)frame->data[y];
+		}
+		msg[frame->data_length++] = 0;
+		frame->data               = (unsigned char *)msg;
+		msg                      += frame->data_length;
+		frame++;
+	}
+	return (nr_frames);	
+}
+
 
 int websocket_recv(char *packet, uint64_t packet_length, struct frame *frames, char *msg, int mask)
 {
