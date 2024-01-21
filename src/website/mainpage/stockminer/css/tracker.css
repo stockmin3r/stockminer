@@ -1,0 +1,16 @@
+.tracker {
+	margin:0 auto;
+	color:white;
+}
+.tracker h1 {
+	position:absolute;
+	top:0;
+	right:0;
+	margin-right:50vw;
+	margin-top:8vh;
+}
+.tracker input {
+	width:800px;
+	line-height:1.4;
+	margin-top:8vh;
+}

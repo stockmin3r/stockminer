@@ -1,6 +1,12 @@
 require('dotenv').config();
 const Discord      = require('discord.js');
-const bot          = new Discord.Client();
+const bot          = new Discord.Client({ intents: [
+  Discord.GatewayIntentBits.Guilds,
+  Discord.GatewayIntentBits.GuildMessages,
+  Discord.GatewayIntentBits.DirectMessages,
+  Discord.GatewayIntentBits.GuildBans,
+  Discord.GatewayIntentBits.MessageContent,
+]});
 const TOKEN        = process.env.TOKEN;
 const fs           = require('fs');
 const request      = require('request');
@@ -32,8 +38,10 @@ var nr_alerts         = 0;
 
 bot.login(TOKEN);
 bot.on('ready', () => {
-	main_channel  = bot.channels.get("777200869392908328");
 	console.info(`Logged in as ${bot.user.tag}!`);
+//	bot.channels.cache.get("1171834979936911443").send("Panda is uncensored - Ask panda anything!");
+	const config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
+	const allowedChannels = config.channels.split(',');
 });
 
 function sendmsg(msg)
@@ -471,14 +479,15 @@ function do_help()
 /*
  * Message Handler
  */
-bot.on('message', msg => {
+bot.on('messageCreate', msg => {
 	var argv = "";
 	var count = 0;
-
+	console.log(msg.content);
+	main_channel = msg.guild.channels.cache.find(channel => channel.name === "general");
+	console.log(msg.content);
 	if (msg.author.bot)
 		return;
 	argv = msg.content.slice().trim().split(/ +/g);
-
 	if (msg.content.startsWith('!img')) {
 		var url = "https://finviz.com/chart.ashx?t=" + argv[1] + "&ty=c&ta=1&p=d&s=l.png";
 		msg.channel.send('', {files: [url]});

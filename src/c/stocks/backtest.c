@@ -28,6 +28,8 @@ DLIST_HEAD(port_list);
 #define PROFIT_TARGET 5.0 // sell after this ticker has gained 5% from the day the position was entered (needs to be a variable)
 #define MAX_RANKS     100
 
+#define BACKTEST_PSEUDORANDOM 1
+
 int BACKTEST_INITIALIZED;
 
 void backtest_long      (char *ticker, struct backtest *backtest);
@@ -244,8 +246,8 @@ void build_port_json(struct session *session, struct port *port, struct backtest
 			continue;
 		day_index      = position->day_index;
 		position_close = position->stock->mag->close[day_index];
-		current_close  = position->stock->mag->close[position->esp->stock->mag->nr_entries-1];
-//		printf("day index: %d nrent: %d\n", day_index, position->esp->stock->mag->nr_entries-1);
+		current_close  = position->stock->mag->close[position->stock->mag->nr_entries-1];
+//		printf("day index: %d nrent: %d\n", day_index, position->stock->mag->nr_entries-1);
 		pc_diff        = ((current_close/position_close)-1)*100;
 //		nbytes         = sprintf(jptr, ITAB_ENTRY, position->stock->sym, position->esp->date2, position->stock->ranks[position->month], pc_diff, position->esp->stock->industry, position->esp->stock->sector);
 		jptr          += nbytes;
@@ -556,10 +558,12 @@ void backtest_save(struct session *session, uint64_t port_id, char *name, int do
 	}
 }
 
-struct stock *backtest_select_stock(struct backtest *backtest)
+struct stock *backtest_select_stock(struct backtest *backtest, int algorithm)
 {
-	int stock_index = random_long()%CURRENT_XLS->nr_stocks;
-
+	switch (algorithm) {
+		case BACKTEST_PSEUDORANDOM:
+			return CURRENT_XLS->STOCKS_PTR[random_long()%CURRENT_XLS->nr_stocks];
+	}
 }
 
 void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *backtest, double money_initial, char **stocklist, int nstocks)
@@ -609,7 +613,8 @@ void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *
 	for (x = 0; x<250; x++) {
 		nr_free_positions   = backtest_close_positions(backtest);
 		for (int y = 0; y <nr_free_positions; y++) {
-			struct stock *stock = backtest_select_stock(backtest);
+			struct stock *stock = backtest_select_stock(backtest, BACKTEST_PSEUDORANDOM);
+			printf("check open position: %s\n", stock->sym);
 			backtest_open_position(backtest, stock, x);
 		}
 	}
@@ -660,10 +665,10 @@ void backtest_ultra(struct session *session, uint64_t port_id, struct backtest *
 		position = &backtest->positions[x];
 		if (position->status == POSITION_CLOSED) {
 			printf("%-6s (bought on: %s) DAYS: %-2d PSIZE: $%.2f PROFIT: $%.2f\n",
-			position->stock->sym, position->esp->date2, position->nr_days, position->size, position->profit-position->size);
+			position->stock->sym, (char *)&position->date, position->nr_days, position->size, position->profit-position->size);
 		} else
 			printf("%-6s (bought on: %s) DAYS: %-2d PSIZE: $%.2f [IN PROGRESS]\n",
-			position->stock->sym, position->esp->date2, position->nr_days, position->size);
+			position->stock->sym, (char *)&position->date, position->nr_days, position->size);
 	}
 //	printf(BOLDGREEN "** TOTAL PROFIT: $%.2f    ** [month: %d] $%.2f maxpos: %d" RESET "\n", profit, start_month, backtest->money_available+backtest->money_invested, backtest->max_positions);
 	backtest->json_linechart_len = linechart_positions(&backtest->json_linechart, backtest->nr_positions, &backtest->positions[0]);
@@ -774,11 +779,11 @@ void backtest_sectors(struct backtest *backtest)
 	nr_positions = backtest->nr_positions;
 	for (x=0; x<nr_positions; x++) {
 		position = &backtest->positions[x];
-//		printf("sector: %s stock: %s\n", SECTORS[position->esp->stock->sector_index], position->esp->stock->sym);
+//		printf("sector: %s stock: %s\n", SECTORS[position->stock->sector_index], position->stock->sym);
 		if (position->status == POSITION_CLOSED)
 			continue;
-		backtest->sectors[position->esp->stock->sector_index]++;
-		nr_sectors = add_sector(&sectors[0], nr_sectors, SECTORS[position->esp->stock->sector_index], sector_colors[position->esp->stock->sector_index]);
+		backtest->sectors[position->stock->sector_index]++;
+		nr_sectors = add_sector(&sectors[0], nr_sectors, SECTORS[position->stock->sector_index], sector_colors[position->stock->sector_index]);
 	}
 
 	for (x=0; x<nr_sectors; x++) {

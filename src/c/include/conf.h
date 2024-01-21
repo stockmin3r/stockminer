@@ -255,6 +255,7 @@ struct session {
 	struct watchlist    *watchlists[MAX_WATCHLISTS+1];
 	struct wtab         *watchtable_presets[MAX_WTAB_PRESETS];
 	struct preset       *presets[MAX_WTAB_PRESETS];
+	struct tracker     **trackers;
 	struct qpage       **qpages;
 	struct object       *objects;
 	yyjson_mut_doc      *qcache;
@@ -278,6 +279,8 @@ struct session {
 	uint32_t             nr_ports;
 	uint32_t             ports_json_len;
 	bool                 rpc_boot;
+	uint16_t             nr_trackers;
+	uint16_t             max_trackers;
 	unsigned char        current_quadverse[MAX_WEBSOCKETS];
 	unsigned char        page;
 	unsigned char        nr_presets;
@@ -539,7 +542,8 @@ void              rpc_user_register       (struct rpc *rpc); // user.c
 void              rpc_user_login          (struct rpc *rpc); // user.c
 void              rpc_xls                 (struct rpc *rpc); // xls.c
 void              rpc_portfolios          (struct rpc *rpc); // backtest.c
-void              rpc_backtest            (struct rpc *rcp); // backtest.c
+void              rpc_backtest            (struct rpc *rpc); // backtest.c
+void              rpc_tracker             (struct rpc *rpc); // tracker.c
 
 /* workspace.c */
 __MODULE_INIT     init_quadverse_module   (void);

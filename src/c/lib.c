@@ -1,6 +1,9 @@
 #include <stdinc.h>
+#include <cdefs.h>
+#include <unix.h>
+#include <lib.h>
 #include <conf.h>
-#include <extern.h>
+//#include <extern.h>
 
 /* **********************
  *
@@ -198,11 +201,6 @@ void fs_appendfile_nl(char *path, char *file, int64_t filesize)
 	write(fd, file, filesize);
 	write(fd, "\n", 1);
 	close(fd);
-}
-
-void fs_log(char *msg)
-{
-	fs_appendfile_nl((char *)DB_LOG_PATH, msg, strlen(msg));
 }
 
 int64_t fs_readfile_str_mtime(char *path, char *buf, time_t *mtime)
@@ -510,6 +508,18 @@ in_addr_t net_get_hostname(char *hostname)
  *     CSTRINGS
  *
  *****************/
+char *cstring(char *str, char c, int pos)
+{
+	char *argv[2048];
+
+	int argc = cstring_split(str, argv, 2047, c);
+	if (argc <= 0)
+		return NULL;
+	if (pos < 0)
+		return argv[argc+pos];
+	return argv[pos];
+}
+
 char *cstring_inject(char *target, char *payload, char *pattern, int *output_size)
 {
 	char *pPattern     = strstr(target, pattern);

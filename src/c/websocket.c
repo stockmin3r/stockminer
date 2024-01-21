@@ -105,7 +105,7 @@ extract_frames(char *packet, struct frame *frames, int packet_length)
 	frame = frames;
 	for (x=0; x<5; x++) {
 		data_length = ((unsigned char) packet[1]) & 127;
-//		printf("%x %x %x data len: %d\n", (unsigned char)packet[0], (unsigned char)packet[1], (unsigned char)packet[2], data_length);
+		printf("%x %x %x data len: %d\n", (unsigned char)packet[0], (unsigned char)packet[1], (unsigned char)packet[2], data_length);
 		if (data_length <= 125) {
 			mask_offset = 2;
 			lensize     = 1;
@@ -127,7 +127,7 @@ extract_frames(char *packet, struct frame *frames, int packet_length)
 		frame->data_length = data_length;
 		frame_length       = data_length + 5 + lensize;
 		*(unsigned int *)frame->mask = *(unsigned int *)(packet+mask_offset);
-//		printf("data_off: %d mask_off: %d frame_len: %d packet_length: %d\n", data_offset, mask_offset, frame_length, packet_length);
+		printf("data_off: %d mask_off: %d frame_len: %d packet_length: %d\n", data_offset, mask_offset, frame_length, packet_length);
 
 		nr_frames++;
 		if (frame_length == packet_length)
@@ -144,10 +144,8 @@ extract_frames(char *packet, struct frame *frames, int packet_length)
 int websocket_send_pong(struct connection *connection, char *packet)
 {
 	int len = packet[1] & 0x7F;
-	printf(BOLDWHITE "len of ping: %d " RESET "\n", len);
-	if (len != 126)
-		return 1;
-	asm("int3");
+	packet[0] = OPCODE_PING | 1;
+	openssl_write_sync(connection, packet, 1);
 	return 1;
 }
 
@@ -161,12 +159,12 @@ int websocket_recv2(struct connection *connection, char *msg, int mask)
 	int           nr_frames, x, y;
 
 	packet_size = openssl_read_sync2(connection, packet, 16 KB);
-	opcode      = packet[0];
+	opcode      = packet[0] & 0x0F;
 	if (opcode == OPCODE_CLOSE)
 		return -1;
 	if (opcode == OPCODE_PING)
 		return websocket_send_pong(connection, packet);
-
+printf("packet size: %d\n", packet_size);
 	nr_frames = extract_frames(packet, frames, packet_size);
 	if (!nr_frames)
 		return -1;
@@ -185,6 +183,7 @@ int websocket_recv2(struct connection *connection, char *msg, int mask)
 		msg                      += frame->data_length;
 		frame++;
 	}
+	asm("int3");
 	return (nr_frames);	
 }
 

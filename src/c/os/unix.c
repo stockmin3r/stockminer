@@ -113,6 +113,14 @@ void event_mod(struct connection *connection)
 	epoll_ctl(connection->event.event_fd, EPOLL_CTL_MOD, connection->fd, &event);
 }
 
+void event_add(struct connection *connection)
+{
+	struct epoll_event event;
+	event.events   = 0;
+	event.data.ptr = NULL;
+	epoll_ctl(connection->event.event_fd, EPOLL_CTL_ADD, connection->fd, &event);
+}
+
 void event_del(struct connection *connection)
 {
 	struct epoll_event event;
@@ -120,7 +128,6 @@ void event_del(struct connection *connection)
 	event.data.ptr = NULL;
 	epoll_ctl(connection->event.event_fd, EPOLL_CTL_DEL, connection->fd, &event);
 }
-
 
 void thread_create(void *(*thread)(void *), void *args)
 {

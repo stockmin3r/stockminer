@@ -505,6 +505,11 @@
 		this['ws'+args.WSID].appendChild(portfolios);
 		portfolios.style.display = "block";
 	}
+	addTracker(args){
+		var tracker = $("body > .tracker").detach()[0];
+		this['ws'+args.WSID].appendChild(tracker);
+		tracker.style.display = "block";
+	}
 
 	/*
 	 * MENUS

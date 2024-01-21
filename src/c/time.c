@@ -156,6 +156,8 @@ void time_load_EOD()
 				char *previous_trading_day = DAYS[y-1];
 				char *current_trading_day  = DAYS[y];
 				char *next_trading_day     = DAYS[y+1]; // XXX: must fix for wraparound for next day in the next year
+				if ((y+1) == calendar->nr_trading_days)
+					next_trading_day = "2024-1-2";
 				market_set_EOD(current_unix, calendar->country_id, previous_trading_day, current_trading_day, next_trading_day);
 				break;
 			}

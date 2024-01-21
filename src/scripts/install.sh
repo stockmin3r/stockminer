@@ -71,3 +71,6 @@ ln -s /usr/local/bin/glibtoolize /usr/local/bin/libtoolize
 
 # freebsd
 pkg install automake libtool node16 npm py39-pip editors/vim converters/base64 science/py-scipy
+
+# discord bot
+npm install request cheerio dotenv discord.js moment-timezone

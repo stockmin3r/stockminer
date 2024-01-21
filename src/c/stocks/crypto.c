@@ -119,6 +119,7 @@ void cryptocompare_handler(struct connection *connection)
 	websocket_send(connection, subactions, subaction_size);
 	while (websocket_recv2(connection, wsbuf, 0)) {
 		update_crypto_data(wsbuf);
+		printf("%s\n", wsbuf);
 	}
 }
 

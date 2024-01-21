@@ -72,6 +72,13 @@
 				"quads": [{
 					"workspace":  [{"mod": "addPortfolio",    "title":"Portfolio"}]
 					}]
+		},{
+			"title":  "Tracker",
+			"grid":   "grid100",
+			"click":  "tracker",
+				"quads": [{
+					"workspace":  [{"mod": "addTracker",   args:{id:"tracker"}, "title":"Tracker"}]
+					}]
 		}]
 	},{
 		title:"Options",

@@ -57,6 +57,7 @@ static void init_stockdata(struct mag *mag, int nr_entries)
 	mag->year_2021    = -1;
 	mag->year_2022    = -1;
 	mag->year_2023    = -1;
+	mag->year_2024    = -1;
 }
 
 void do_trends(struct stock *stock, struct mag *mag)
@@ -810,10 +811,10 @@ void load_stock_csv(struct XLS *XLS, struct stock *stock, struct mag *mag, unsig
 	}
 
 	/*
-	 * The website loads much slower with year_2022 as an index so use 2023 for now
+	 * The website loads much slower with year_2022 as an index so use 2024 for now
 	 */
 	if (start_entry == -1)
-		start_entry = mag->year_2023;
+		start_entry = mag->year_2024;
 
 	price                    = stock->price;
 	price->price_1d          = (char *)malloc(64 KB);
@@ -823,13 +824,13 @@ void load_stock_csv(struct XLS *XLS, struct stock *stock, struct mag *mag, unsig
 	mag->months[month++]     = start_entry;
 	for (entry=start_entry; entry<nr_entries; entry++) {
 		year = *(unsigned int *)mag->date[entry];
-		if (year == YEAR_2022) {
+		if (year == YEAR_2023) {
 			if (year == months[month])
 				mag->months[month++] = entry;
 			if (count_months)
 				month_days_array[month-1]++;
 		}
-		if (entry == YEAR_2023)
+		if (entry == YEAR_2024)
 			month_days_array[month-1]++;
 
 		/*
@@ -960,7 +961,7 @@ void init_anyday(struct XLS *XLS)
 	struct quarter *quarter, *quarter10;
 	struct mag     *mag;
 	int             days_5pc, days_10pc, idx, nr_stocks, nr_entries, nr_days;
-	int             year_2023=0,year_2022=0, year_2021=0;
+	int             year_2024=0,year_2023=0,year_2022=0, year_2021=0;
 	int             year_2020=-1,year_2019=-1,year_2018=-1,year_2017=-1,year_2016=-1,year_2015=-1;
 	double          current_close,prior_close;
 
@@ -972,7 +973,7 @@ void init_anyday(struct XLS *XLS)
 			continue;
 		mag = stock->mag;
 		nr_entries = mag->nr_entries;
-		for (int y=0; y<8; y++) {
+		for (int y=0; y<9; y++) {
 			switch (y) {
 				case 0:
 					idx = mag->year_2015;
@@ -1068,6 +1069,15 @@ void init_anyday(struct XLS *XLS)
 					nr_days   = nr_entries-year_2023;
 					quarter   = get_quarter("2023", mag);
 					quarter10 = get_quarter10("2023", mag);
+					break;
+				case 9:
+					idx = mag->year_2024;
+					year_2024 = idx;
+					if (idx == -1)
+						continue;
+					nr_days   = nr_entries-year_2024;
+					quarter   = get_quarter("2024", mag);
+					quarter10 = get_quarter10("2024", mag);
 					break;
 			}
 

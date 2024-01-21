@@ -203,8 +203,8 @@ struct mag {
 	struct action  *a4esp;
 	struct qslide  *qslide;
 	struct CANDLE  *candles;
-	struct quarter  quarters[8];
-	struct quarter  quarters10[8];
+	struct quarter  quarters[9];
+	struct quarter  quarters10[9];
 	unsigned short  months[64];
 	double          delta_high_peak;
 	double          delta_low_peak;
@@ -777,24 +777,32 @@ static __inline__ double stdev(double *input, int nr_days)
 static __inline__ struct quarter *get_quarter(char *date, struct mag *mag)
 {
 	switch (*(date+3)) {
+		case '4': // 2024
+			if (*(date+2) != '4')
+				return NULL;
+			return &mag->quarters[0];
+		case '3': // 2023
+			if (*(date+2) != '3')
+				return NULL;
+			return &mag->quarters[1];
 		case '2': // 2022
 			if (*(date+2) != '2')
 				return NULL;
-			return &mag->quarters[0];
-		case '1': // 2021
-			return &mag->quarters[1];
-		case '0': // 2020
 			return &mag->quarters[2];
-		case '9': // 2019
+		case '1': // 2021
 			return &mag->quarters[3];
-		case '8': // 2018
+		case '0': // 2020
 			return &mag->quarters[4];
-		case '7': // 2017
+		case '9': // 2019
 			return &mag->quarters[5];
-		case '6': // 2016
+		case '8': // 2018
 			return &mag->quarters[6];
-		case '5': // 2015
+		case '7': // 2017
 			return &mag->quarters[7];
+		case '6': // 2016
+			return &mag->quarters[8];
+		case '5': // 2015
+			return &mag->quarters[9];
 	}
 	return NULL;
 }
@@ -802,24 +810,32 @@ static __inline__ struct quarter *get_quarter(char *date, struct mag *mag)
 static __inline__ struct quarter *get_quarter10(char *date, struct mag *mag)
 {
 	switch (*(date+3)) {
+		case '4': // 2024
+			if (*(date+2) != '4')
+				return NULL;
+			return &mag->quarters10[0];
+		case '3': // 2023
+			if (*(date+2) != '3')
+				return NULL;
+			return &mag->quarters10[1];
 		case '2': // 2022
 			if (*(date+2) != '2')
 				return NULL;
-			return &mag->quarters[0];
-		case '1': // 2021
-			return &mag->quarters[1];
-		case '0': // 2020
 			return &mag->quarters10[2];
-		case '9': // 2019
+		case '1': // 2021
 			return &mag->quarters10[3];
-		case '8': // 2018
+		case '0': // 2020
 			return &mag->quarters10[4];
-		case '7': // 2017
+		case '9': // 2019
 			return &mag->quarters10[5];
-		case '6': // 2016
+		case '8': // 2018
 			return &mag->quarters10[6];
-		case '5': // 2015
+		case '7': // 2017
 			return &mag->quarters10[7];
+		case '6': // 2016
+			return &mag->quarters10[8];
+		case '5': // 2015
+			return &mag->quarters10[9];
 	}
 	return NULL;
 }
@@ -829,6 +845,11 @@ static __inline__ int date2entry(struct mag *mag, char *target_date)
 	int start_entry, nr_days, x;
 
 	switch (*(target_date+3)) {
+		case '4': // 2024
+			if (*(target_date+2) != '2')
+				return 0.0;
+			start_entry = mag->year_2024;
+			break;
 		case '3': // 2023
 			if (*(target_date+2) != '2')
 				return 0.0;

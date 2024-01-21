@@ -738,6 +738,7 @@ void init_ufo(struct XLS *XLS)
 			} else if (board_table[y].btype == BULLCAPS         || (board_table[y].btype == BEARCAPS)) {
 				boards[y]->add(stock, boards[y]);
 			} else if (stock->type == STOCK_TYPE_CRYPTO         && (board_table[y].btype & BTYPE_CRYPTO)) {
+				printf("adding to crypto board: %s\n", stock->sym);
 				boards[y]->add(stock, boards[y]);
 			}
 		}

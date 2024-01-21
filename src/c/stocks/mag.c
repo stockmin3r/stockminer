@@ -79,17 +79,23 @@ void build_mag2(struct stock *stock, int nr_entries)
 	char         path[256];
 	double      *m;
 	int64_t      filesize;
-	int          msize;
+	int          msize, x = 0, nr_mag2;
 
-	msize = sizeof(struct mag2) * nr_entries;
-	mag2  = (struct mag2 *)zmalloc(msize);
-	if (msize > 1760 && msize != 1764 && stock->mag)
-		printf(BOLDRED "build_mag2 %s nr_entries: %d msize: %d" RESET "\n", stock->sym, stock->mag->nr_entries, (int)msize);
 	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/mag2/%s.csv", stock->sym);
-	map   = value = fs_mallocfile_str(path, &filesize);
+	map = value = fs_mallocfile_str(path, &filesize);
 	if (!map)
 		return;
+
+	nr_mag2 = cstring_line_count(map);
+	if (nr_mag2 != nr_entries) {
+		free(map);
+		return;
+	}
+
+	msize = sizeof(struct mag2) * nr_mag2;
+	mag2  = (struct mag2 *)zmalloc(msize);
 	m     = (double *)mag2;
+	printf("[%s] nr_mag2: %d nr_ent: %d\n", stock->sym, nr_mag2, nr_entries);
 	while ((p2=strchr(value, '\n'))) {
 		*p2++ = 0;
 		while ((p=strchr(value, ','))) {
@@ -100,7 +106,7 @@ void build_mag2(struct stock *stock, int nr_entries)
 		}
 		*(double *)m++ = strtod(p+1, NULL);
 		value = p2;
-		if (p2-map >= filesize)
+		if (p2-map >= (filesize-(sizeof(struct mag2))))
 			break;
 	}
 	snprintf(path, sizeof(path)-1, "data/stocks/stockdb/mag2/%s.m2", stock->sym);
@@ -320,6 +326,8 @@ void build_mag(char *ticker, struct XLS *XLS)
 	char path[256];
 	int nr_entries, nr_stocks, x;
 
+	XLS = load_stocks();
+
 	/* build mag2/mag3 */
 	stocks    = XLS->STOCKS_PTR;
 	nr_stocks = XLS->nr_stocks;
@@ -344,7 +352,7 @@ void stockdata_poll_thread(struct thread *thread)
 	char         *filename;
 	int           nr_mag2 = 0;
 
-	if (!fs_opendir(STOCKDB_MAG2_PATH, &dirmap))
+	if (!fs_opendir((char *)STOCKDB_MAG2_PATH, &dirmap))
 		return;
 
 	while ((filename=fs_readdir(&dirmap)) != NULL) {

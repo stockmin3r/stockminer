@@ -109,7 +109,9 @@ struct request rpc_requests[] = {
 	{ "fini",                rpc_session_finish,         1, 1, ARGS_TYPE_ARGV},
 	{ "login",               rpc_user_login,             2, 2, ARGS_TYPE_ARGV},
 	{ "register",            rpc_user_register,          2, 2, ARGS_TYPE_ARGV},
-	{ "checkpoint",          rpc_checkpoint,             1, 2, ARGS_TYPE_ARGV}
+	{ "checkpoint",          rpc_checkpoint,             1, 2, ARGS_TYPE_ARGV},
+	/* Tracker */
+	{ "tracker",             rpc_tracker,                2, 2, ARGS_TYPE_ARGV}
 };
 
 int NR_RPC_REQUESTS  = sizeof(rpc_requests)/sizeof(struct request);

@@ -23,6 +23,11 @@ int             market;
 int             do_resume;
 struct server   Server;
 
+void fs_log(char *msg)
+{
+	fs_appendfile_nl((char *)DB_LOG_PATH, msg, strlen(msg));
+}
+
 void init_main(struct server *server)
 {
 	init_paths();
